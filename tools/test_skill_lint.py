@@ -250,5 +250,63 @@ class DangerousContentTest(unittest.TestCase):
             self.assertEqual(skill_lint.check_dangerous_content(p), [])
 
 
+class CrossManifestTest(unittest.TestCase):
+    def _setup(self, tmp: Path, skill_perms: dict, plugin_perms, gemini_perms):
+        skills_dir = tmp / "skills" / "myskill"
+        skills_dir.mkdir(parents=True)
+        skill_md = skills_dir / "SKILL.md"
+        import yaml as _yaml
+        fm = {
+            "name": "myskill",
+            "description": "y" * 60,
+            "license": "MIT",
+            "version": "1",
+            "permissions": skill_perms,
+        }
+        skill_md.write_text("---\n" + _yaml.safe_dump(fm) + "---\nbody\n")
+        claude_dir = tmp / ".claude-plugin"
+        claude_dir.mkdir()
+        plugin_json = claude_dir / "plugin.json"
+        import json as _json
+        plugin_json.write_text(_json.dumps({
+            "name": "myskill", "description": "ok",
+            "permissions": plugin_perms,
+        }))
+        gemini_json = tmp / "gemini-extension.json"
+        gemini_json.write_text(_json.dumps({
+            "name": "myskill", "description": "ok",
+            "permissions": gemini_perms,
+        }))
+        return [skill_md, plugin_json, gemini_json]
+
+    def test_all_three_match(self):
+        import tempfile
+        with tempfile.TemporaryDirectory() as tmp:
+            perms = {"mcp": ["pencil:x"], "shell": "none",
+                     "filesystem": "project-only", "network": "none"}
+            paths = self._setup(Path(tmp), perms, perms, perms)
+            self.assertEqual(skill_lint.check_cross_manifest_consistency(paths), [])
+
+    def test_plugin_missing_permissions(self):
+        import tempfile
+        with tempfile.TemporaryDirectory() as tmp:
+            perms = {"mcp": [], "shell": "none",
+                     "filesystem": "project-only", "network": "none"}
+            paths = self._setup(Path(tmp), perms, None, perms)
+            findings = skill_lint.check_cross_manifest_consistency(paths)
+            self.assertTrue(any(f.code in ("AST04", "AST10") for f in findings))
+
+    def test_divergent_permissions_flagged(self):
+        import tempfile
+        with tempfile.TemporaryDirectory() as tmp:
+            perms_a = {"mcp": ["pencil:x"], "shell": "none",
+                       "filesystem": "project-only", "network": "none"}
+            perms_b = {"mcp": ["pencil:y"], "shell": "none",
+                       "filesystem": "project-only", "network": "none"}
+            paths = self._setup(Path(tmp), perms_a, perms_b, perms_a)
+            findings = skill_lint.check_cross_manifest_consistency(paths)
+            self.assertTrue(any(f.code == "AST10" for f in findings))
+
+
 if __name__ == "__main__":
     unittest.main()
