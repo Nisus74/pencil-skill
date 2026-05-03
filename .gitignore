@@ -1,0 +1,22 @@
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Claude Code local state
+.claude/settings.local.json
+.claude/todos/
+.claude/session-env/
+
+# Editor artifacts
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Local scratch / private notes
+scratch/
+NOTES.md
+TODO.md
+.private/
