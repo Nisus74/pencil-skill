@@ -5,6 +5,9 @@ A platform-agnostic AI coding skill plugin that teaches AI coding tools how to w
 
 Works with Claude Code, OpenAI Codex, Google Gemini CLI, GitHub Copilot CLI, and Cursor.
 
+[Star the repo](https://github.com/Nisus74/pencil-skill) if it helps you, or
+[buy me a coffee or lunch](https://www.buymeacoffee.com/Nisus74) to support ongoing maintenance.
+
 ---
 
 ## What This Skill Does
@@ -133,6 +136,17 @@ Contributions are welcome — bug reports, workflow improvements, and new trigge
 Please read [docs/CONTRIBUTING.md](./docs/CONTRIBUTING.md) before opening a PR.
 
 Security issues: see [docs/SECURITY.md](./docs/SECURITY.md).
+
+---
+
+## Support
+
+I maintain this project outside of paid work. If it saves you time or helps you
+build something useful, you are welcome to buy me a coffee or lunch.
+
+[![Buy Me A Coffee](https://www.buymeacoffee.com/assets/img/custom_images/orange_img.png)](https://www.buymeacoffee.com/Nisus74)
+
+No pressure. Stars, issues, feedback, and pull requests also help a lot.
 
 ---
 
