@@ -40,7 +40,8 @@ Describe the specific scenario where the skill falls short and what you'd want i
 2. **Edit** `skills/pencil-design/SKILL.md` (or the relevant reference file).
 
 3. **Test** your change with at least 3 different prompts that should trigger the skill:
-   - Install the plugin locally in Claude Code: `/plugin install .` (from the repo root)
+   - Install the plugin locally on the AI coding tool of your choice
+     (Claude Code: `/plugin install .` from the repo root)
    - Try your trigger phrases and verify the skill activates and behaves correctly
    - Test at least one edge case
 
@@ -72,9 +73,8 @@ The skill lives in `skills/pencil-design/SKILL.md`. When editing it:
 - Document tool sequencing where it matters (e.g., call `get_editor_state` before
   `batch_design`).
 
-If you use Claude Code, the `superpowers:writing-skills` skill (from the
-[superpowers plugin](https://github.com/superpowers)) provides useful guidance for
-authoring high-quality SKILL.md content. It is entirely optional and not a dependency
+If you use Claude Code, the `superpowers:writing-skills` skill provides useful guidance
+for authoring high-quality SKILL.md content. It is entirely optional and not a dependency
 of this project.
 
 ---
@@ -83,8 +83,8 @@ of this project.
 
 After any meaningful change, bump the version in:
 - `.claude-plugin/plugin.json`
-- `.cursor-plugin/plugin.json` (keep in sync)
 - `skills/pencil-design/SKILL.md` frontmatter
+- Add an entry to `docs/CHANGELOG.md`
 
 Follow [Semantic Versioning](https://semver.org/):
 

@@ -1,0 +1,20 @@
+# Auto-detect text files and normalize to LF on commit
+* text=auto eol=lf
+
+# Explicit text files
+*.md       text eol=lf
+*.json     text eol=lf
+*.yml      text eol=lf
+*.yaml     text eol=lf
+*.toml     text eol=lf
+*.sh       text eol=lf
+LICENSE    text eol=lf
+
+# Binary files (don't try to diff or merge)
+*.png      binary
+*.jpg      binary
+*.jpeg     binary
+*.gif      binary
+*.ico      binary
+*.pdf      binary
+*.pen      binary

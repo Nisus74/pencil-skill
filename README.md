@@ -1,31 +1,34 @@
 # pencil-dev-skill
 
-A standalone AI coding skill plugin that teaches Claude Code, Cursor, OpenAI Codex,
-and Google Gemini CLI how to work with [pencil.dev](https://pencil.dev) design files
-(`.pen` format) via the Pencil MCP server.
+A platform-agnostic AI coding skill plugin that teaches AI coding tools how to work with
+[pencil.dev](https://pencil.dev) design files (`.pen` format) via the Pencil MCP server.
+
+Works with Claude Code, OpenAI Codex, Google Gemini CLI, GitHub Copilot CLI, and Cursor.
 
 ---
 
 ## What This Skill Does
 
-- Guides the AI through reading and interpreting `.pen` design files safely (they are encrypted — file tools cannot open them)
+- Guides the AI through reading and interpreting `.pen` design files safely
+  (`.pen` files are encrypted — file tools cannot open them directly)
 - Documents the Pencil MCP server tools and when to use each one
 - Provides workflow patterns for generating and editing UI designs in pencil.dev
-- Includes platform-specific tool-name mappings for Codex, Gemini CLI, and Copilot CLI
+- Includes per-platform tool-name mappings so the same skill works everywhere
 
 > **Status:** `v0.1.0` — placeholder skill. Full workflow content is being written.
-> Follow [the repo](https://github.com/Nisus74/pencil-skill) to be notified when v1.0 ships.
+> Watch [the repo](https://github.com/Nisus74/pencil-skill) to be notified when v1.0 ships.
 
 ---
 
 ## Prerequisites
 
-1. An AI coding tool installed:
+1. An AI coding tool — any of:
    - [Claude Code](https://claude.ai/code)
+   - [OpenAI Codex CLI](https://openai.com/codex)
+   - [Google Gemini CLI](https://github.com/google-gemini/gemini-cli)
+   - [GitHub Copilot CLI](https://github.com/github/gh-copilot)
    - [Cursor](https://cursor.com)
-   - OpenAI Codex CLI
-   - Google Gemini CLI
-2. Pencil MCP server configured in your environment
+2. Pencil MCP server configured in that tool
 3. A pencil.dev project with `.pen` files
 
 ---
@@ -38,21 +41,7 @@ and Google Gemini CLI how to work with [pencil.dev](https://pencil.dev) design f
 /plugin install github:Nisus74/pencil-skill
 ```
 
-Or add to your project's `.claude/settings.json`:
-
-```json
-{
-  "plugins": [
-    { "source": "github", "repo": "Nisus74/pencil-skill" }
-  ]
-}
-```
-
-### Cursor
-
-Same as Claude Code — Cursor reads `.cursor-plugin/plugin.json` from the installed plugin.
-
-### Gemini CLI
+### Google Gemini CLI
 
 Add to your Gemini configuration:
 
@@ -64,9 +53,17 @@ Add to your Gemini configuration:
 }
 ```
 
-### OpenAI Codex
+### OpenAI Codex / GitHub Copilot CLI
 
-Codex natively discovers skills from the `skills/` directory — no extra installation step needed once the plugin is available in your environment.
+Both auto-discover skills from a `skills/` directory. Clone or symlink this repo
+into your tool's skills path (consult your tool's docs for the exact location).
+
+### Cursor
+
+Cursor uses the Pencil MCP server natively — no plugin install needed. Once the
+Pencil MCP server is configured in Cursor, the skill content in this repo can be
+referenced as project context (Cursor reads `AGENTS.md` automatically when opened
+as a workspace).
 
 ---
 
@@ -91,11 +88,30 @@ Example trigger phrases:
 
 ---
 
+## Repository Layout
+
+The substance of this project is platform-agnostic. Platform-specific files exist
+only as install adapters:
+
+```
+skills/pencil-design/        # Platform-agnostic skill content (the real work)
+AGENTS.md                    # Canonical project context (cross-platform)
+
+.claude-plugin/plugin.json   # Required by Claude Code's installer
+gemini-extension.json        # Required by Gemini CLI's installer
+```
+
+See [AGENTS.md](./AGENTS.md) for the full developer guide.
+
+---
+
 ## Contributing
 
 Contributions are welcome — bug reports, workflow improvements, and new trigger phrases all help.
 
-Please read [CONTRIBUTING.md](./docs/CONTRIBUTING.md) before opening a PR.
+Please read [docs/CONTRIBUTING.md](./docs/CONTRIBUTING.md) before opening a PR.
+
+Security issues: see [docs/SECURITY.md](./docs/SECURITY.md).
 
 ---
 

@@ -1,39 +1,105 @@
-# pencil-dev-skill — Developer Guide
+# pencil-dev-skill — Project Context
+
+This is the canonical project-context file. All AI coding tools (Claude Code, OpenAI Codex,
+Google Gemini CLI, GitHub Copilot CLI, Cursor, etc.) should read this file for project
+context. Platform-specific files (`CLAUDE.md`) are thin pointers to this file.
+
+---
 
 ## Project Purpose
 
-This repository is a standalone AI coding skill plugin that teaches Claude Code (and other
-AI coding tools) how to work with [pencil.dev](https://pencil.dev) design files (`.pen` format)
+This repository is a standalone, **platform-agnostic** AI coding skill plugin that teaches
+AI coding tools how to work with [pencil.dev](https://pencil.dev) design files (`.pen` format)
 via the Pencil MCP server.
 
-**Plugin type:** Skill-only plugin (no slash commands, no agents, no hooks)
-**Skill name:** `pencil-design`
-**Skill trigger domain:** pencil.dev design tasks, `.pen` file manipulation, Pencil MCP usage
-**Supported platforms:** Claude Code, Cursor, OpenAI Codex, Google Gemini CLI, GitHub Copilot CLI
+**Core artifact:** `skills/pencil-design/SKILL.md` — the platform-agnostic skill content.
+**Platform adapters:** `.claude-plugin/plugin.json` and `gemini-extension.json` are the
+minimum files required by each platform's installer; they exist only so users on those
+platforms can run a one-line install command. They are not the substance of the project.
+
+---
+
+## Naming Conventions
+
+Three names appear in this project — each scoped to a different layer:
+
+| Name | Scope | Where it appears |
+|------|-------|-----------------|
+| `pencil-skill` | GitHub repo name | Repo URL, clone URL |
+| `pencil-dev-skill` | Plugin package name | `plugin.json`, marketplace listings |
+| `pencil-design` | Skill name | `SKILL.md` frontmatter, skill activation triggers |
+
+This is intentional: the repo is the deliverable, the plugin is the package, and the
+skill is the capability the AI invokes.
 
 ---
 
 ## Repository Structure
 
 ```
+skills/pencil-design/              # The platform-agnostic core
+  SKILL.md                         # The skill — YAML frontmatter + instructions
+  references/                      # Per-platform tool-name mappings
+    codex-tools.md
+    gemini-tools.md
+    copilot-tools.md
+
+# Platform install adapters (required by each platform's installer)
 .claude-plugin/plugin.json         # Claude Code plugin manifest
-.cursor-plugin/plugin.json         # Cursor plugin manifest (identical to Claude Code)
 gemini-extension.json              # Gemini CLI extension manifest
-skills/pencil-design/SKILL.md      # The skill — YAML frontmatter + instructions
-skills/pencil-design/references/   # Platform tool-name mappings
-AGENTS.md                          # This file (symlinked for Codex compatibility)
-CLAUDE.md                          # This file
-GEMINI.md                          # Minimal Gemini wrapper
+
+# Project context files
+AGENTS.md                          # This file — canonical, platform-agnostic
+CLAUDE.md                          # Thin pointer to AGENTS.md (for Claude Code)
+
+# Public-facing
+README.md
+LICENSE
+
+# Repo hygiene
+.gitignore                         # Includes secret patterns
+.gitattributes                     # Cross-platform line-ending normalization
+.gitleaks.toml                     # Secret-scanning config
+
+# Documentation
+docs/
+  CONTRIBUTING.md
+  CODE_OF_CONDUCT.md
+  SECURITY.md
+  CHANGELOG.md
+
+# GitHub repo configuration
+.github/
+  PULL_REQUEST_TEMPLATE.md
+  ISSUE_TEMPLATE/
+    bug_report.md
+    feature_request.md
+    config.yml
+  workflows/
+    secret-scan.yml                # gitleaks runs on push + PR
 ```
+
+---
+
+## Platform Support
+
+| Platform | How it consumes the skill |
+|----------|--------------------------|
+| OpenAI Codex | Reads `AGENTS.md`; auto-discovers `skills/` |
+| GitHub Copilot CLI | Reads `AGENTS.md`; auto-discovers `skills/` |
+| Cursor | Reads `AGENTS.md`; uses Pencil MCP server natively |
+| Claude Code | Reads `CLAUDE.md` (which points here); installs via `.claude-plugin/plugin.json` |
+| Google Gemini CLI | Loads `AGENTS.md` via `gemini-extension.json` |
 
 ---
 
 ## Plugin System Rules
 
-- `plugin.json` must live at `.claude-plugin/plugin.json` and `.cursor-plugin/plugin.json`
-- `skills/` must be at the repo root (not inside `.claude-plugin/`)
-- Each skill is a subdirectory under `skills/` with a `SKILL.md` file
-- The YAML frontmatter `description` field controls when the skill activates — edit it carefully
+- `plugin.json` MUST live at `.claude-plugin/plugin.json` (Claude Code requirement)
+- `gemini-extension.json` MUST live at the repo root (Gemini CLI requirement)
+- `skills/` MUST be at the repo root
+- Each skill is a subdirectory under `skills/` containing one `SKILL.md`
+- The YAML frontmatter `description` field controls when the skill activates — edit carefully
 - Skills may have a `references/` subdirectory for supplementary docs loaded on demand
 
 ---
@@ -71,9 +137,20 @@ When writing or editing `skills/pencil-design/SKILL.md`:
 3. Use progressive disclosure: core workflow in `SKILL.md`, edge cases in `references/`
 4. Never instruct AI to use `Read`/`Grep` on `.pen` files — always use MCP tools
 5. Document tool sequencing (e.g., call `get_editor_state` before `batch_design`)
+6. Keep instructions **platform-agnostic**. Use generic verbs ("read", "write", "search")
+   rather than tool names where possible. When tool names are necessary, default to the
+   Claude Code names and rely on `references/<platform>-tools.md` for mappings.
 
-If you use Claude Code, the `superpowers:writing-skills` skill provides useful guidance
-for authoring high-quality SKILL.md content — but it is not a dependency of this project.
+---
+
+## CI / Hooks
+
+| Hook | Trigger | Purpose |
+|------|---------|---------|
+| `.github/workflows/secret-scan.yml` | push, PR | Runs gitleaks; blocks merge if secrets are detected |
+
+The repo has no AI-runtime hooks — these are GitHub Actions hooks that run in CI,
+not inside any AI session.
 
 ---
 
@@ -85,7 +162,7 @@ Follow semantic versioning in `.claude-plugin/plugin.json` (and mirror in `SKILL
 - **MINOR** (`0.x.0`): New capability documented, new trigger phrases added
 - **MAJOR** (`x.0.0`): Breaking restructuring of the skill workflow
 
-Keep `.cursor-plugin/plugin.json` in sync — it should always match `.claude-plugin/plugin.json`.
+After bumping, add an entry to `docs/CHANGELOG.md`.
 
 ---
 
@@ -95,17 +172,16 @@ Keep `.cursor-plugin/plugin.json` in sync — it should always match `.claude-pl
 ```bash
 # From repo root
 /plugin install .
-# Then ask: "help me design a login screen in pencil"
-# Verify the pencil-design skill triggers
+# Then describe a pencil task; verify pencil-design skill triggers
 ```
 
 **Gemini CLI:**
 ```bash
-# Ensure gemini-extension.json is present
-# Then: activate_skill pencil-design
+# Install the extension; AGENTS.md loads automatically as project context
+# Describe a pencil task; the skill activates via the description trigger
 ```
 
-**Codex:**
+**Codex / Copilot CLI:**
 ```bash
 # Skills are auto-discovered from skills/ — no install step needed
 ```
