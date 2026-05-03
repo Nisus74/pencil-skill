@@ -1,9 +1,28 @@
 ---
 name: pencil-design
-description: Use when the user asks to "design in pencil", "create a pencil.dev design", "open a .pen file", "work with pencil MCP", "generate UI in pencil", "edit a pencil design", "sketch a screen in pencil", "update a pencil component", or any task involving pencil.dev's design tool, the .pen file format, or the Pencil MCP server tools. Also use when the user asks you to read, inspect, or modify any file with a .pen extension.
-version: 0.1.0
+description: Use this skill for any pencil.dev work — designing UI in a .pen file, editing an open Pencil canvas, sketching or mocking screens, instantiating components from a .lib.pen library, scaffolding a project's design-system/ folder, fixing batch_design schema errors, or recovering from Pencil MCP host-not-connected issues. Pick it on any mention of pencil.dev, .pen, .lib.pen, "the Pencil MCP", "the Pencil canvas", or a design-system/ folder in a Pencil context — even when the user phrases it casually, mid-sentence, or doesn't name the tool. This is the canonical skill for all Pencil tasks; reach for it before any general design or frontend skill when Pencil signals are present.
 license: MIT
 compatibility: Any AI coding tool with the Pencil MCP server configured (Claude Code, Codex, Gemini CLI, Copilot CLI, Cursor)
+metadata:
+  version: "1.1.0"
+permissions:
+  mcp:
+    - pencil:get_editor_state
+    - pencil:open_document
+    - pencil:get_guidelines
+    - pencil:batch_get
+    - pencil:batch_design
+    - pencil:snapshot_layout
+    - pencil:get_screenshot
+    - pencil:get_variables
+    - pencil:set_variables
+    - pencil:find_empty_space_on_canvas
+    - pencil:search_all_unique_properties
+    - pencil:replace_all_matching_properties
+    - pencil:export_nodes
+  shell: none
+  filesystem: project-only  # reads ./design-system/ and writes scaffolded templates from skill assets
+  network: none
 ---
 
 # Pencil.dev Design Skill
