@@ -19,7 +19,7 @@
       "id": 2,
       "name": "import-library-and-use",
       "prompt": "I have a design library at design/system.lib.pen with Button and Input components. Add a sign-up form to my open .pen file using those components. Explain the tools you'd call and why.",
-      "expected_output": "Agent verifies the document's imports field, adds an imports entry via U op on document root if missing, queries the library's reusable components, instantiates Button and Input via ref nodes (not from primitives), uses descendants for instance-level overrides, screenshots to verify the refs resolve correctly.",
+      "expected_output": "Agent verifies the document's imports field, adds an imports entry via U op on document root if missing, queries the library's reusable components, instantiates Button and Input via ref nodes (not from primitives), uses descendants for instance-level overrides. Verifies via the verification ladder: snapshot_layout or batch_get on the instantiated refs first to confirm structure and bindings, then a single get_screenshot scoped to the form/card subtree (via nodeId) — never the page frame — only as final sign-off.",
       "files": []
     }
   ]
