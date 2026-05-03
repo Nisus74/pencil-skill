@@ -85,3 +85,8 @@ NOTES.md
 TODO.md
 .private/
 .notes/
+
+# =============================================================================
+# Git worktrees (isolated workspaces for parallel feature work)
+# =============================================================================
+.worktrees/
