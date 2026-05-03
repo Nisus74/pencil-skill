@@ -1,0 +1,13 @@
+[extend]
+# Use the default gitleaks ruleset as the base
+useDefault = true
+
+[allowlist]
+description = "Repo-level allowlist"
+paths = [
+  # Test fixtures and example files (none yet, add here if needed)
+]
+regexes = [
+  # Placeholder — add repo-specific false-positive patterns here if gitleaks
+  # flags something that is intentionally in the repo (e.g. a public key in docs)
+]
