@@ -38,3 +38,30 @@ Because this repository contains only documentation and skill instructions
 - **Secrets accidentally committed** to the repo (gitleaks runs on every PR)
 
 If you believe any of the above has occurred, please report it via the channels above.
+
+---
+
+## OWASP Agentic Skills Top 10 — Compliance Map
+
+This repo's controls against the [OWASP Agentic Skills Top 10](https://owasp.org/www-project-agentic-skills-top-10/).
+
+| Code | Risk | Control in this repo |
+|------|------|----------------------|
+| AST01 | Malicious skills | `tools/skill-lint.py` scans `SKILL.md` for shell-eval, exfiltration, and writes to identity/secret paths. Runs in pre-commit and CI. |
+| AST02 | Supply chain compromise | All GitHub Actions pinned to 40-char SHAs with version comments. `CODEOWNERS` requires maintainer review on every PR. Branch protection (manual repo setting) requires green Skill Lint and Secret Scan checks. |
+| AST03 | Over-privileged skills | `SKILL.md` frontmatter declares a `permissions:` block (`shell: none`, `network: none`, `filesystem: project-only`, explicit MCP allowlist). Lint enforces a default-deny baseline; deviations require a non-empty `allowlist-justification`. |
+| AST04 | Insecure metadata | Lint enforces required frontmatter fields, name-matches-directory, and substantive descriptions. Both platform manifests carry the same `description` and a mirrored `permissions` block; lint enforces consistency. |
+| AST05 | Unsafe deserialization | Frontmatter parsed via `yaml.safe_load`; lint rejects Python tags and non-mapping frontmatter. Manifests parsed via stdlib `json`. |
+| AST06 | Weak isolation | **N/A.** This repo ships documentation only; there is no runtime under our control. Isolation is the responsibility of the AI host. |
+| AST07 | Update drift | Same SHA-pin rule as AST02. Dependabot opens grouped weekly bumps (`github-actions`, `pip`) so pins stay current with reviewable diffs. |
+| AST08 | Poor scanning | The lint + pre-commit + CI is the scanning layer. PR template requires the contributor to confirm a green run. |
+| AST09 | No governance | `CODEOWNERS`, `SECURITY.md` (this file), `CHANGELOG.md`, semver, PR template gate, and branch protection (manual). |
+| AST10 | Cross-platform reuse | Lint runs against all three faces — `SKILL.md` frontmatter, `.claude-plugin/plugin.json`, and `gemini-extension.json` — so a divergent compromise on one platform is caught. |
+
+## Reporting a malicious skill update
+
+If you believe a published version of `pencil-dev-skill` is compromised
+(unexpected manifest changes, new permissions, dangerous instructions in
+`SKILL.md`), report it via the channels above and **uninstall the plugin
+locally** until the issue is acknowledged. Include the plugin version
+and a diff against the previous known-good version if possible.

@@ -79,6 +79,45 @@ of this project.
 
 ---
 
+## Security Checks (OWASP AST)
+
+Before opening a PR, install the pre-commit hook so the OWASP Agentic Skills
+Top 10 checks run on every commit:
+
+```bash
+pip install pre-commit
+pre-commit install
+pre-commit run --all-files
+```
+
+The `tools/skill-lint.py` script enforces:
+
+- `SKILL.md` frontmatter loads safely under `yaml.safe_load` and contains the
+  required fields (`name`, `description`, `license`, `version`/`metadata.version`)
+- `name` matches the skill's directory
+- A `permissions:` block exists with `shell: none`, `network: none`,
+  `filesystem: none|project-only`, and an explicit `mcp` allowlist
+- Both platform manifests (`plugin.json`, `gemini-extension.json`) carry a
+  `permissions` field equal to the SKILL.md block
+- No dangerous patterns in skill bodies (`curl | bash`, writes to
+  `MEMORY.md` / `SOUL.md` / `AGENTS.md` / `CLAUDE.md` / `.env` / `~/.ssh`)
+- Every `uses:` in `.github/workflows/*.yml` is pinned to a 40-char SHA
+
+If you have a legitimate reason to deviate, suppress the finding with a
+non-empty justification:
+
+- For `permissions:`, add an `allowlist-justification: "<reason>"` sibling
+  key in the same mapping.
+- For workflow `uses:` lines, append `# skill-lint: AST07 allow — <reason>`.
+- For dangerous patterns inside an illustrative fenced code block, mark the
+  opening fence: ` ```bash skill-lint:AST01 allow — <reason>`.
+
+Empty justifications are themselves errors.
+
+The full mapping of AST risks to controls lives in [SECURITY.md](./SECURITY.md).
+
+---
+
 ## Versioning
 
 After any meaningful change, bump the version in:
