@@ -229,9 +229,16 @@ When to import a library on the user's behalf: only when `design-system/design-s
 
 See `references/batch-design-grammar.md` for the complete grammar including delete and move ops, ordering rules, and common error fixes.
 
-## Verification: get_screenshot loop
+## Verification ladder
 
-`get_screenshot()` returns a rendered image of the current canvas (or a selected node). Use it as your eyes. Things to scan for, in order:
+Verification answers one of two questions: *did the change land?* (structural) or *does it look right?* (visual). Use the cheapest tool that answers the actual question. The ladder, in order:
+
+1. **`batch_design` response** — confirms ops succeeded. Free.
+2. **`snapshot_layout(parentId, maxDepth: 2)`** — confirms structural intent (positions, sizes, gaps, child order). Returns numbers; cheap.
+3. **`batch_get({ nodeIds: [...] })`** — confirms property-level intent (variable bindings, text, refs). Returns JSON; cheap.
+4. **`get_screenshot(nodeId)`** — confirms visual intent. Returns an image; **expensive**. Always pass the most specific `nodeId` that contains the change — never the page frame when a card subtree would do. Reserve for: WCAG contrast under real rendering, image content (AI-generated assets, photos), spacing/type rhythm at scale, final sign-off.
+
+When you've decided rung 4 is needed, scan the rendered image in this order:
 
 1. **Layout integrity** — does the page hold together at the intended viewport? Any element off-canvas, wildly oversized, or visibly missing?
 2. **Spacing rhythm** — gaps between sections should match `tokens.md`. If they don't, the auto-layout `gap` is wrong, not the surrounding margin.
