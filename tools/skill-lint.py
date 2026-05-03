@@ -195,6 +195,74 @@ def check_permissions_block(path: Path) -> list[Finding]:
     return findings
 
 
+_DANGEROUS_PATTERNS: tuple[tuple[str, re.Pattern[str]], ...] = (
+    ("eval-shell", re.compile(r"\beval\s+[\"$`]")),
+    ("curl-pipe-shell", re.compile(r"curl[^\n]*\|\s*(sh|bash|zsh)\b")),
+    ("wget-pipe-shell", re.compile(r"wget[^\n]*\|\s*(sh|bash|zsh)\b")),
+    ("base64-pipe-shell", re.compile(r"base64\s+-d[^\n]*\|\s*(sh|bash|zsh)\b")),
+    ("write-MEMORY.md", re.compile(r"\bMEMORY\.md\b")),
+    ("write-SOUL.md", re.compile(r"\bSOUL\.md\b")),
+    ("write-AGENTS.md", re.compile(r"\bAGENTS\.md\b")),
+    ("write-CLAUDE.md", re.compile(r"\bCLAUDE\.md\b")),
+    ("dotenv-path", re.compile(r"(^|[\s/])\.env(\b|$)")),
+    ("ssh-keys", re.compile(r"~/\.ssh\b")),
+)
+
+_FENCE_OPEN_RE = re.compile(r"^```([^\n]*)$")
+
+
+def _split_fenced_blocks(body: str) -> list[tuple[str, str]]:
+    """Yield (kind, text) where kind in {'prose', 'fence', 'fence-allowed'}.
+
+    A fenced block is 'fence-allowed' iff its info string contains
+    'skill-lint:AST01 allow' followed by a non-empty reason after dash/em-dash.
+    """
+    out: list[tuple[str, str]] = []
+    lines = body.splitlines(keepends=True)
+    i = 0
+    buf: list[str] = []
+    while i < len(lines):
+        m = _FENCE_OPEN_RE.match(lines[i].rstrip("\n"))
+        if m:
+            if buf:
+                out.append(("prose", "".join(buf)))
+                buf = []
+            info = m.group(1)
+            allowed = bool(re.search(r"skill-lint:AST01 allow\s*[—-]\s*\S", info))
+            i += 1
+            block: list[str] = []
+            while i < len(lines) and not lines[i].rstrip("\n").startswith("```"):
+                block.append(lines[i])
+                i += 1
+            i += 1  # skip closing fence
+            out.append(("fence-allowed" if allowed else "fence", "".join(block)))
+        else:
+            buf.append(lines[i])
+            i += 1
+    if buf:
+        out.append(("prose", "".join(buf)))
+    return out
+
+
+def check_dangerous_content(path: Path) -> list[Finding]:
+    text = path.read_text(encoding="utf-8")
+    body = _FRONTMATTER_RE.sub("", text, count=1)
+    findings: list[Finding] = []
+    for kind, chunk in _split_fenced_blocks(body):
+        if kind == "fence-allowed":
+            continue
+        for label, pat in _DANGEROUS_PATTERNS:
+            if pat.search(chunk):
+                findings.append(Finding(
+                    code="AST01",
+                    severity=SEVERITY_ERROR,
+                    location=str(path),
+                    message=f"dangerous pattern '{label}' found in skill body",
+                ))
+                break  # one finding per chunk per scan is enough
+    return findings
+
+
 def lint_paths(paths: list[Path]) -> list[Finding]:
     """Return findings for the given paths. Empty list = clean."""
     findings: list[Finding] = []
