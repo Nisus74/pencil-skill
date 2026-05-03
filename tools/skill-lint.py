@@ -71,6 +71,77 @@ def check_frontmatter_loads_safely(path: Path) -> list[Finding]:
     return []
 
 
+_REQUIRED_FIELDS = ("name", "description", "license")
+_MIN_DESCRIPTION_CHARS = 50
+
+
+def _load_frontmatter(path: Path) -> dict | None:
+    raw, err = _read_frontmatter(path)
+    if err or raw is None:
+        return None
+    try:
+        data = yaml.safe_load(raw)
+    except yaml.YAMLError:
+        return None
+    return data if isinstance(data, dict) else None
+
+
+def check_frontmatter_required_fields(path: Path) -> list[Finding]:
+    data = _load_frontmatter(path)
+    if data is None:
+        return []  # AST05 already reported it
+    findings: list[Finding] = []
+    for field in _REQUIRED_FIELDS:
+        if not data.get(field):
+            findings.append(Finding(
+                code="AST04",
+                severity=SEVERITY_ERROR,
+                location=str(path),
+                message=f"missing required frontmatter field: {field}",
+            ))
+    has_top_version = bool(data.get("version"))
+    has_meta_version = bool((data.get("metadata") or {}).get("version"))
+    if not (has_top_version or has_meta_version):
+        findings.append(Finding(
+            code="AST04",
+            severity=SEVERITY_ERROR,
+            location=str(path),
+            message="missing version: declare 'version' or 'metadata.version'",
+        ))
+    return findings
+
+
+def check_name_matches_directory(path: Path) -> list[Finding]:
+    data = _load_frontmatter(path)
+    if data is None:
+        return []
+    name = data.get("name")
+    expected = path.parent.name
+    if name and name != expected:
+        return [Finding(
+            code="AST04",
+            severity=SEVERITY_ERROR,
+            location=str(path),
+            message=f"frontmatter name '{name}' does not match directory '{expected}'",
+        )]
+    return []
+
+
+def check_description_substantive(path: Path) -> list[Finding]:
+    data = _load_frontmatter(path)
+    if data is None:
+        return []
+    desc = (data.get("description") or "").strip()
+    if 0 < len(desc) < _MIN_DESCRIPTION_CHARS:
+        return [Finding(
+            code="AST04",
+            severity=SEVERITY_WARN,
+            location=str(path),
+            message=f"description is {len(desc)} chars (recommend ≥ {_MIN_DESCRIPTION_CHARS})",
+        )]
+    return []
+
+
 def lint_paths(paths: list[Path]) -> list[Finding]:
     """Return findings for the given paths. Empty list = clean."""
     findings: list[Finding] = []
