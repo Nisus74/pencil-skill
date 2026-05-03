@@ -7,6 +7,7 @@ Warning-severity findings are printed but do not fail the run.
 """
 from __future__ import annotations
 
+import json
 import re
 import sys
 from dataclasses import dataclass
@@ -260,6 +261,78 @@ def check_dangerous_content(path: Path) -> list[Finding]:
                     message=f"dangerous pattern '{label}' found in skill body",
                 ))
                 break  # one finding per chunk per scan is enough
+    return findings
+
+
+def _load_json(path: Path) -> dict | None:
+    try:
+        return json.loads(path.read_text(encoding="utf-8"))
+    except (json.JSONDecodeError, FileNotFoundError):
+        return None
+
+
+def check_cross_manifest_consistency(paths: list[Path]) -> list[Finding]:
+    """Compare SKILL.md ↔ plugin.json ↔ gemini-extension.json.
+
+    Operates on whatever subset of the three is present in `paths`.
+    """
+    skill_paths = [p for p in paths if p.name == "SKILL.md"]
+    plugin_path = next((p for p in paths if p.name == "plugin.json"), None)
+    gemini_path = next((p for p in paths if p.name == "gemini-extension.json"), None)
+    if not (skill_paths and plugin_path and gemini_path):
+        return []
+
+    findings: list[Finding] = []
+    plugin = _load_json(plugin_path) or {}
+    gemini = _load_json(gemini_path) or {}
+
+    for field in ("name", "description"):
+        if not plugin.get(field):
+            findings.append(Finding(
+                code="AST04", severity=SEVERITY_ERROR,
+                location=str(plugin_path),
+                message=f"plugin.json missing or empty '{field}'",
+            ))
+        if not gemini.get(field):
+            findings.append(Finding(
+                code="AST04", severity=SEVERITY_ERROR,
+                location=str(gemini_path),
+                message=f"gemini-extension.json missing or empty '{field}'",
+            ))
+
+    skill_dirnames = {p.parent.name for p in skill_paths}
+    if plugin.get("name") and plugin["name"] not in skill_dirnames:
+        findings.append(Finding(
+            code="AST04", severity=SEVERITY_WARN,
+            location=str(plugin_path),
+            message=(
+                f"plugin.json name '{plugin['name']}' is not a skill directory name "
+                f"({sorted(skill_dirnames)})"
+            ),
+        ))
+
+    for skill_md in skill_paths:
+        skill_data = _load_frontmatter(skill_md) or {}
+        skill_perms = skill_data.get("permissions")
+        if skill_perms is None:
+            continue
+        for manifest_path, manifest in (
+            (plugin_path, plugin), (gemini_path, gemini),
+        ):
+            manifest_perms = manifest.get("permissions")
+            if manifest_perms is None:
+                findings.append(Finding(
+                    code="AST10", severity=SEVERITY_ERROR,
+                    location=str(manifest_path),
+                    message="manifest is missing 'permissions' field declared in SKILL.md",
+                ))
+                continue
+            if manifest_perms != skill_perms:
+                findings.append(Finding(
+                    code="AST10", severity=SEVERITY_ERROR,
+                    location=str(manifest_path),
+                    message="permissions diverge from SKILL.md frontmatter",
+                ))
     return findings
 
 
