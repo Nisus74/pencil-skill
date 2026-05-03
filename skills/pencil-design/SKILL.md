@@ -4,7 +4,7 @@ description: Use this skill for any pencil.dev work — designing UI in a .pen f
 license: MIT
 compatibility: Any AI coding tool with the Pencil MCP server configured (Claude Code, Codex, Gemini CLI, Copilot CLI, Cursor)
 metadata:
-  version: "1.1.0"
+  version: "1.2.0"
 permissions:
   mcp:
     - pencil:get_editor_state
@@ -164,6 +164,8 @@ The default workflow assumes a fresh, end-to-end design. Most tasks aren't that.
 - **No `design-system/` folder + the task is real project work** (not a one-off doodle). Pause once at step 2 and offer to scaffold (see Failure modes §3). If declined, proceed without; do not ask twice in the same session.
 - **"Quick sketch" / "throwaway" / "just mock something up".** Skip steps 3 and the design-system check entirely. Go straight from step 2 → step 5. Verification still happens.
 - **User shows you a reference image.** Read the image, name the layout pattern out loud (e.g. "split-screen with hero left, form right"), and only then plan the tree. Don't skip naming — the model produces visibly better designs when it labels the pattern first.
+- **Adding frames to a populated canvas** (multiple existing top-level frames already on the canvas). Before placing a new top-level frame at step 5, call `find_empty_space_on_canvas` at step 4 to locate a coordinate region that doesn't overlap existing content. Pass the returned position as `x`/`y` on the outermost frame in your first `batch_design` call. Skipping this on a crowded canvas produces invisible overlaps that look like rendering failures.
+- **"Export this", "generate assets", "hand off the design".** Use `export_nodes` with the target node id(s). Ask the user what format (PNG, SVG, PDF) and destination path if not stated — the answer shapes the call. Do not substitute `get_screenshot` for an export; `get_screenshot` produces a canvas preview, not a properly-sized export artifact.
 
 **Verification cadence.** Screenshot is cheap, blind iteration is expensive. After a chunk worth ~10–25 ops, screenshot. Then between substantive change sets. Stop when: no rhythm-breaking issues remain, components match the library, contrast OK, the user's stated requirements are covered. Hand back with a one-paragraph summary of what landed.
 
@@ -238,6 +240,8 @@ See `references/batch-design-grammar.md` for the complete grammar including dele
 5. **Component fidelity** — anything that should be a `ref` to a library component is one (no hand-built buttons drifting from the library style).
 
 When something is off, fix it with a targeted `U` op against the offending node, screenshot again, move on. If three iterations don't converge on a single issue, stop and ask the user — the requirement is probably ambiguous.
+
+**`snapshot_layout` vs `get_screenshot`.** `get_screenshot` returns pixels — use it for visual validation. `snapshot_layout` returns a structural snapshot of node positions, sizes, and layout relationships. Reach for `snapshot_layout` when you need numbers rather than pixels: verifying an exact gap width, capturing a before/after state across a sequence of updates, or debugging an auto-layout issue where the visual looks right but you need to confirm the computed values. In practice you'll use `get_screenshot` far more often; reserve `snapshot_layout` for cases where a rendered image can't tell you what you need.
 
 ## Failure modes
 

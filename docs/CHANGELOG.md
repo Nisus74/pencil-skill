@@ -4,6 +4,19 @@ All notable changes to this project will be documented here.
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.2.0] - 2026-05-03
+
+### Added
+
+- **Documented three previously-undocumented MCP tools** that were in the permissions block but missing from the workflow:
+  - `snapshot_layout` — explained as the structural complement to `get_screenshot`; guidance on when to use each (pixels vs. numbers), added to the Verification section
+  - `find_empty_space_on_canvas` — added to Design Intelligence as the required step before placing frames on a populated canvas, to prevent invisible overlaps
+  - `export_nodes` — added to Design Intelligence with guidance on when to use it vs. `get_screenshot`, and what to ask the user before calling
+
+### Changed
+
+- Plugin and skill versions bumped to `1.2.0`
+
 ## [1.1.0] - 2026-05-03
 
 ### Added
