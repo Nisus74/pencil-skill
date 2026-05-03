@@ -1,8 +1,8 @@
 {
   "name": "pencil-dev-skill",
   "displayName": "Pencil.dev Design Skill",
-  "description": "Teaches AI coding tools to read, generate, and validate pencil.dev designs using .pen files and the Pencil MCP server",
-  "version": "0.1.0",
+  "description": "Teaches AI coding tools to design, edit, and validate pencil.dev UIs using .pen files, .lib.pen libraries, design-system docs, and the Pencil MCP server",
+  "version": "1.1.0",
   "author": {
     "name": "Travis Polland",
     "email": "tpolland@gmail.com",
@@ -12,5 +12,25 @@
   "repository": "https://github.com/Nisus74/pencil-skill",
   "license": "MIT",
   "keywords": ["design", "pencil-dev", "ui", "mcp", "design-tool", "ai-skill"],
-  "skills": "./skills/"
+  "skills": "./skills/",
+  "permissions": {
+    "mcp": [
+      "pencil:get_editor_state",
+      "pencil:open_document",
+      "pencil:get_guidelines",
+      "pencil:batch_get",
+      "pencil:batch_design",
+      "pencil:snapshot_layout",
+      "pencil:get_screenshot",
+      "pencil:get_variables",
+      "pencil:set_variables",
+      "pencil:find_empty_space_on_canvas",
+      "pencil:search_all_unique_properties",
+      "pencil:replace_all_matching_properties",
+      "pencil:export_nodes"
+    ],
+    "shell": "none",
+    "filesystem": "project-only",
+    "network": "none"
+  }
 }
