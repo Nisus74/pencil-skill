@@ -203,8 +203,10 @@ _DANGEROUS_PATTERNS: tuple[tuple[str, re.Pattern[str]], ...] = (
     ("base64-pipe-shell", re.compile(r"base64\s+-d[^\n]*\|\s*(sh|bash|zsh)\b")),
     ("write-MEMORY.md", re.compile(r"\bMEMORY\.md\b")),
     ("write-SOUL.md", re.compile(r"\bSOUL\.md\b")),
-    ("write-AGENTS.md", re.compile(r"\bAGENTS\.md\b")),
-    ("write-CLAUDE.md", re.compile(r"\bCLAUDE\.md\b")),
+    # Narrowed: AGENTS.md / CLAUDE.md are commonly referenced in skill prose,
+    # so require a write-intent verb on the same line to avoid false positives.
+    ("write-AGENTS.md", re.compile(r"\b(write|append|modify|update|edit|overwrite|inject|patch)\b[^\n]*\bAGENTS\.md\b", re.IGNORECASE)),
+    ("write-CLAUDE.md", re.compile(r"\b(write|append|modify|update|edit|overwrite|inject|patch)\b[^\n]*\bCLAUDE\.md\b", re.IGNORECASE)),
     ("dotenv-path", re.compile(r"(^|[\s/])\.env(\b|$)")),
     ("ssh-keys", re.compile(r"~/\.ssh\b")),
 )
@@ -337,7 +339,7 @@ def check_cross_manifest_consistency(paths: list[Path]) -> list[Finding]:
 
 
 _USES_RE = re.compile(r"^\s*-\s*uses:\s*([^\s#]+)(.*)$")
-_PINNED_RE = re.compile(r"^[A-Za-z0-9._/-]+@[a-f0-9]{40}$")
+_PINNED_RE = re.compile(r"^[A-Za-z0-9._/-]+@[a-fA-F0-9]{40}$")
 _INLINE_ALLOW_RE = re.compile(r"#\s*skill-lint:\s*AST(02|07)\s+allow\s*[—-]\s*\S")
 
 
