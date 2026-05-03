@@ -3,7 +3,7 @@ name: pencil-design
 description: Use when the user asks to "design in pencil", "create a pencil.dev design", "open a .pen file", "work with pencil MCP", "generate UI in pencil", "edit a pencil design", "sketch a screen in pencil", "update a pencil component", or any task involving pencil.dev's design tool, the .pen file format, or the Pencil MCP server tools. Also use when the user asks you to read, inspect, or modify any file with a .pen extension.
 version: 0.1.0
 license: MIT
-compatibility: Claude Code (or Cursor/Codex/Gemini) with the Pencil MCP server configured
+compatibility: Any AI coding tool with the Pencil MCP server configured (Claude Code, Codex, Gemini CLI, Copilot CLI, Cursor)
 ---
 
 # Pencil.dev Design Skill
@@ -12,22 +12,24 @@ compatibility: Claude Code (or Cursor/Codex/Gemini) with the Pencil MCP server c
 
 ## Platform Note
 
-This skill was written for Claude Code. If you are on a different platform, see the
-tool name mapping for your environment:
+This skill is platform-agnostic. Tool names below use Claude Code conventions by default.
+For tool-name mappings on other platforms, see:
 
-- **Codex**: `skills/pencil-design/references/codex-tools.md`
-- **Gemini CLI**: `skills/pencil-design/references/gemini-tools.md`
-- **GitHub Copilot CLI**: `skills/pencil-design/references/copilot-tools.md`
+- **OpenAI Codex**: `references/codex-tools.md`
+- **Google Gemini CLI**: `references/gemini-tools.md`
+- **GitHub Copilot CLI**: `references/copilot-tools.md`
+
+Cursor uses the Pencil MCP server directly — the MCP tool names are identical across all platforms.
 
 ## Prerequisites
 
-- Pencil MCP server must be configured in your Claude Code environment
+- Pencil MCP server must be configured in your AI coding tool's environment
 - A `.pen` file must be open or accessible via the Pencil MCP tools
 
 ## Core Principle
 
-`.pen` files are encrypted. **Never use `Read`, `Grep`, or any file tool on `.pen` files.**
-Always use the Pencil MCP tools listed below.
+`.pen` files are encrypted. **Never use generic file-read tools (`Read`, `Grep`, `cat`, etc.)
+on `.pen` files.** Always use the Pencil MCP tools listed below.
 
 ## Available Pencil MCP Tools
 
