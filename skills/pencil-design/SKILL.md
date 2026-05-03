@@ -157,7 +157,7 @@ This is the reflex sequence for any design task. Follow it; deviate only at the 
 
 The default workflow assumes a fresh, end-to-end design. Most tasks aren't that. Deviate as follows:
 
-- **"Edit the X" or "change the Y to Z".** Skip the plan-the-tree part of step 4. `batch_get` the affected node first to see its current shape, then issue `R` (full replace) or `U` (property-level update) ops. One screenshot is usually enough.
+- **"Edit the X" or "change the Y to Z".** Skip the plan-the-tree part of step 4. `batch_get` the affected node first to see its current shape, then issue `R` (full replace) or `U` (property-level update) ops. `snapshot_layout` or `batch_get` on the changed node is usually enough; screenshot only if the change was visual (a color, an image, a spacing relationship the user described in pixel terms).
 - **"Use my design library" / library is imported.** After step 3, check the open document's `imports` field. If the named `.lib.pen` is imported, query its reusable components via `batch_get` and instantiate them with `ref` nodes — never re-build a Button from primitives when one exists. If the library isn't imported, add it first via a `U` op on the document root (see `references/example-import-library.md`).
 - **User mentions an icon by name.** Always reach for `icon_font` (Lucide / Material Symbols / Phosphor / Feather). The icon library is named in `design-system/design-system.md`. Don't import an SVG unless the user is naming a specific custom asset.
 - **Big screen (>30 visible elements).** Plan multiple `batch_design` calls before starting. Build the page-level frame and main columns first, screenshot, then fill in. Cramming 60 ops into one call is asking for ordering bugs.
