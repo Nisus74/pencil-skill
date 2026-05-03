@@ -248,7 +248,7 @@ When you've decided rung 4 is needed, scan the rendered image in this order:
 
 When something is off, fix it with a targeted `U` op against the offending node, screenshot again, move on. If three iterations don't converge on a single issue, stop and ask the user — the requirement is probably ambiguous.
 
-**`snapshot_layout` vs `get_screenshot`.** `get_screenshot` returns pixels — use it for visual validation. `snapshot_layout` returns a structural snapshot of node positions, sizes, and layout relationships. Reach for `snapshot_layout` when you need numbers rather than pixels: verifying an exact gap width, capturing a before/after state across a sequence of updates, or debugging an auto-layout issue where the visual looks right but you need to confirm the computed values. In practice you'll use `get_screenshot` far more often; reserve `snapshot_layout` for cases where a rendered image can't tell you what you need.
+**`snapshot_layout` is your default verification tool, not a niche one.** It returns positions, sizes, and layout relationships as numbers — perfect for "did the gap change to 12px?", "is the button 44px tall?", "is the form column the width I asked for?". Use it after every meaningful structural change. Reach for `get_screenshot` only when the question genuinely needs pixels: visual rhythm, real-rendered contrast, image content, or final sign-off. The reflex from older versions of this skill — "screenshot after every chunk" — is wrong; it burns tokens to confirm things the structural snapshot already proved.
 
 ## Failure modes
 
