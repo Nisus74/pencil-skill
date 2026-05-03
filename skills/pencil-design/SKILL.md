@@ -250,6 +250,18 @@ When something is off, fix it with a targeted `U` op against the offending node,
 
 **`snapshot_layout` is your default verification tool, not a niche one.** It returns positions, sizes, and layout relationships as numbers — perfect for "did the gap change to 12px?", "is the button 44px tall?", "is the form column the width I asked for?". Use it after every meaningful structural change. Reach for `get_screenshot` only when the question genuinely needs pixels: visual rhythm, real-rendered contrast, image content, or final sign-off. The reflex from older versions of this skill — "screenshot after every chunk" — is wrong; it burns tokens to confirm things the structural snapshot already proved.
 
+### Worked example: a 6-op edit, zero pre-final screenshots
+
+User asks: *"On the LoginCard, change the Sign in button from blue to the brand green, and add 8px of breathing room above 'Forgot password?'."*
+
+1. **Locate.** `batch_get` the LoginCard subtree, identify the button node and the link node. *(One JSON call; would have been needed regardless.)*
+2. **Execute.** One `batch_design` call: `U("<button>", { fill: "$brandGreen" })`, `U("<linkContainer>", { paddingTop: 8 })`. Server response confirms both ops landed. *(Rung 1.)*
+3. **Verify structure.** `snapshot_layout(parentId: "<LoginCard>", maxDepth: 2)`. Confirm the link's top padding is 8 (the only structural change) and that nothing else shifted unexpectedly. *(Rung 2.)*
+4. **Verify property.** `batch_get({ nodeIds: ["<button>"] })`. Confirm `fill` resolved to `$brandGreen` (not a raw hex). *(Rung 3.)*
+5. **Final visual sign-off.** `get_screenshot(nodeId: "<LoginCard>")` — scoped to the card, not the page. Confirm the green renders as expected against the card background and the spacing reads right. *(Rung 4, once.)*
+
+Total screenshots: **1**, scoped to the smallest meaningful subtree. The pre-skill version of this same task would typically have produced 2–3 (one mid-flight, one full-canvas final, possibly one in dark mode).
+
 ## Failure modes
 
 Six concrete cases. Detect, respond, do not improvise.
