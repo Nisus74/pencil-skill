@@ -34,7 +34,11 @@ class MainTest(unittest.TestCase):
         self.assertEqual(skill_lint.lint_paths([]), [])
 
     def test_main_returns_zero_when_no_findings(self):
-        self.assertEqual(skill_lint.main(["skill-lint.py"]), 0)
+        import tempfile
+        with tempfile.TemporaryDirectory() as tmp:
+            tmp_path = Path(tmp) / "empty.md"
+            tmp_path.write_text("---\nname: x\n---\nbody\n")
+            self.assertEqual(skill_lint.main(["skill-lint.py", str(tmp_path)]), 0)
 
 
 class FrontmatterLoadsSafelyTest(unittest.TestCase):
@@ -351,6 +355,24 @@ class WorkflowPinTest(unittest.TestCase):
                 "      - uses: actions/checkout@v4  # skill-lint: AST07 allow — local-only test\n"
             )
             self.assertEqual(skill_lint.check_workflow_pin(p), [])
+
+
+class LintPathsIntegrationTest(unittest.TestCase):
+    def test_aggregates_findings_across_files(self):
+        import tempfile
+        with tempfile.TemporaryDirectory() as tmp:
+            d = Path(tmp) / "skills" / "myskill"
+            d.mkdir(parents=True)
+            skill_md = d / "SKILL.md"
+            # Missing 'permissions:' (AST03), missing version (AST04).
+            skill_md.write_text(
+                "---\nname: myskill\ndescription: " + ("y" * 60)
+                + "\nlicense: MIT\n---\nbody\n"
+            )
+            findings = skill_lint.lint_paths([skill_md])
+            codes = {f.code for f in findings}
+            self.assertIn("AST03", codes)
+            self.assertIn("AST04", codes)
 
 
 if __name__ == "__main__":

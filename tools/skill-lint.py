@@ -365,8 +365,24 @@ def check_workflow_pin(path: Path) -> list[Finding]:
 
 
 def lint_paths(paths: list[Path]) -> list[Finding]:
-    """Return findings for the given paths. Empty list = clean."""
     findings: list[Finding] = []
+    for p in paths:
+        if not p.exists():
+            findings.append(Finding(
+                code="AST08", severity=SEVERITY_ERROR,
+                location=str(p), message="path does not exist",
+            ))
+            continue
+        if p.name == "SKILL.md":
+            findings += check_frontmatter_loads_safely(p)
+            findings += check_frontmatter_required_fields(p)
+            findings += check_name_matches_directory(p)
+            findings += check_description_substantive(p)
+            findings += check_permissions_block(p)
+            findings += check_dangerous_content(p)
+        elif p.suffix in (".yml", ".yaml") and ".github/workflows" in str(p):
+            findings += check_workflow_pin(p)
+    findings += check_cross_manifest_consistency(paths)
     return findings
 
 
