@@ -23,3 +23,4 @@
 - [ ] The skill `description` frontmatter accurately reflects when it triggers
 - [ ] No project-specific content added to this general-purpose skill
 - [ ] Version bumped in `plugin.json` and `SKILL.md` frontmatter
+- [ ] I ran `pre-commit run --all-files` and all OWASP AST checks pass
