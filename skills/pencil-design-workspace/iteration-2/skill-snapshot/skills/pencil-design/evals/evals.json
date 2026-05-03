@@ -1,0 +1,26 @@
+{
+  "skill_name": "pencil-design",
+  "evals": [
+    {
+      "id": 0,
+      "name": "login-screen-greenfield",
+      "prompt": "I need to design a login screen in pencil. It should have email + password inputs, a primary submit button, and a 'forgot password?' link. Walk me through what you'd do step by step before touching any tools.",
+      "expected_output": "Agent describes the seven-step workflow: detects host first, locates context (open .pen, design-system/ folder, selection), loads guidelines, plans, executes via batch_design, verifies via get_screenshot, iterates. References design-system/ check and library import. Plans before executing.",
+      "files": []
+    },
+    {
+      "id": 1,
+      "name": "design-system-scaffold",
+      "prompt": "Set up a pencil design system in this project. The repo currently has no design-system/ folder.",
+      "expected_output": "Agent confirms before scaffolding; copies all 7 templates from assets/design-system/ to design-system/; names each file (README.md, design-system.md, tokens.md, components.md, layout.md, voice.md, code-export.md); mentions collision detection if a code-bearing design-system/ already exists; tells the user which fields to fill in first.",
+      "files": []
+    },
+    {
+      "id": 2,
+      "name": "import-library-and-use",
+      "prompt": "I have a design library at design/system.lib.pen with Button and Input components. Add a sign-up form to my open .pen file using those components. Explain the tools you'd call and why.",
+      "expected_output": "Agent verifies the document's imports field, adds an imports entry via U op on document root if missing, queries the library's reusable components, instantiates Button and Input via ref nodes (not from primitives), uses descendants for instance-level overrides, screenshots to verify the refs resolve correctly.",
+      "files": []
+    }
+  ]
+}

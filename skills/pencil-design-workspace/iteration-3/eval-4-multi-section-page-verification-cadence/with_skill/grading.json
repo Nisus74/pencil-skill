@@ -1,0 +1,14 @@
+{
+  "expectations": [
+    {"text": "Total get_screenshot calls across the entire build is 1 or 2 (not one per region)", "passed": true, "evidence": "Totals section: '1 get_screenshot call (final sign-off on MfFjS)'. Exactly one across the whole build."},
+    {"text": "Per-region verification is structural-first (snapshot_layout) rather than visual-first", "passed": true, "evidence": "Region 1: one snapshot_layout, no screenshot. Region 2: one snapshot_layout, no screenshot. Region 3: one snapshot_layout, then the single final screenshot."},
+    {"text": "When get_screenshot is used, it is scoped to a specific nodeId", "passed": true, "evidence": "The single screenshot was 'get_screenshot with nodeId: MfFjS (the whole page)' — scoped, with explicit reasoning ('the question was does the entire page hold together visually')."},
+    {"text": "Does NOT re-screenshot in dark mode", "passed": true, "evidence": "Only one screenshot total; no dark-mode re-screenshot."},
+    {"text": "Closing paragraph honestly reports the breakdown by tool type", "passed": true, "evidence": "Totals paragraph: '3 snapshot_layout calls, 0 batch_get calls, 1 get_screenshot call' plus support-call breakdown. Honest and precise."}
+  ],
+  "summary": {"pass_rate": 1.0, "passed": 5, "failed": 0, "total": 5},
+  "notes": [
+    "Verification distribution: 3 snapshot_layout / 0 batch_get / 1 get_screenshot. Total: 4 verification calls.",
+    "The single screenshot was the final page-level sign-off, exactly the pattern the new skill prescribes."
+  ]
+}

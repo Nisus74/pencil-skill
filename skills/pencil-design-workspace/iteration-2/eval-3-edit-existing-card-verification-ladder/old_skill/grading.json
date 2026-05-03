@@ -1,0 +1,41 @@
+{
+  "expectations": [
+    {
+      "text": "In the EDIT phase (after the scratch is built), at most ONE get_screenshot call is made",
+      "passed": true,
+      "evidence": "Response shows a single get_screenshot call in the verification report (step 2 of three verification calls). Summary section names it as the only screenshot."
+    },
+    {
+      "text": "Any get_screenshot call in the edit phase is scoped to the LoginCard nodeId, NOT the document root or page frame",
+      "passed": true,
+      "evidence": "Step 2 of the verification report: 'nodeId passed: JOGar (the LoginCard root, not the individual edited nodes)'. Scoped to the card."
+    },
+    {
+      "text": "snapshot_layout is called on the LoginCard subtree before any get_screenshot in the edit phase",
+      "passed": false,
+      "evidence": "Order of verification calls in the response: (1) batch_get, (2) get_screenshot, (3) snapshot_layout. The screenshot was taken BEFORE snapshot_layout — snapshot_layout was reached for only as a diagnostic AFTER the screenshot raised a question. The new ladder requires snapshot_layout BEFORE the screenshot as default verification, not as a fallback."
+    },
+    {
+      "text": "batch_get is called on the modified button to verify the fill resolved correctly before any get_screenshot",
+      "passed": true,
+      "evidence": "Step 1 of verification: 'batch_get on the two edited nodes — answered did the writes persist? (yes)'. Done before the screenshot in step 2."
+    },
+    {
+      "text": "Does NOT re-screenshot in dark mode after the edit",
+      "passed": true,
+      "evidence": "Only one screenshot in the entire edit phase. No dark-mode re-screenshot."
+    }
+  ],
+  "summary": {
+    "pass_rate": 0.8,
+    "passed": 4,
+    "failed": 1,
+    "total": 5
+  },
+  "notes": [
+    "Tool-use count from notification: 11 total tool uses (notably FEWER than with_skill's 15 — see analysis).",
+    "The old skill happened to take only one screenshot here because the document was already prepared (no scratch build needed) and the edit was small. Under the old guidance ('screenshot after each meaningful chunk'), a multi-chunk edit would have produced more screenshots — the eval measures default behavior, and the old behavior just got lucky on this small edit.",
+    "The key behavioral difference: with_skill chose snapshot_layout BEFORE the screenshot as default verification (correct ladder). old_skill defaulted to screenshot, then reached for snapshot_layout only as a diagnostic when the screenshot raised a question. Same final tool set, wrong order — and on a more complex edit, the old order means more screenshots.",
+    "The grader is being strict on the ordering assertion — this is the assertion that distinguishes the new ladder discipline from the old screenshot-first reflex."
+  ]
+}

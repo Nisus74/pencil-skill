@@ -1,0 +1,38 @@
+{
+  "expectations": [
+    {
+      "text": "In the EDIT phase (after the scratch is built), at most ONE get_screenshot call is made",
+      "passed": true,
+      "evidence": "Response section 'Rung 4 — get_screenshot(nodeId: \"JOGar\")' is the single screenshot mentioned. Summary table row 4 confirms 'one' screenshot. Closing line: 'Total screenshots in the edit phase: 1, scoped to the card subtree.'"
+    },
+    {
+      "text": "Any get_screenshot call in the edit phase is scoped to the LoginCard nodeId, NOT the document root or page frame",
+      "passed": true,
+      "evidence": "Rung 4 explicitly: 'nodeId passed: JOGar (the LoginCard, not the document/page)' with a paragraph justifying the choice ('I chose JOGar over the page root because the change is contained to the card — screenshotting the page would burn tokens on irrelevant area')."
+    },
+    {
+      "text": "snapshot_layout is called on the LoginCard subtree before any get_screenshot in the edit phase",
+      "passed": true,
+      "evidence": "Rung 2 (snapshot_layout on JOGar) is positioned ahead of Rung 4 (screenshot). Response says: 'I issued the rung-2 and rung-3 calls in parallel because they're independent: structure vs. properties.' Both structural calls precede the screenshot."
+    },
+    {
+      "text": "batch_get is called on the modified button to verify the fill resolved correctly before any get_screenshot",
+      "passed": true,
+      "evidence": "Rung 3: 'batch_get({ nodeIds: [\"tR78b\", \"co1Nc\"] })' confirms tR78b.fill === \"#16A34A\" before reaching for the screenshot at Rung 4."
+    },
+    {
+      "text": "Does NOT re-screenshot in dark mode after the edit",
+      "passed": true,
+      "evidence": "Only one screenshot appears in the edit phase (Rung 4, primary mode). No re-screenshot under theme: { mode: \"dark\" } anywhere in the response."
+    }
+  ],
+  "summary": {
+    "pass_rate": 1.0,
+    "passed": 5,
+    "failed": 0,
+    "total": 5
+  },
+  "notes": [
+    "Tool-use count from notification: 15 total tool uses across the entire run (scratch + edit + verify). At least 4 of those are explicit verification calls (batch_design success ack + snapshot_layout + batch_get + 1 get_screenshot). Plus 1 follow-up snapshot when investigating the clipping. No second screenshot was taken to investigate the clipping — the agent stayed structural for diagnosis."
+  ]
+}
