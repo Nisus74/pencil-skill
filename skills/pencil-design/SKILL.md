@@ -4,7 +4,7 @@ description: Use this skill for any pencil.dev work — designing UI in a .pen f
 license: MIT
 compatibility: Any AI coding tool with the Pencil MCP server configured (Claude Code, Codex, Gemini CLI, Copilot CLI, Cursor)
 metadata:
-  version: "1.2.0"
+  version: "1.3.0"
 permissions:
   mcp:
     - pencil:get_editor_state

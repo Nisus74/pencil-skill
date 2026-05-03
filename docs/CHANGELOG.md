@@ -4,6 +4,26 @@ All notable changes to this project will be documented here.
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.3.0] - 2026-05-03
+
+### Changed
+
+- **Verification reframed as structural-first, visual-last** to reduce screenshot-driven token consumption. Previous guidance defaulted to `get_screenshot` after every chunk and mandated a dual-mode (light + dark) re-screenshot for every design. Both have been replaced with a four-rung **verification ladder**:
+  1. `batch_design` response — confirms ops succeeded (free)
+  2. `snapshot_layout` — confirms structural intent (numbers; cheap)
+  3. `batch_get` — confirms property-level intent (JSON; cheap)
+  4. `get_screenshot` — confirms visual intent (image; expensive — reserve for genuinely-visual questions or final sign-off, always scoped to the most specific `nodeId`)
+- **Dual-mode screenshotting is now conditional**, not mandatory: only re-screenshot the alternate theme mode when the design uses mode-conditional colors that may have been set with raw hex instead of variables. Designs built entirely from variables get the variable system's correctness guarantee for free.
+- **`snapshot_layout` repositioned** as the default verification tool (previously framed as a niche structural debugger)
+- **"Edit the X" deviation** updated to prefer `snapshot_layout` / `batch_get` over a screenshot when the change is structural or property-level
+- New `### Worked example: a 6-op edit, zero pre-final screenshots` subsection in SKILL.md illustrates the ladder end-to-end on a typical edit
+- Plugin and skill versions bumped to `1.3.0`
+
+### Added (evals)
+
+- Eval 0 (`login-screen-greenfield`) and eval 2 (`import-library-and-use`) — assertions extended to require the verification-ladder description and conditional dual-mode screenshotting
+- New eval 3 (`edit-existing-card-verification-ladder`) — execution-based eval where the model actually invokes MCP tools to perform a small edit and must explain its verification choices; pass criteria include at most one `get_screenshot` call in the edit phase, scoped to the affected subtree (not the document root)
+
 ## [1.2.0] - 2026-05-03
 
 ### Added
