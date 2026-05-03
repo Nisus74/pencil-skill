@@ -148,9 +148,10 @@ When writing or editing `skills/pencil-design/SKILL.md`:
 | Hook | Trigger | Purpose |
 |------|---------|---------|
 | `.github/workflows/secret-scan.yml` | push, PR | Runs gitleaks; blocks merge if secrets are detected |
+| `.github/workflows/skill-lint.yml` | push, PR | Runs `tools/skill-lint.py` (OWASP Agentic Skills Top 10) and unit tests |
+| `.pre-commit-config.yaml` | local `git commit` | Same skill-lint + gitleaks + basic hygiene; install with `pip install pre-commit && pre-commit install` |
 
-The repo has no AI-runtime hooks — these are GitHub Actions hooks that run in CI,
-not inside any AI session.
+The OWASP AST compliance map lives in [docs/SECURITY.md](./docs/SECURITY.md).
 
 ---
 
