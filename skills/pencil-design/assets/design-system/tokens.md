@@ -23,6 +23,13 @@ Every color variable carries BOTH a `light` and a `dark` value. No exceptions. T
 
 **Rule:** every color in a new design uses one of these variables. Never `#hex` directly. If you need a color that doesn't exist here, add it (with both light and dark values) before you reference it.
 
+**Defaults (override per project):**
+
+- One accent only (`$primary`); pick `$accent` only when a second hue genuinely earns its keep. Keep saturation under ~80%.
+- Pick neutrals from one family — Zinc *or* Slate *or* Stone — and don't mix warm and cool grays.
+- `$surface` (light) should be off-white (e.g. `#FAFAFA`), not `#FFFFFF`. `$surface` (dark) should be off-black (e.g. Zinc-950 `#09090B`), not `#000000`. Pure black on pure white reads as an AI default.
+- No neon glows, no purple/blue gradient text on headings. If the brand calls for a gradient, declare it explicitly here and scope where it's used.
+
 **Contrast:** every (text color, background) pair must hit WCAG AA — body text ≥ 4.5:1, large text and UI components ≥ 3:1. Check it in BOTH modes; a pair that passes in light often fails in dark and vice versa. If a pair fails, change the value, don't ship the design.
 
 **Theming syntax** (Pencil schema):
@@ -78,9 +85,17 @@ A type ramp. All font sizes come from here.
 
 Font families:
 
-- `$fontHeading` — `<Inter | Geist | Manrope | other>`
-- `$fontBody` — `<Inter | Geist | Manrope | other>`
-- `$fontMono` — `<JetBrains Mono | IBM Plex Mono | other>` (for code/numerics)
+- `$fontHeading` — `<Geist | Satoshi | Cabinet Grotesk | other>`
+- `$fontBody` — `<Geist | Satoshi | other>`
+- `$fontMono` — `<Geist Mono | JetBrains Mono | IBM Plex Mono | other>` (for code/numerics)
+
+**Defaults (override per project):**
+
+- Dashboards / software UIs: `Geist` + `Geist Mono`, or `Satoshi` + `JetBrains Mono`.
+- Marketing / editorial: `Cabinet Grotesk` or `Satoshi` for display; pair with a modern serif (`Fraunces`, `Instrument Serif`, `Editorial New`) only if the brand warrants it.
+- Avoid by default: `Inter` (overused to the point of being an AI signature) and generic serifs (`Times New Roman`, `Georgia`, `Garamond`, `Palatino`). Use them only if the brand explicitly calls for them.
+- Body lines cap at ~65 characters.
+- In dense layouts, numerics use `$fontMono` so columns of figures align.
 
 **Rule:** every text node uses a `$textN` variable. Avoid raw font sizes. Body text is `$textBase` unless there's a reason.
 

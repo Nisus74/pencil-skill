@@ -74,8 +74,25 @@ These read as either jargon or filler. Replace.
 | *Sorry* (for non-errors) | (just say what happened) |
 | *Click here* | A specific link label |
 | *Submit* | A specific verb |
+| *Elevate* | (cut — AI cliché) |
+| *Seamless* / *seamlessly* | (cut — AI cliché) |
+| *Unleash* | (cut — AI cliché) |
+| *Empower* | (cut — AI cliché) |
+| *Next-gen* / *Next-generation* | (cut — AI cliché) |
+| *Revolutionize* | (cut — AI cliché) |
+| *Cutting-edge* | (cut — AI cliché) |
 
 Add product-specific bans here.
+
+## Filler to avoid
+
+These read as machine-generated when they appear in shipped product:
+
+- **Hero filler:** *"Scroll to explore"*, *"Swipe down"*, animated chevrons. If a hero needs a prompt, write a real one tied to the product.
+- **Placeholder names:** *John Doe*, *Acme*, *Nexus*, *Lorem Ipsum*. Use plausible context-appropriate content; for imagery use `G(node, "ai", "...")`.
+- **Fabricated metrics:** invented stats, made-up testimonials, fake "system status" numbers. Either source real data or omit the section.
+- **`LABEL // YEAR` formatting:** the slash-separated typographic affectation borrowed from generated portfolio sites.
+- **Emojis in production UI:** acceptable only if explicitly opted into above for specific surfaces (e.g. a status pill set, a celebratory toast).
 
 ## Numbers, dates, currency
 

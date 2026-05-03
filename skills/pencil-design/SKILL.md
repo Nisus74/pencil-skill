@@ -108,12 +108,20 @@ Test under both modes via `theme: { mode: "dark" }` on the document or page root
 
 ### Responsive
 
-Design for the canonical breakpoints unless the user explicitly says otherwise: **mobile (390 × 844), tablet (768 × 1024), desktop (1440 × 900)**. Two patterns work; pick one per project and stay consistent:
+Design for the canonical breakpoints unless the user explicitly says otherwise. Frame dimensions are fixed; content widths and gutters are the levers:
+
+| Breakpoint | Frame size | Content max-width | Side gutter | Column gap |
+|------------|------------|-------------------|-------------|------------|
+| Mobile     | 390 × 844  | 358               | 16          | 12         |
+| Tablet     | 768 × 1024 | 704               | 32          | 16         |
+| Desktop    | 1440 × 900 | 1200              | 120         | 24         |
+
+Two layout patterns work; pick one per project and stay consistent:
 
 - **Per-breakpoint frames** (recommended for marketing pages, dashboards, anywhere layout shifts dramatically). One frame per breakpoint, sibling to each other, sharing the same components and variables. Name them `LoginPage_Desktop`, `LoginPage_Tablet`, `LoginPage_Mobile`.
 - **Single fluid frame** (recommended for app surfaces with predictable scaling). One frame using `width: "fill_container"` and well-tuned auto-layout that holds together as the parent resizes. Test by resizing the canvas frame.
 
-Page max content width is `$maxContent` (default 1200). Body text never exceeds ~70ch comfortable reading width.
+Bind content max-width to `$maxContent` (default 1200) so projects can override globally. Body text never exceeds ~65ch comfortable reading width — pick the tighter of `maxContent` or `65ch * font-size` for prose blocks.
 
 ### Accessibility
 
@@ -126,6 +134,54 @@ Five non-negotiable checks that run as part of step 6 verification:
 5. **Component states cover keyboard focus.** When you build or extend a component, define default / hover / focus / disabled states — even if the focus state is only a 2px outline. Skipping focus states ships inaccessible UI by default.
 
 If a check fails, fix it before reporting done. Don't note it as a TODO.
+
+## Aesthetic defaults
+
+The Discipline rules govern *correctness*; this section governs *taste*. These are **defaults that lose to the project's `design-system/`** — when `tokens.md`, `design-system.md`, or `voice.md` says something specific, follow them. Use these defaults only when the project is silent (no `design-system/` folder, the relevant file is empty, or the task is a one-off sketch).
+
+### Name the atmosphere before you plan
+
+In step 4 (Plan), commit to a one-line vibe before any `batch_design` call. Pick one adjective from each axis:
+
+- **Density:** airy / balanced / dense
+- **Variance:** symmetric / offset / chaotic
+- **Motion:** static / fluid / cinematic
+
+Example: *"Dense dashboard, symmetric, static."* This forces a stance the rest of the design has to honor; without it, the model defaults to "balanced / symmetric / fluid" for everything and the work reads generic.
+
+### Color
+
+- **One accent, low saturation.** Max one accent hue per design; keep saturation under ~80%. Multiple competing accents are an AI tell.
+- **Neutrals from one family.** Pick Zinc *or* Slate *or* Stone and stay there. Mixing warm and cool grays in the same design looks accidental.
+- **Never bind raw `#000000` or `#FFFFFF` for surfaces.** Use a `surface` / `surfaceInverse` variable that resolves to Zinc-950 / off-white (e.g. `#FAFAFA`). Pure black against pure white is the strongest visual AI tell after Inter.
+- **No neon, no glow shadows, no purple/blue gradient text on headings.** If the project's `tokens.md` declares a brand gradient, use it as declared and only there.
+
+### Typography
+
+When `design-system/tokens.md` doesn't pin a font stack, default by project type:
+
+- **Dashboards / software UIs:** `Geist` + `Geist Mono`, or `Satoshi` + `JetBrains Mono`.
+- **Marketing / editorial:** `Cabinet Grotesk` or `Satoshi` for display; pair with a modern serif (`Fraunces`, `Instrument Serif`, `Editorial New`) only if the brand warrants it.
+- **Banned by default:** `Inter` (overused to the point of being an AI signature), generic serifs (`Times New Roman`, `Georgia`, `Garamond`, `Palatino`).
+- **Body width:** body text caps at ~65 characters per line (matches the Responsive rule).
+- **High-density layouts:** when density is "dense", numerics use a monospace font so columns of figures align — even inside otherwise sans-serif UI.
+
+### Anti-patterns (AI tells — never ship these)
+
+These patterns immediately read as machine-generated. Treat each as a bug to fix in passing if you see it in an existing file:
+
+- Pure `#000000` or `#FFFFFF` bound directly (use a variable resolving to off-black / off-white).
+- `Inter` as the UI font, or generic serifs (`Times`, `Georgia`, `Garamond`) for display.
+- Neon glow shadows, outer glows, or purple/blue gradient fills on headings.
+- Three-column equal-card grids as the default layout for "features" or "benefits".
+- Fabricated numbers, metrics, or "system stats" sections invented to fill space.
+- Placeholder names like `John Doe`, `Acme`, `Nexus`, `Lorem Ipsum` left in shipped designs — use plausible context-appropriate content or `G(node, "ai", ...)` for imagery.
+- AI copywriting clichés: "Elevate", "Seamless", "Unleash", "Next-Gen", "Revolutionize", "Empower". Strike them from any text you author.
+- `LABEL // YEAR` and similar typographic affectations borrowed from generated portfolio sites.
+- Emojis in production UI (acceptable in voice/microcopy only if `voice.md` opts in).
+- Filler hero copy: "Scroll to explore", "Swipe down", animated chevrons.
+
+When the project's `voice.md` or `tokens.md` explicitly opts into one of these (a brand that *does* use Inter, a deliberate neon aesthetic), follow the project. The rule is "don't reach for these by default", not "refuse them on demand".
 
 ## Prerequisites & host detection
 
