@@ -4,6 +4,33 @@ All notable changes to this project will be documented here.
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.4.0] - 2026-05-03
+
+### Added
+
+- **Five new on-demand references** filling the largest gaps in design knowledge and tool-surface coverage:
+  - `references/mcp-tools.md` — cookbook for all 13 Pencil MCP tools (including the four previously undocumented ones: `get_variables`, `set_variables`, `search_all_unique_properties`, `replace_all_matching_properties`), the eight `get_guidelines` categories with a "for task X load category Y" decision table, composite recipes (token audit, greenfield bootstrap, library smoke test), and a tool-cost cheatsheet
+  - `references/states.md` — component states (default/hover/focus/pressed/disabled/loading/error/success/skeleton/empty/partial-failure) and screen-level fault states (404/403/500/503/408/429/offline/partial-failure), plus the four-kind empty-state taxonomy (first-use / no-results / no-permission / post-action)
+  - `references/flows.md` — what happens *between* screens: modal-vs-page-vs-sheet decisions, sync/async/submit-time form validation, multi-step wizards, the back-stack model (web vs mobile), confirmations and undo, optimistic UI, real-time/presence flows, deep links, and "plausible content" guidance
+  - `references/accessibility.md` — beyond the SKILL.md 5-point baseline: ARIA semantics, focus order, keyboard navigation, screen-reader content, deeper-cut contrast (gradients, text on photos), `prefers-reduced-motion`, `prefers-contrast`, `prefers-reduced-transparency`, `forced-colors`, dynamic type, RTL & internationalization, motor accessibility, verification checklist
+  - `references/modern-patterns.md` — patterns the model under-uses by default: container queries, fluid type with `clamp()`, AI-UI affordances (disclosure, regenerate, confidence, citations, abort), perceived performance (skeleton, optimistic UI, LQIP, staggered reveal), modern dark-mode handling; plus dated AI defaults to avoid (glassmorphism overuse, three-card grids, parallax-everything, scroll-jacked storytelling)
+- **`references/pencil-cli.md` expanded** from a 29-line cautionary note to a full reference (~150 lines): install & runtime, agent vs interactive modes, every flag grouped by purpose, `pencil status` / `pencil login` walkthroughs, headless / CI workflows with a GitHub Actions example, auth troubleshooting, a load-bearing "When CLI vs MCP" decision table, and what each surface can/can't do that the other can't. The no-auto-fall-back policy is preserved verbatim
+- **One new design-system scaffold:** `assets/design-system/states.md` — project-level state contract (per-component state coverage matrix, visual recipes, screen-level state coverage by archetype, empty-state copy variants). Brings the core scaffold count from 11 to 12 templates
+- **Two new worked examples:**
+  - `assets/examples/example-error-screen.md` — designing a 404 + offline pair with a shared `ErrorBlock` lockup; exercises `get_variables`/`set_variables`, `find_empty_space_on_canvas`, sibling top-level frames, and library-candidate surfacing
+  - `assets/examples/example-form-flow.md` — multi-step signup with email verification across three sibling frames; exercises validation states via `descendants` overrides on `Input`, the focused-with-error edge case, and a confirmation step with a different lockup
+- **SKILL.md surgical edits** (~25 lines net add, total stays under 400):
+  - New "Design completeness" mini-section under Discipline rules pointing at `states.md` / `flows.md` / `accessibility.md`
+  - Three new bullets under "Design intelligence: when to deviate" — error/empty screens load `states.md`; multi-step flows load `flows.md`; container-queries / fluid-type / AI-UI / "modern" patterns load `modern-patterns.md`; less-used MCP tools load `mcp-tools.md`
+  - Default workflow step 3 now links to `mcp-tools.md` § `get_guidelines` for the eight-category decision table
+  - Accessibility rule footer points to `accessibility.md` for the deeper cut
+  - Reference index expanded with all new files; design-system convention block updated to include `states.md` as a 12th core template
+
+### Changed
+
+- Plugin and skill versions bumped to `1.4.0`
+- The 8 `get_guidelines` categories (Code, Design System, Landing Page, Mobile App, Slides, Table, Tailwind, Web App) are now enumerated in `mcp-tools.md` with explicit decision shortcuts. The skill instructs agents to call `get_guidelines()` with no args first to discover the live list, treating the documented set as guidance rather than a closed enumeration
+
 ## [1.3.0] - 2026-05-03
 
 ### Changed

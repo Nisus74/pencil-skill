@@ -4,7 +4,7 @@ description: Use this skill for any pencil.dev work — designing UI in a .pen f
 license: MIT
 compatibility: Any AI coding tool with the Pencil MCP server configured (Claude Code, Codex, Gemini CLI, Copilot CLI, Cursor)
 metadata:
-  version: "1.3.0"
+  version: "1.4.0"
 permissions:
   mcp:
     - pencil:get_editor_state
@@ -135,6 +135,18 @@ Five non-negotiable checks that run as part of step 6 verification:
 
 If a check fails, fix it before reporting done. Don't note it as a TODO.
 
+For deeper coverage (ARIA roles, focus order, screen-reader content, RTL & internationalization, dynamic type, `prefers-contrast` / `prefers-reduced-transparency`), see `references/accessibility.md`.
+
+### Design completeness
+
+Before declaring a design done, confirm three coverage areas. Each has a dedicated reference loaded on demand:
+
+- **States** — every component you authored has the states it needs (per `components.md` and `references/states.md`); every page has the fault states the project's `states.md` requires (404 / 500 / offline / empty / loading).
+- **Flows** — if the design crosses screens, modal-vs-page choice is justified, validation timing is documented, back-stack behavior is explicit (per `references/flows.md`).
+- **Accessibility** — beyond the 5 baseline checks above, the design accounts for keyboard nav, focus order, and the `prefers-*` media queries when relevant (per `references/accessibility.md`).
+
+A design that ships only the default state of every component or the happy path of every screen is incomplete.
+
 ## Aesthetic defaults
 
 The Discipline rules govern *correctness*; this section governs *taste*. These are **defaults that lose to the project's `design-system/`** — when `tokens.md`, `design-system.md`, or `voice.md` says something specific, follow them. Use these defaults only when the project is silent (no `design-system/` folder, the relevant file is empty, or the task is a one-off sketch).
@@ -203,7 +215,7 @@ This is the reflex sequence for any design task. Follow it; deviate only at the 
 
 1. **Detect host.** `get_editor_state({ include_schema: false })`. Failure → stop and instruct the user (see Failure modes §1).
 2. **Locate context.** From the result, determine: is a `.pen` file open? What's selected? Then check the project filesystem for a `design-system/` folder (use a directory listing, not the MCP). The combination of these three facts shapes everything that follows.
-3. **Load guidelines + inventory components.** Call `get_guidelines()` with no arguments first — the server reports which categories exist for this document. Read the ones that match the task (e.g. `colors`, `typography`, `spacing`). If the project has `design-system/README.md`, read it next; then read whichever specific files it points at (typically `design-system.md` and `tokens.md`). **Then inventory components** per the Components-first rule above: `batch_get({ patterns: [{ reusable: true }], readDepth: 2 })` against the open doc, and again with `filePath` set against each `.lib.pen` in the document's `imports`. Hold the resulting list in mind for step 4 — when planning, name which existing components you'll instantiate vs. anything you'll have to build from primitives.
+3. **Load guidelines + inventory components.** Call `get_guidelines()` with no arguments first — the server reports which categories exist for this document. Read the ones that match the task (e.g. `Web App`, `Mobile App`, `Landing Page`, `Table`, `Tailwind`, `Design System`). See `references/mcp-tools.md` § `get_guidelines` for the full live-as-of-2026-05 category list and the *for task X load category Y* decision table. If the project has `design-system/README.md`, read it next; then read whichever specific files it points at (typically `design-system.md` and `tokens.md`). **Then inventory components** per the Components-first rule above: `batch_get({ patterns: [{ reusable: true }], readDepth: 2 })` against the open doc, and again with `filePath` set against each `.lib.pen` in the document's `imports`. Hold the resulting list in mind for step 4 — when planning, name which existing components you'll instantiate vs. anything you'll have to build from primitives.
 4. **Plan.** State a 2–3 sentence plan to the user before any `batch_design` call. Name the top-level frames you'll create, the components you'll instantiate (by id from the `.lib.pen`), and roughly the layout. This is the moment to catch bad assumptions cheaply.
 5. **Execute.** One or more `batch_design` calls. Each call ≤25 ops. Use the `foo=I("parent", {...})` binding form whenever a later op needs to reference a node you just created. For images, use `G(nodeId, "ai", "<prompt>")` rather than placeholder rectangles. **Apply the discipline rules at every op:** every node gets a meaningful `name`; every non-trivial node gets a `context`; theme-aware colors come from variables that have light AND dark values; designs target a canonical breakpoint (or breakpoints). See `references/batch-design-grammar.md` for the full op grammar.
 6. **Verify (structural-first).** Walk the verification ladder, stopping at the cheapest rung that answers the question: (a) did the `batch_design` response report success? (b) `snapshot_layout` on the affected subtree to confirm structure landed (gaps, padding, child order, sizing); (c) `batch_get` on specific nodes to confirm property-level changes (color variables bound, text content, refs instantiated); (d) `get_screenshot` on the most specific `nodeId` containing the change — only when the question is genuinely visual (rhythm, contrast in render, image quality, reference-image match) or as the final sign-off before handing back. **Dual-mode rule:** screenshot the primary mode only. Re-screenshot the alternate mode only if the design uses mode-conditional colors *and* you have reason to suspect they were set wrong (e.g. raw hex used instead of a variable). Routine theme-aware designs — those built entirely from variables with both light/dark values — do not need a second screenshot to "confirm both modes hold up"; the variable system guarantees it.
@@ -222,6 +234,10 @@ The default workflow assumes a fresh, end-to-end design. Most tasks aren't that.
 - **User shows you a reference image.** Read the image, name the layout pattern out loud (e.g. "split-screen with hero left, form right"), and only then plan the tree. Don't skip naming — the model produces visibly better designs when it labels the pattern first.
 - **Adding frames to a populated canvas** (multiple existing top-level frames already on the canvas). Before placing a new top-level frame at step 5, call `find_empty_space_on_canvas` at step 4 to locate a coordinate region that doesn't overlap existing content. Pass the returned position as `x`/`y` on the outermost frame in your first `batch_design` call. Skipping this on a crowded canvas produces invisible overlaps that look like rendering failures.
 - **"Export this", "generate assets", "hand off the design".** Use `export_nodes` with the target node id(s). Ask the user what format (PNG, SVG, PDF) and destination path if not stated — the answer shapes the call. Do not substitute `get_screenshot` for an export; `get_screenshot` produces a canvas preview, not a properly-sized export artifact.
+- **User asks for an error, 404, 500, offline, or empty screen.** Load `references/states.md` before planning. It owns the screen-level fault state taxonomy and the empty-state taxonomy (first-use / no-results / no-permission / post-action). See `assets/examples/example-error-screen.md` for a worked walkthrough.
+- **User asks for a multi-step form, wizard, signup, onboarding, or any flow that crosses screens.** Load `references/flows.md` before planning. It owns validation timing, modal-vs-page decisions, the back-stack model, and multi-step confirmation anatomy. See `assets/examples/example-form-flow.md` for a worked walkthrough.
+- **User mentions container queries, fluid type, AI UI affordances, optimistic updates, real-time presence, or "modern" patterns.** Load `references/modern-patterns.md`. It surfaces the patterns the model under-uses by default and flags the AI defaults (glassmorphism, three-card grids, parallax-everywhere) that read as already-dated.
+- **User wants to use a Pencil MCP tool you haven't touched recently** (`get_variables`, `set_variables`, `search_all_unique_properties`, `replace_all_matching_properties`, `find_empty_space_on_canvas`, `export_nodes`). Load `references/mcp-tools.md` — it's a per-tool cookbook with worked invocations and composite recipes (token audit, greenfield bootstrap, library smoke test).
 
 **Verification cadence.** Screenshots are the most expensive thing this skill does — each one returns a sizeable image payload to the model, costing tokens and consuming context. Do not screenshot "to check progress." Walk the verification ladder (workflow step 6) and stop at the cheapest rung. A typical end-to-end design task should need **one or two screenshots** total: optionally one mid-flight if a structural snapshot reveals something pixel-only can resolve, and one at the end before handing back. Stop when: no rhythm-breaking issues remain, components match the library, contrast OK, the user's stated requirements are covered. Hand back with a one-paragraph summary of what landed.
 
@@ -241,6 +257,7 @@ This skill teaches a project-level convention: a `design-system/` folder of mark
     elevation.md        ← shadow scale + dark-mode treatment (border/glow fallbacks)
     iconography.md      ← stroke weight, sizes per context, icon-only vs paired
     patterns.md         ← page-level templates (marketing, settings, dashboard, list/detail, auth)
+    states.md           ← per-component state coverage and per-archetype fault-state matrix
     voice.md            ← microcopy tone, error/empty-state templates
     code-export.md      ← how Pencil concepts map to the chosen stack
     # Optional, scaffolded conditionally (see scaffold offer below):
@@ -253,7 +270,7 @@ This skill teaches a project-level convention: a `design-system/` folder of mark
 **Detection (step 2 of the workflow).** Look for `./design-system/`. Three states:
 
 - **Exists, has the files above.** Load `README.md`; load others on demand.
-- **Doesn't exist, and the task is real project work.** Offer once: *"This repo doesn't have a `design-system/` folder yet. I have 11 core templates I can drop in — they teach me your tokens, components, voice, motion, patterns, and tech stack. I can also include optional ones for mobile (`mobile.md`), charts (`data-viz.md`), brand identity (`brand.md`), or imagery treatment (`imagery.md`). Want me to scaffold the core, plus any optional ones that fit your project?"* On yes, copy from `assets/design-system/` (this skill's bundled templates) into the user's project — see "Conditional Tier 2 scaffolding" below. On no, proceed and don't ask again this session.
+- **Doesn't exist, and the task is real project work.** Offer once: *"This repo doesn't have a `design-system/` folder yet. I have 12 core templates I can drop in — they teach me your tokens, components, voice, motion, patterns, and tech stack. I can also include optional ones for mobile (`mobile.md`), charts (`data-viz.md`), brand identity (`brand.md`), or imagery treatment (`imagery.md`). Want me to scaffold the core, plus any optional ones that fit your project?"* On yes, copy from `assets/design-system/` (this skill's bundled templates) into the user's project — see "Conditional Tier 2 scaffolding" below. On no, proceed and don't ask again this session.
 - **Exists but contains source code** (`.tsx`, `package.json`, `index.js`, etc.) — i.e. it's a code module, not docs. **Do not overwrite.** Ask where to put the docs instead: `design-system/docs/`, `docs/design-system/`, `.pencil/design-system/`, or a custom path. Adjust the templates' internal cross-refs accordingly.
 
 **Conditional Tier 2 scaffolding.** Always copy the 11 core files. For the 4 optional files, use a combination of explicit user opt-in (in the scaffold offer) and project signals:
@@ -344,7 +361,7 @@ Six concrete cases. Detect, respond, do not improvise.
 |---|------|------------------|----------|
 | 1 | MCP not connected | `get_editor_state` errors with `transport not connected to app: desktop` (or any connection-refused message) | Stop. Tell the user: *"Pencil's MCP server isn't reachable. Open the Pencil desktop app or the Pencil IDE extension, then ask me again."* Do not fall back to the CLI silently. |
 | 2 | No .pen file open | `get_editor_state` succeeds but reports no active document | Ask the user: *"No `.pen` file is open. Should I (a) open an existing one — give me the path, or (b) create a new one with `open_document('new')`?"* Wait for the answer. |
-| 3 | No `design-system/` folder | Folder absent in the project root AND the task implies real project work (not a sketch) | Offer once: *"This repo doesn't have a `design-system/` folder yet. I have 11 core templates I can drop in, plus 4 optional ones (`mobile.md`, `data-viz.md`, `brand.md`, `imagery.md`) for projects that ship those surfaces. Want me to scaffold the core, plus any optional ones that fit your project?"* On yes, copy from `assets/design-system/` per the conditional rules in the Design-system convention section above. On no, proceed without; do not ask again this session. |
+| 3 | No `design-system/` folder | Folder absent in the project root AND the task implies real project work (not a sketch) | Offer once: *"This repo doesn't have a `design-system/` folder yet. I have 12 core templates I can drop in, plus 4 optional ones (`mobile.md`, `data-viz.md`, `brand.md`, `imagery.md`) for projects that ship those surfaces. Want me to scaffold the core, plus any optional ones that fit your project?"* On yes, copy from `assets/design-system/` per the conditional rules in the Design-system convention section above. On no, proceed without; do not ask again this session. |
 | 4 | Conflicting `design-system/` | Folder exists but contains code files (`.tsx`, `.ts`, `package.json`, `index.js`, etc.) | Do not overwrite. Ask where to place docs instead: `design-system/docs/`, `docs/design-system/`, `.pencil/design-system/`, or a custom path. Adjust scaffolded files' cross-refs. |
 | 5 | .lib.pen import missing | `design-system/design-system.md` names a library path; the open doc's `imports` doesn't include it (or the file at the path doesn't exist) | If the file exists: add the `imports` entry via `batch_design` `U` op on the document root. If the file doesn't exist: tell the user the path in `design-system.md` is stale, ask whether to update the path or create the library. Don't silently invent. |
 | 6 | batch_design schema error | Server returns an error mentioning invalid op, unknown type, invalid property, or missing parent | Read the error verbatim. Cross-reference `references/batch-design-grammar.md` and `references/pen-schema.md`. Common causes: id contains `/`; used `width: "100%"` (use bare-string `"fill_container"`); used the older `{ sizing: "fill_container" }` object (use the bare string); used `stroke.fills` plural or `stroke.alignment` (use singular `stroke.fill`); passed raw color where a `$variable` was expected; referenced a parent before binding it. Retry with the fix; never blindly. |
@@ -361,10 +378,17 @@ The Pencil MCP tool names (`get_editor_state`, `batch_design`, etc.) are identic
 
 - `references/pen-schema.md` — full `.pen` data model: every node type, properties, layout/sizing/variables, theme axes, components, slots
 - `references/batch-design-grammar.md` — complete `batch_design` op syntax and chunking rules
-- `references/pencil-cli.md` — what `@pencil.dev/cli` is and why this skill does not auto-fall-back to it
+- `references/mcp-tools.md` — cookbook for all 13 Pencil MCP tools, the 8 `get_guidelines` categories, composite recipes (token audit, greenfield bootstrap, library smoke test), and a tool-cost cheatsheet
+- `references/states.md` — component states (default/hover/focus/pressed/disabled/loading/error/success/skeleton/empty/partial-failure) and screen-level fault states (404/403/500/503/408/429/offline/partial-failure) plus the empty-state taxonomy
+- `references/flows.md` — transitions across screens: modal-vs-page, validation timing (sync/async/submit-time), multi-step wizards, back-stack model, optimistic UI, real-time/presence, deep links, plausible content
+- `references/accessibility.md` — beyond the SKILL baseline: ARIA, focus order, keyboard nav, screen-reader content, deeper-cut contrast, `prefers-*` media queries, dynamic type, RTL & internationalization, motor accessibility
+- `references/modern-patterns.md` — patterns the model under-uses by default: container queries, fluid type, AI-UI affordances, perceived performance (skeleton, optimistic UI, LQIP), modern dark mode; plus dated defaults to avoid
+- `references/pencil-cli.md` — full `@pencil.dev/cli` reference: install, agent mode, interactive mode, every flag, headless/CI workflows, auth troubleshooting, when CLI vs MCP. Preserves the no-auto-fall-back policy.
 - `assets/examples/example-login-screen.md` — worked example: greenfield design from prompt
 - `assets/examples/example-import-library.md` — worked example: importing a `.lib.pen` and instantiating its components
 - `assets/examples/example-scaffold-system.md` — worked example: scaffolding `design-system/` into a fresh project
+- `assets/examples/example-error-screen.md` — worked example: 404 + offline page pair using `get_variables`/`set_variables` and a shared lockup
+- `assets/examples/example-form-flow.md` — worked example: multi-step signup with email verification across three sibling frames
 - `references/codex-tools.md`, `references/gemini-tools.md`, `references/copilot-tools.md` — platform tool-name mappings
-- `assets/design-system/` — the 11 core markdown templates copied into user projects on scaffold (`README.md`, `design-system.md`, `tokens.md`, `components.md`, `layout.md`, `motion.md`, `elevation.md`, `iconography.md`, `patterns.md`, `voice.md`, `code-export.md`), plus 4 optional templates scaffolded conditionally (`mobile.md`, `data-viz.md`, `brand.md`, `imagery.md`)
-- `assets/examples/` — worked walkthroughs the agent loads on demand (greenfield design, library import, scaffolding)
+- `assets/design-system/` — the 12 core markdown templates copied into user projects on scaffold (`README.md`, `design-system.md`, `tokens.md`, `components.md`, `layout.md`, `motion.md`, `elevation.md`, `iconography.md`, `patterns.md`, `states.md`, `voice.md`, `code-export.md`), plus 4 optional templates scaffolded conditionally (`mobile.md`, `data-viz.md`, `brand.md`, `imagery.md`)
+- `assets/examples/` — worked walkthroughs the agent loads on demand (greenfield design, library import, scaffolding, error screens, multi-step form flows)

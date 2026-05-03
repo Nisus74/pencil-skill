@@ -38,11 +38,36 @@ skill is the capability the AI invokes.
 
 ```
 skills/pencil-design/              # The platform-agnostic core
-  SKILL.md                         # The skill — YAML frontmatter + instructions
-  references/                      # Per-platform tool-name mappings
-    codex-tools.md
-    gemini-tools.md
-    copilot-tools.md
+  SKILL.md                         # The skill — YAML frontmatter + instructions (v1.4.0)
+  references/                      # On-demand references loaded by the skill
+    mcp-tools.md                   # Cookbook for all 13 MCP tools + composite recipes
+    states.md                      # Component states + screen-level fault states
+    flows.md                       # Transitions between screens (modal, validation, back-stack)
+    accessibility.md               # ARIA, focus order, RTL, prefers-*, dynamic type
+    modern-patterns.md             # Container queries, fluid type, AI-UI, perceived perf
+    pencil-cli.md                  # Full Pencil CLI reference + When CLI vs MCP table
+    pen-schema.md                  # .pen file JSON schema reference
+    batch-design-grammar.md        # batch_design op syntax (I/C/R/U/G/D/M)
+    codex-tools.md                 # OpenAI Codex tool name mappings
+    gemini-tools.md                # Google Gemini CLI tool name mappings
+    copilot-tools.md               # GitHub Copilot CLI tool name mappings
+  assets/
+    design-system/                 # 12 scaffold templates — copy into any project
+      README.md                    # Index + how to use
+      design-system.md             # Top-level design system doc
+      tokens.md                    # Color, spacing, type tokens
+      components.md                # Component catalogue + state table
+      layout.md                    # Grid, breakpoints, spacing
+      patterns.md                  # Page-level templates (landing, dashboard, auth, …)
+      voice.md                     # Copy tone + empty/error copy rules
+      code-export.md               # Token export to CSS/Tailwind
+      states.md                    # Per-component state matrix + screen fault coverage
+    examples/                      # 5 worked examples with real MCP tool sequences
+      example-login-screen.md      # Greenfield auth screen
+      example-import-library.md    # Import .lib.pen library + instantiate components
+      example-scaffold-system.md   # Bootstrap a full design-system scaffold
+      example-error-screen.md      # 404 + offline page pair
+      example-form-flow.md         # Multi-step signup with email verification
 
 # Platform install adapters (required by each platform's installer)
 .claude-plugin/plugin.json         # Claude Code plugin manifest
@@ -61,6 +86,12 @@ LICENSE
 .gitattributes                     # Cross-platform line-ending normalization
 .gitleaks.toml                     # Secret-scanning config
 
+# Quality tooling
+tools/
+  skill-lint.py                    # OWASP Agentic Skills Top 10 lint (CI + pre-commit)
+  test_skill_lint.py               # 36 unit tests for skill-lint
+  requirements.txt                 # pip deps for Dependabot
+
 # Documentation
 docs/
   CONTRIBUTING.md
@@ -72,11 +103,12 @@ docs/
 .github/
   PULL_REQUEST_TEMPLATE.md
   ISSUE_TEMPLATE/
-    bug_report.md
-    feature_request.md
-    config.yml
+  CODEOWNERS
+  dependabot.yml
   workflows/
-    secret-scan.yml                # gitleaks runs on push + PR
+    secret-scan.yml                # gitleaks on push + PR
+    skill-lint.yml                 # skill-lint + unit tests on push + PR
+.pre-commit-config.yaml            # Local gate: skill-lint + gitleaks + hygiene
 ```
 
 ---

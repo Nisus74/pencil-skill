@@ -26,6 +26,7 @@ This progressive loading keeps the agent's context small while still giving it t
 | `elevation.md` | Choosing shadows / depth — cards, modals, popovers, dropdowns. |
 | `iconography.md` | Picking an icon size, deciding icon-only vs paired-with-label, applying icon color. |
 | `patterns.md` | Laying out a whole page — marketing landing, settings, dashboard shell, list+detail, auth, onboarding. |
+| `states.md` | Deciding which states a component needs (hover, focus, error, loading, skeleton…) or which fault states a page needs (404, 500, offline, empty). |
 | `voice.md` | Writing user-facing copy — labels, error messages, empty states, CTAs. |
 | `code-export.md` | Translating a design into code (React component, SwiftUI view, etc.). |
 

@@ -4,6 +4,8 @@ Page-level templates. The agent reads this when laying out a whole page, not jus
 
 The patterns below are starting structures, not rigid grids. Adapt rhythms; don't reinvent.
 
+**What this file does NOT own:** transitions *between* screens (modal-vs-page choice, validation timing, back-stack, multi-step flows, optimistic UI) — those are flow concerns, not layout concerns. When the auth or onboarding lockups below cross multiple steps, this file covers the *page* shape; the step-to-step behavior lives in the agent skill's `flows` reference.
+
 ## Marketing landing page
 
 A linear, scroll-down structure. **Don't** invent four-column feature grids or scroll-jacked sections by default.
