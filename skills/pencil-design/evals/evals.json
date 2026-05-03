@@ -5,7 +5,7 @@
       "id": 0,
       "name": "login-screen-greenfield",
       "prompt": "I need to design a login screen in pencil. It should have email + password inputs, a primary submit button, and a 'forgot password?' link. Walk me through what you'd do step by step before touching any tools.",
-      "expected_output": "Agent describes the seven-step workflow: detects host first, locates context (open .pen, design-system/ folder, selection), loads guidelines, plans, executes via batch_design, verifies via get_screenshot, iterates. References design-system/ check and library import. Plans before executing.",
+      "expected_output": "Agent describes the seven-step workflow: detects host first, locates context (open .pen, design-system/ folder, selection), loads guidelines, plans, executes via batch_design, verifies via the verification ladder (structural-first: batch_design response → snapshot_layout → batch_get → get_screenshot reserved for visual-only questions or final sign-off), iterates. References design-system/ check and library import. Plans before executing. Does NOT prescribe screenshotting after every chunk. Treats dual-mode (light + dark) screenshotting as conditional on mode-specific color usage, not mandatory.",
       "files": []
     },
     {
