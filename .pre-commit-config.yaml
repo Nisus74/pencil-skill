@@ -1,0 +1,35 @@
+# Pre-commit hooks for pencil-dev-skill.
+# Install: pip install pre-commit && pre-commit install
+# Run all: pre-commit run --all-files
+
+repos:
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: cef0300fd0fc4d2a87a85fa2093c6b283ea36f4b  # v5.0.0
+    hooks:
+      - id: check-yaml
+        exclude: ^skills/.*/SKILL\.md$  # SKILL.md is markdown with YAML frontmatter, not YAML
+      - id: check-json
+      - id: end-of-file-fixer
+      - id: trailing-whitespace
+
+  - repo: https://github.com/gitleaks/gitleaks
+    rev: 83d9cd684c87d95d656c1458ef04895a7f1cbd8e  # v8.30.1
+    hooks:
+      - id: gitleaks
+
+  - repo: local
+    hooks:
+      - id: skill-lint
+        name: OWASP AST skill lint
+        entry: python3 tools/skill-lint.py
+        language: system
+        pass_filenames: false
+        always_run: true
+        files: '^(skills/.*/SKILL\.md|\.claude-plugin/plugin\.json|gemini-extension\.json|\.github/workflows/.*\.ya?ml)$'
+
+      - id: skill-lint-tests
+        name: OWASP AST lint unit tests
+        entry: python3 tools/test_skill_lint.py
+        language: system
+        pass_filenames: false
+        files: '^tools/skill-lint\.py$|^tools/test_skill_lint\.py$'
