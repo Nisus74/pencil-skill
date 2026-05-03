@@ -14,14 +14,29 @@ This progressive loading keeps the agent's context small while still giving it t
 
 ## Files
 
+### Core (always present)
+
 | File | Read when… |
 |------|-----------|
 | `design-system.md` | Always (after this file). Pointer to the `.lib.pen`, tech stack, icon library, brand quick-reference. |
 | `tokens.md` | Picking a color, a spacing value, a font size, or any token-driven property. |
 | `components.md` | Deciding which component to use for a job (Button vs IconButton, Card vs Modal, etc.). |
 | `layout.md` | Setting auto-layout, choosing sizing behavior (`fill_container` vs `fit_content`), or laying out a page grid. |
+| `motion.md` | Adding any transition, hover effect, modal entrance, or animated state. |
+| `elevation.md` | Choosing shadows / depth — cards, modals, popovers, dropdowns. |
+| `iconography.md` | Picking an icon size, deciding icon-only vs paired-with-label, applying icon color. |
+| `patterns.md` | Laying out a whole page — marketing landing, settings, dashboard shell, list+detail, auth, onboarding. |
 | `voice.md` | Writing user-facing copy — labels, error messages, empty states, CTAs. |
 | `code-export.md` | Translating a design into code (React component, SwiftUI view, etc.). |
+
+### Optional (present only if your project ships these surfaces)
+
+| File | Read when… | Delete if… |
+|------|-----------|-----------|
+| `mobile.md` | Designing native-mobile patterns (tab bar, sheets, safe areas, gestures, haptics). | Your project is desktop-only. |
+| `data-viz.md` | Designing a chart, sparkline, or dashboard tile. | Your project doesn't render charts. |
+| `brand.md` | Placing a logo, designing OG/social-share imagery, applying brand identity. | Your project has no marketing surface and no distinct brand mark. |
+| `imagery.md` | Choosing photo style, illustration style, AI-imagery treatment, avatar fallbacks. | Your project is mostly chrome and data. |
 
 ## Editing this folder
 

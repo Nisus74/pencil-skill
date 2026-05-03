@@ -214,7 +214,7 @@ This is the reflex sequence for any design task. Follow it; deviate only at the 
 The default workflow assumes a fresh, end-to-end design. Most tasks aren't that. Deviate as follows:
 
 - **"Edit the X" or "change the Y to Z".** Skip the plan-the-tree part of step 4. `batch_get` the affected node first to see its current shape, then issue `R` (full replace) or `U` (property-level update) ops. `snapshot_layout` or `batch_get` on the changed node is usually enough; screenshot only if the change was visual (a color, an image, a spacing relationship the user described in pixel terms).
-- **"Use my design library" / library is imported.** After step 3, check the open document's `imports` field. If the named `.lib.pen` is imported, query its reusable components via `batch_get` and instantiate them with `ref` nodes — never re-build a Button from primitives when one exists. If the library isn't imported, add it first via a `U` op on the document root (see `references/example-import-library.md`).
+- **"Use my design library" / library is imported.** After step 3, check the open document's `imports` field. If the named `.lib.pen` is imported, query its reusable components via `batch_get` and instantiate them with `ref` nodes — never re-build a Button from primitives when one exists. If the library isn't imported, add it first via a `U` op on the document root (see `assets/examples/example-import-library.md`).
 - **User mentions an icon by name.** Always reach for `icon_font` (Lucide / Material Symbols / Phosphor / Feather). The icon library is named in `design-system/design-system.md`. Don't import an SVG unless the user is naming a specific custom asset.
 - **Big screen (>30 visible elements).** Plan multiple `batch_design` calls before starting. Build the page-level frame and main columns first, screenshot, then fill in. Cramming 60 ops into one call is asking for ordering bugs.
 - **No `design-system/` folder + the task is real project work** (not a one-off doodle). Pause once at step 2 and offer to scaffold (see Failure modes §3). If declined, proceed without; do not ask twice in the same session.
@@ -237,15 +237,33 @@ This skill teaches a project-level convention: a `design-system/` folder of mark
     tokens.md           ← which color / spacing / type token to use when
     components.md       ← catalog: when to pick which component
     layout.md           ← spacing rhythm, grid, auto-layout rules
+    motion.md           ← durations, easings, what to animate (and what not to)
+    elevation.md        ← shadow scale + dark-mode treatment (border/glow fallbacks)
+    iconography.md      ← stroke weight, sizes per context, icon-only vs paired
+    patterns.md         ← page-level templates (marketing, settings, dashboard, list/detail, auth)
     voice.md            ← microcopy tone, error/empty-state templates
     code-export.md      ← how Pencil concepts map to the chosen stack
+    # Optional, scaffolded conditionally (see scaffold offer below):
+    mobile.md           ← native-mobile patterns: tab bar, sheets, safe areas, gestures, haptics
+    data-viz.md         ← chart palettes, default chart types, dashboard tile shape
+    brand.md            ← logo lockups, clear space, OG / social imagery
+    imagery.md          ← photo / illustration style, aspect ratios, AI-imagery rules
 ```
 
 **Detection (step 2 of the workflow).** Look for `./design-system/`. Three states:
 
 - **Exists, has the files above.** Load `README.md`; load others on demand.
-- **Doesn't exist, and the task is real project work.** Offer once: *"This repo doesn't have a `design-system/` folder yet. I have seven template files I can drop in — they teach me your tokens, components, voice, and tech stack so designs stay consistent. Want me to scaffold them?"* On yes, copy from `assets/design-system/` (this skill's bundled templates) into the user's project. On no, proceed and don't ask again this session.
+- **Doesn't exist, and the task is real project work.** Offer once: *"This repo doesn't have a `design-system/` folder yet. I have 11 core templates I can drop in — they teach me your tokens, components, voice, motion, patterns, and tech stack. I can also include optional ones for mobile (`mobile.md`), charts (`data-viz.md`), brand identity (`brand.md`), or imagery treatment (`imagery.md`). Want me to scaffold the core, plus any optional ones that fit your project?"* On yes, copy from `assets/design-system/` (this skill's bundled templates) into the user's project — see "Conditional Tier 2 scaffolding" below. On no, proceed and don't ask again this session.
 - **Exists but contains source code** (`.tsx`, `package.json`, `index.js`, etc.) — i.e. it's a code module, not docs. **Do not overwrite.** Ask where to put the docs instead: `design-system/docs/`, `docs/design-system/`, `.pencil/design-system/`, or a custom path. Adjust the templates' internal cross-refs accordingly.
+
+**Conditional Tier 2 scaffolding.** Always copy the 11 core files. For the 4 optional files, use a combination of explicit user opt-in (in the scaffold offer) and project signals:
+
+- `mobile.md` — include if the user opts in OR if the project shows mobile signals: `react-native`, `expo`, `flutter` in `package.json` / `pubspec.yaml`; an iOS / Android / SwiftUI / Kotlin folder; a `Podfile` or `*.xcodeproj`; or the user's stated `Build target` includes `iOS`, `Android`, or `mobile-web`.
+- `data-viz.md` — include if the user opts in. There's no reliable signal for "this product has charts" from a fresh repo; ask if it's not obvious.
+- `brand.md` — include if the user opts in OR if the project clearly ships a marketing surface (a `marketing/`, `www/`, or `landing/` directory; multiple `app.tsx` / `landing.tsx` files; a `next.config.js` with public marketing routes).
+- `imagery.md` — include if the user opts in OR if `brand.md` is being included (they pair) OR the project is content-heavy.
+
+When in doubt, prefer **including** an optional file with its delete-this-file-if header at top, over silently omitting it. A user can delete a file in 2 seconds; reconstructing one they didn't know existed is harder.
 
 The folder name is **`design-system/`**, not `pencil/`. The contents are tool-agnostic markdown — frontend coding agents can read them too.
 
@@ -263,7 +281,7 @@ This makes the library's variables and `reusable: true` components available. In
 
 When to make a `.lib.pen`: as soon as the project has more than one `.pen` and you find yourself recreating the same component. Don't create one prematurely; one-off designs don't need it.
 
-When to import a library on the user's behalf: only when `design-system/design-system.md` declares the path AND the open document's `imports` doesn't include it. See `references/example-import-library.md` for the exact ops.
+When to import a library on the user's behalf: only when `design-system/design-system.md` declares the path AND the open document's `imports` doesn't include it. See `assets/examples/example-import-library.md` for the exact ops.
 
 ## batch_design grammar (essentials)
 
@@ -326,7 +344,7 @@ Six concrete cases. Detect, respond, do not improvise.
 |---|------|------------------|----------|
 | 1 | MCP not connected | `get_editor_state` errors with `transport not connected to app: desktop` (or any connection-refused message) | Stop. Tell the user: *"Pencil's MCP server isn't reachable. Open the Pencil desktop app or the Pencil IDE extension, then ask me again."* Do not fall back to the CLI silently. |
 | 2 | No .pen file open | `get_editor_state` succeeds but reports no active document | Ask the user: *"No `.pen` file is open. Should I (a) open an existing one — give me the path, or (b) create a new one with `open_document('new')`?"* Wait for the answer. |
-| 3 | No `design-system/` folder | Folder absent in the project root AND the task implies real project work (not a sketch) | Offer once: *"This repo doesn't have a `design-system/` folder yet. I have seven template files I can drop in. Want me to scaffold them?"* On yes, copy from `assets/design-system/`. On no, proceed without; do not ask again this session. |
+| 3 | No `design-system/` folder | Folder absent in the project root AND the task implies real project work (not a sketch) | Offer once: *"This repo doesn't have a `design-system/` folder yet. I have 11 core templates I can drop in, plus 4 optional ones (`mobile.md`, `data-viz.md`, `brand.md`, `imagery.md`) for projects that ship those surfaces. Want me to scaffold the core, plus any optional ones that fit your project?"* On yes, copy from `assets/design-system/` per the conditional rules in the Design-system convention section above. On no, proceed without; do not ask again this session. |
 | 4 | Conflicting `design-system/` | Folder exists but contains code files (`.tsx`, `.ts`, `package.json`, `index.js`, etc.) | Do not overwrite. Ask where to place docs instead: `design-system/docs/`, `docs/design-system/`, `.pencil/design-system/`, or a custom path. Adjust scaffolded files' cross-refs. |
 | 5 | .lib.pen import missing | `design-system/design-system.md` names a library path; the open doc's `imports` doesn't include it (or the file at the path doesn't exist) | If the file exists: add the `imports` entry via `batch_design` `U` op on the document root. If the file doesn't exist: tell the user the path in `design-system.md` is stale, ask whether to update the path or create the library. Don't silently invent. |
 | 6 | batch_design schema error | Server returns an error mentioning invalid op, unknown type, invalid property, or missing parent | Read the error verbatim. Cross-reference `references/batch-design-grammar.md` and `references/pen-schema.md`. Common causes: id contains `/`; used `width: "100%"` (use bare-string `"fill_container"`); used the older `{ sizing: "fill_container" }` object (use the bare string); used `stroke.fills` plural or `stroke.alignment` (use singular `stroke.fill`); passed raw color where a `$variable` was expected; referenced a parent before binding it. Retry with the fix; never blindly. |
@@ -344,8 +362,9 @@ The Pencil MCP tool names (`get_editor_state`, `batch_design`, etc.) are identic
 - `references/pen-schema.md` — full `.pen` data model: every node type, properties, layout/sizing/variables, theme axes, components, slots
 - `references/batch-design-grammar.md` — complete `batch_design` op syntax and chunking rules
 - `references/pencil-cli.md` — what `@pencil.dev/cli` is and why this skill does not auto-fall-back to it
-- `references/example-login-screen.md` — worked example: greenfield design from prompt
-- `references/example-import-library.md` — worked example: importing a `.lib.pen` and instantiating its components
-- `references/example-scaffold-system.md` — worked example: scaffolding `design-system/` into a fresh project
+- `assets/examples/example-login-screen.md` — worked example: greenfield design from prompt
+- `assets/examples/example-import-library.md` — worked example: importing a `.lib.pen` and instantiating its components
+- `assets/examples/example-scaffold-system.md` — worked example: scaffolding `design-system/` into a fresh project
 - `references/codex-tools.md`, `references/gemini-tools.md`, `references/copilot-tools.md` — platform tool-name mappings
-- `assets/design-system/` — the seven markdown templates copied into user projects on scaffold
+- `assets/design-system/` — the 11 core markdown templates copied into user projects on scaffold (`README.md`, `design-system.md`, `tokens.md`, `components.md`, `layout.md`, `motion.md`, `elevation.md`, `iconography.md`, `patterns.md`, `voice.md`, `code-export.md`), plus 4 optional templates scaffolded conditionally (`mobile.md`, `data-viz.md`, `brand.md`, `imagery.md`)
+- `assets/examples/` — worked walkthroughs the agent loads on demand (greenfield design, library import, scaffolding)
