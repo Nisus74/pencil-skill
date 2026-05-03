@@ -336,6 +336,34 @@ def check_cross_manifest_consistency(paths: list[Path]) -> list[Finding]:
     return findings
 
 
+_USES_RE = re.compile(r"^\s*-\s*uses:\s*([^\s#]+)(.*)$")
+_PINNED_RE = re.compile(r"^[A-Za-z0-9._/-]+@[a-f0-9]{40}$")
+_INLINE_ALLOW_RE = re.compile(r"#\s*skill-lint:\s*AST(02|07)\s+allow\s*[—-]\s*\S")
+
+
+def check_workflow_pin(path: Path) -> list[Finding]:
+    findings: list[Finding] = []
+    for lineno, line in enumerate(path.read_text(encoding="utf-8").splitlines(), 1):
+        m = _USES_RE.match(line)
+        if not m:
+            continue
+        ref = m.group(1)
+        rest = m.group(2)
+        if _INLINE_ALLOW_RE.search(rest):
+            continue
+        if not _PINNED_RE.match(ref):
+            findings.append(Finding(
+                code="AST07",
+                severity=SEVERITY_ERROR,
+                location=f"{path}:{lineno}",
+                message=(
+                    f"'{ref}' is not pinned to a 40-char SHA "
+                    "(format: owner/repo@<40-hex>  # vX.Y.Z)"
+                ),
+            ))
+    return findings
+
+
 def lint_paths(paths: list[Path]) -> list[Finding]:
     """Return findings for the given paths. Empty list = clean."""
     findings: list[Finding] = []
