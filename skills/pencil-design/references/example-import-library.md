@@ -56,13 +56,23 @@ submit=I(form, { type: "ref", ref: "ButtonPrimary", descendants: { label: { text
 
 Five ops.
 
-## Step 7 — Verify
+## Step 7 — Verify (structural-first)
+
+Walk the ladder. Cheapest first — confirm the refs resolved and bound correctly:
 
 ```
-get_screenshot(form)
+batch_get({ nodeIds: [emailField, passwordField, submit] })
 ```
 
-If components render correctly (correct fonts, correct primary color from the library's variables), you're done. If a `ref` shows as a placeholder, the import path is wrong or the component id is misspelled — fix and retry.
+This returns the resolved instance trees. If a `ref` shows as a placeholder (no resolved descendants, original component name missing), the import path is wrong or the component id is misspelled — fix and retry before screenshotting.
+
+If the refs resolved, take one screenshot scoped to the form for final visual sign-off:
+
+```
+get_screenshot(nodeId: "form")
+```
+
+Confirm fonts, the primary color from the library's variables, and overall rhythm. Don't screenshot the whole page when the form subtree is what changed.
 
 ## Common pitfalls
 

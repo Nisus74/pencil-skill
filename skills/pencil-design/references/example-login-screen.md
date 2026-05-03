@@ -58,28 +58,42 @@ forgot=I(form, { type: "ref", ref: "LinkText", descendants: { label: { text: "Fo
 
 10 ops — well under 25.
 
-## Step 6 — Verify
+## Step 6 — Verify (structural-first)
+
+Walk the verification ladder. Start cheap:
 
 ```
-get_screenshot()
+snapshot_layout({ parentId: "page", maxDepth: 2 })
 ```
 
-Look at the result. Assume two issues surface:
+This tells us positions and sizes — confirms the form card's width, the `page`'s computed height, the `gap` values between rows. Suppose it surfaces one issue: `page`'s computed height is shorter than 900 (the document root is constraining it), so `justifyContent: "center"` has nothing to center within.
 
-1. Form is sitting at the very top of the page — `justifyContent` on `page` was `start` not `center`.
-2. The forgot-password link is left-aligned; should be centered to match the form's vertical rhythm.
-
-(Wait — `justifyContent` was set to `"center"` in the op. If the screenshot shows it at the top, the parent `page` height isn't actually 900 — perhaps the document root constrains it. This is the sort of thing the screenshot reveals that the JSON wouldn't.)
-
-## Step 7 — Iterate
+That's a structural issue — fix it before reaching for pixels:
 
 ```
 U("page", { height: "fill_container(900)" })
+```
+
+Now the visual sign-off, scoped to the page (not the document root):
+
+```
+get_screenshot(nodeId: "page")
+```
+
+Suppose one visual issue remains that the snapshot couldn't catch: the forgot-password link is left-aligned and looks off against the centered form. Fix it:
+
+```
 U(forgot, { textAlign: "center" })
 ```
 
-Screenshot again. Looks right.
+## Step 7 — Final visual sign-off
+
+```
+get_screenshot(nodeId: "page")
+```
+
+Looks right. Two screenshots total — one after the structural fix, one for final sign-off — both scoped to the `page` node, never the document root.
 
 ## Final report to user
 
-> *"Done. Login screen at `LoginPage` — 1440×900, centered 360px form card with email/password inputs, primary submit, and a centered forgot-password link. All components are instances of your library (`Input`, `ButtonPrimary`, `LinkText`); colors and spacing reference your tokens. Two iterations after the first screenshot to fix vertical centering and link alignment."*
+> *"Done. Login screen at `LoginPage` — 1440×900, centered 360px form card with email/password inputs, primary submit, and a centered forgot-password link. All components are instances of your library (`Input`, `ButtonPrimary`, `LinkText`); colors and spacing reference your tokens. Verified structurally with `snapshot_layout`, then a screenshot of the page revealed the link was off-center; fixed and re-verified."*

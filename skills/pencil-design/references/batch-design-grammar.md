@@ -105,7 +105,7 @@ A single call should stay at or under 25 ops. Why:
 For big screens, plan the order:
 
 1. **Skeleton call:** page frame + main columns + sidebar + footer. Maybe 5-10 ops.
-2. **Verify** with `get_screenshot()` — page geometry should look right.
+2. **Verify structurally** with `snapshot_layout(parentId: "<page>", maxDepth: 2)` — the geometry numbers tell you whether the skeleton landed without paying for a screenshot.
 3. **Region calls:** one per substantial region (hero, form, list). Each ≤25 ops.
 4. **Polish call:** final tweaks, after the main structure is solid.
 
