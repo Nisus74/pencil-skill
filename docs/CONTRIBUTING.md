@@ -12,6 +12,9 @@ bug reports, workflow improvements, new trigger phrases, and platform-specific f
 - For questions or discussion, use [GitHub Discussions](https://github.com/Nisus74/pencil-skill/discussions)
   rather than opening an issue.
 - Please read and follow the [Code of Conduct](./CODE_OF_CONDUCT.md).
+- **Never commit secrets.** API keys, tokens, passwords, and credentials must never appear
+  in any file. Every PR is automatically scanned by [gitleaks](https://github.com/gitleaks/gitleaks)
+  and will be blocked if secrets are detected.
 
 ---
 
