@@ -1,0 +1,16 @@
+{
+  "name": "pencil-dev-skill",
+  "displayName": "Pencil.dev Design Skill",
+  "description": "Teaches Claude Code to read, generate, and validate pencil.dev designs using .pen files and the Pencil MCP server",
+  "version": "0.1.0",
+  "author": {
+    "name": "Travis Polland",
+    "email": "tpolland@gmail.com",
+    "url": "https://github.com/Nisus74"
+  },
+  "homepage": "https://github.com/Nisus74/pencil-skill",
+  "repository": "https://github.com/Nisus74/pencil-skill",
+  "license": "MIT",
+  "keywords": ["design", "pencil", "pencil-dev", "ui", "pen-files", "mcp", "design-tool"],
+  "skills": "./skills/"
+}
