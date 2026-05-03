@@ -37,5 +37,35 @@ class MainTest(unittest.TestCase):
         self.assertEqual(skill_lint.main(["skill-lint.py"]), 0)
 
 
+class FrontmatterLoadsSafelyTest(unittest.TestCase):
+    def _write(self, tmp: Path, body: str) -> Path:
+        p = tmp / "SKILL.md"
+        p.write_text(body)
+        return p
+
+    def test_clean_frontmatter_no_findings(self):
+        import tempfile
+        with tempfile.TemporaryDirectory() as tmp:
+            p = self._write(Path(tmp), "---\nname: x\n---\nbody\n")
+            self.assertEqual(skill_lint.check_frontmatter_loads_safely(p), [])
+
+    def test_python_tag_is_rejected(self):
+        import tempfile
+        with tempfile.TemporaryDirectory() as tmp:
+            p = self._write(Path(tmp), "---\n!!python/object/apply:os.system ['id']\n---\n")
+            findings = skill_lint.check_frontmatter_loads_safely(p)
+            self.assertTrue(findings)
+            self.assertEqual(findings[0].code, "AST05")
+            self.assertEqual(findings[0].severity, "error")
+
+    def test_missing_frontmatter_block(self):
+        import tempfile
+        with tempfile.TemporaryDirectory() as tmp:
+            p = self._write(Path(tmp), "no frontmatter at all\n")
+            findings = skill_lint.check_frontmatter_loads_safely(p)
+            self.assertTrue(findings)
+            self.assertEqual(findings[0].code, "AST05")
+
+
 if __name__ == "__main__":
     unittest.main()
