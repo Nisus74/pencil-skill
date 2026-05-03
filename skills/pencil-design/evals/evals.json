@@ -21,6 +21,13 @@
       "prompt": "I have a design library at design/system.lib.pen with Button and Input components. Add a sign-up form to my open .pen file using those components. Explain the tools you'd call and why.",
       "expected_output": "Agent verifies the document's imports field, adds an imports entry via U op on document root if missing, queries the library's reusable components, instantiates Button and Input via ref nodes (not from primitives), uses descendants for instance-level overrides. Verifies via the verification ladder: snapshot_layout or batch_get on the instantiated refs first to confirm structure and bindings, then a single get_screenshot scoped to the form/card subtree (via nodeId) — never the page frame — only as final sign-off.",
       "files": []
+    },
+    {
+      "id": 3,
+      "name": "edit-existing-card-verification-ladder",
+      "prompt": "I want to test how you verify edits. First, create a brand-new .pen scratch document with a single LoginCard frame containing: a 'Sign in' heading, an Email input, a Password input, a primary 'Sign in' button (blue fill), and a 'Forgot password?' link below the button. Once that's in place, perform this edit: change the Sign in button's fill to a brand green color, and add 8px of paddingTop to the link's container so it has more breathing room. After the edit, explain — step by step — exactly which MCP tools you called to verify the edit landed correctly, in what order, and why you chose each. Be precise about which nodeId you passed to each verification call.",
+      "expected_output": "Agent first creates the scratch design via batch_design (this phase is not graded). For the edit phase: identifies the affected nodes via batch_get, performs the two-op edit in a single batch_design call. Verification follows the four-rung ladder: (1) acknowledges the batch_design response confirmed both ops landed; (2) calls snapshot_layout scoped to the LoginCard (parentId is the card, not the document root) to confirm the link's paddingTop is 8 and the button's geometry is unchanged; (3) calls batch_get on the button node to confirm fill resolved to the brand green variable (not a raw hex); (4) calls get_screenshot AT MOST ONCE, scoped to the LoginCard nodeId (NOT the document root or page frame), as a final visual sign-off. Total get_screenshot calls in the edit phase: exactly 1. Does NOT re-screenshot in dark mode (the change is structural + a variable-bound color, not mode-conditional). Does NOT screenshot the document root.",
+      "files": []
     }
   ]
 }
