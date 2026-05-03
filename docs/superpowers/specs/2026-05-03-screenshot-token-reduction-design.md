@@ -226,16 +226,80 @@ rule.
 
 ## How we'll know it's working
 
+The skill already has an eval harness at `skills/pencil-design/evals/`
+with three evals (`login-screen-greenfield`, `design-system-scaffold`,
+`import-library-and-use`). Per-run output (`run-N/timing.json`) records
+`total_tokens` and `duration_ms`; per-run grading
+(`run-N/grading.json`) records assertion pass/fail. Each eval runs in
+both `with_skill` and `without_skill` modes. This gives us exactly the
+two axes we need: **token cost** and **quality** — the latter measured
+as assertion pass rate.
+
+The eval changes are part of this work; without them we have no way to
+confirm the change helped without breaking anything.
+
+### Eval changes
+
+**1. Add behavioral assertions to existing evals.**
+
+To `eval-0-login-screen-greenfield` (workflow description):
+- *"Does NOT prescribe screenshotting after every chunk; describes
+  verification as structural-first (snapshot_layout / batch_get) with
+  get_screenshot reserved for visual-only questions or final sign-off."*
+- *"Does NOT mandate dual-mode (light + dark) screenshotting; treats it
+  as conditional on mode-specific color usage."*
+
+To `eval-2-import-library-and-use` (form with components):
+- *"Mentions snapshot_layout or batch_get verification of the
+  instantiated refs before any screenshot."*
+- *"If a screenshot is described, scopes it to the form/card subtree
+  via nodeId — not to the page frame."*
+
+**2. Add one new execution eval.**
+
+`eval-3-edit-existing-card` — a small, focused edit task on a fixture
+`.pen` file (similar in shape to the worked example in this spec: change
+a button color and adjust one spacing value). The model must actually
+call MCP tools, not just describe them. Assertions:
+- The change actually lands in the file (verify via post-run
+  `batch_get`).
+- The model uses `snapshot_layout` or `batch_get` to verify before any
+  `get_screenshot`.
+- At most one `get_screenshot` call (the final sign-off).
+- All `get_screenshot` calls are scoped to the affected node, not the
+  document root.
+
+This is the eval that produces the headline number. Without it, we are
+measuring described intent, not actual behavior.
+
+### Acceptance criteria
+
+The change is accepted when, comparing before-change and after-change
+runs of the eval suite:
+
+- **Cost:** `total_tokens` on `eval-3-edit-existing-card` (the only eval
+  where the model actually executes) drops by ≥30% in `with_skill` mode.
+  Descriptive evals (0, 1, 2) may show small token shifts in either
+  direction; that is acceptable as long as quality holds.
+- **Quality:** assertion pass rate on every eval stays at or above its
+  pre-change value. Eval 0 currently grades 10/10 in `with_skill`; that
+  must not regress.
+- **No new failures introduced:** `without_skill` runs are a control —
+  their grading should not improve more than `with_skill` runs (which
+  would suggest the skill is now actively harmful).
+
+If the criteria are met on the local eval suite, the change ships. If
+they are not, iterate on the SKILL.md edits until they are.
+
+### Production signal (post-ship)
+
+Beyond the eval suite, watch for:
 - **Behavioral signal (qualitative):** in real design tasks after the
   change, the model reaches for `snapshot_layout` or `batch_get` first,
   and screenshots once or twice per task instead of every chunk.
 - **Quality signal:** no increase in user-reported "you didn't notice X
   was wrong" complaints. If a regression pattern shows up (e.g. "missed
   dark-mode contrast bugs"), tighten the dual-mode rule.
-
-A formal eval suite is not required for this change — it is a
-prompting/policy edit to a skill, and the feedback loop on real use is
-fast.
 
 ## Follow-ups (out of scope here)
 
