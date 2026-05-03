@@ -308,5 +308,50 @@ class CrossManifestTest(unittest.TestCase):
             self.assertTrue(any(f.code == "AST10" for f in findings))
 
 
+class WorkflowPinTest(unittest.TestCase):
+    def _wf(self, tmp: Path, body: str) -> Path:
+        d = tmp / ".github" / "workflows"
+        d.mkdir(parents=True)
+        p = d / "ci.yml"
+        p.write_text(body)
+        return p
+
+    def test_pinned_sha_with_comment_passes(self):
+        import tempfile
+        with tempfile.TemporaryDirectory() as tmp:
+            p = self._wf(Path(tmp),
+                "jobs:\n  x:\n    runs-on: ubuntu-latest\n    steps:\n"
+                "      - uses: actions/checkout@" + ("a" * 40) + "  # v4.2.2\n"
+            )
+            self.assertEqual(skill_lint.check_workflow_pin(p), [])
+
+    def test_floating_tag_is_error(self):
+        import tempfile
+        with tempfile.TemporaryDirectory() as tmp:
+            p = self._wf(Path(tmp),
+                "jobs:\n  x:\n    steps:\n      - uses: actions/checkout@v4\n"
+            )
+            findings = skill_lint.check_workflow_pin(p)
+            self.assertTrue(any(f.code in ("AST02", "AST07") for f in findings))
+
+    def test_short_sha_is_error(self):
+        import tempfile
+        with tempfile.TemporaryDirectory() as tmp:
+            p = self._wf(Path(tmp),
+                "jobs:\n  x:\n    steps:\n      - uses: actions/checkout@abc1234\n"
+            )
+            findings = skill_lint.check_workflow_pin(p)
+            self.assertTrue(any(f.code in ("AST02", "AST07") for f in findings))
+
+    def test_inline_skill_lint_allow_suppresses(self):
+        import tempfile
+        with tempfile.TemporaryDirectory() as tmp:
+            p = self._wf(Path(tmp),
+                "jobs:\n  x:\n    steps:\n"
+                "      - uses: actions/checkout@v4  # skill-lint: AST07 allow — local-only test\n"
+            )
+            self.assertEqual(skill_lint.check_workflow_pin(p), [])
+
+
 if __name__ == "__main__":
     unittest.main()
