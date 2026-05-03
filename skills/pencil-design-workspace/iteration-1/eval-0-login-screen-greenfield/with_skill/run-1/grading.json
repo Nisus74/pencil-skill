@@ -1,0 +1,60 @@
+{
+  "expectations": [
+    {
+      "text": "Mentions calling get_editor_state as the first step (host detection)",
+      "passed": true,
+      "evidence": "Line 8: 'get_editor_state({ include_schema: false })' explicitly described as 'First call would be:'"
+    },
+    {
+      "text": "Names the seven-step default workflow OR enumerates at least five of: detect host, locate context, load guidelines, plan, execute, verify, iterate",
+      "passed": true,
+      "evidence": "Sections 1-7 follow the workflow exactly: 'Detect the Pencil host', 'Locate context', 'Load guidelines', 'State the plan', 'Open the document if needed', 'First batch_design \u2014 skeleton + components', 'Verify with get_screenshot()', 'Iterate or report'"
+    },
+    {
+      "text": "Mentions checking for an open .pen file and creating one (via open_document) if none is open",
+      "passed": true,
+      "evidence": "Lines 25-26: 'No .pen open. I'd ask whether you want me to open an existing file (give me the path) or create a new one with open_document(\"new\")'"
+    },
+    {
+      "text": "Mentions checking for a design-system/ folder before designing",
+      "passed": true,
+      "evidence": "Line 21: 'Does the project root have a design-system/ folder?' plus all branch handling on lines 27-28"
+    },
+    {
+      "text": "States a concrete plan (form layout, dimensions, components) before describing batch_design ops",
+      "passed": true,
+      "evidence": "Lines 43-46: 'Centered single-column login at 1440x900. A ~360px-wide form card with title... an email Input and a password Input (instances of your library's Input component if present), a primary submit Button as a ref, and a Forgot password? link beneath it.'"
+    },
+    {
+      "text": "References batch_design with at least one specific op (I, C, R, U, or G) \u2014 bonus if it shows the foo=I(...) binding pattern",
+      "passed": true,
+      "evidence": "Lines 68-76 show I, C, R, U ops; explicit foo=I(...) binding pattern at lines 69, 70, 71. Line 79: 'The foo=I(...) binding form so later ops can reference nodes I just created'"
+    },
+    {
+      "text": "Mentions get_screenshot for verification after batch_design",
+      "passed": true,
+      "evidence": "Line 87: 'Verify with get_screenshot()' \u2014 entire section 6 is dedicated to it"
+    },
+    {
+      "text": "References variables ($primary, $space-N, $textBase or similar) rather than raw hex/px values",
+      "passed": true,
+      "evidence": "$surface, $surfaceMuted, $space-4, $space-6, $text2xl, $textBase, $textMuted all used throughout the batch_design example"
+    },
+    {
+      "text": "Mentions instantiating Input and ButtonPrimary as ref nodes from a library, NOT building them from primitives",
+      "passed": true,
+      "evidence": "Lines 73-76 use type: 'ref', ref: 'Input'/'ButtonPrimary'/'LinkText' with descendants overrides. Line 84: 'as soon as a project has more than one .pen, those components belong in a .lib.pen'"
+    },
+    {
+      "text": "Mentions stopping if MCP host is not connected (failure mode 1) \u2014 at least implicitly",
+      "passed": true,
+      "evidence": "Line 11: 'If this errors with something like transport not connected to app: desktop, I stop and ask you to open the Pencil desktop app or the Pencil IDE extension... I won't silently fall back to the CLI.'"
+    }
+  ],
+  "summary": {
+    "pass_rate": 1.0,
+    "passed": 10,
+    "failed": 0,
+    "total": 10
+  }
+}

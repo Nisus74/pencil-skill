@@ -68,8 +68,10 @@ The skill lives in `skills/pencil-design/SKILL.md`. When editing it:
   Include the exact phrases users are likely to say.
 - Keep the main `SKILL.md` focused on the core workflow. Move detailed edge cases
   or reference content to `skills/pencil-design/references/`.
-- Never instruct the AI to use `Read`, `Grep`, or other file tools on `.pen` files —
-  they are encrypted and must be accessed via the Pencil MCP tools only.
+- Always route `.pen` reads and writes through the Pencil MCP tools. The format is
+  JSON and technically readable with file tools, but the MCP path gives you schema
+  validation, screenshot feedback, and live-editor sync — and it's the contract the
+  skill teaches.
 - Document tool sequencing where it matters (e.g., call `get_editor_state` before
   `batch_design`).
 

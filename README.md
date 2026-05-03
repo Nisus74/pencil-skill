@@ -9,8 +9,8 @@ Works with Claude Code, OpenAI Codex, Google Gemini CLI, GitHub Copilot CLI, and
 
 ## What This Skill Does
 
-- Guides the AI through reading and interpreting `.pen` design files safely
-  (`.pen` files are encrypted — file tools cannot open them directly)
+- Guides the AI through reading and interpreting `.pen` design files via the
+  Pencil MCP server (the schema-enforced, screenshot-aware path)
 - Documents the Pencil MCP server tools and when to use each one
 - Provides workflow patterns for generating and editing UI designs in pencil.dev
 - Includes per-platform tool-name mappings so the same skill works everywhere

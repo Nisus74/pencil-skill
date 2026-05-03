@@ -1,0 +1,50 @@
+{
+  "expectations": [
+    {
+      "text": "Calls get_editor_state first to verify host and inspect the open document's imports field",
+      "passed": true,
+      "evidence": "Line 5: 'get_editor_state({ include_schema: true })' as step 1."
+    },
+    {
+      "text": "Adds the library to the document's imports (e.g. via U op on document root with imports: { ds: './design/system.lib.pen' }) when not already imported",
+      "passed": false,
+      "evidence": "Lines 21-23 use open_document on the library file instead of an imports entry. Misunderstands the cross-document model: 'open_document(\"design/system.lib.pen\")... this either makes the library available to the active document as a linked dependency, or simply gives me a readable handle to copy from.' Hand-wavy and wrong."
+    },
+    {
+      "text": "Reads the library to discover available reusable components (batch_get with a cross-document pattern)",
+      "passed": true,
+      "evidence": "Line 27: 'batch_get(patterns: [\"Button\", \"Input\"])' \u2014 does query the library."
+    },
+    {
+      "text": "Instantiates Button and Input via ref nodes (type: 'ref', ref: '<componentId>') NOT by recreating them from primitives",
+      "passed": false,
+      "evidence": "Lines 56-61 use C (copy) instead of ref. Line 68: 'C (copy/instance) for Button and Input' \u2014 the agent treats copy as instancing, but C duplicates the node, which doesn't create a live link to the library. The skill's pen-schema reference says ref is the instantiation primitive."
+    },
+    {
+      "text": "Uses descendants for instance-level overrides (label text, placeholders, etc.)",
+      "passed": false,
+      "evidence": "Uses 'props: { ... }' syntax (lines 56-61), which isn't the .pen schema. Pencil's override mechanism is descendants keyed by child id, not props."
+    },
+    {
+      "text": "Mentions screenshot verification after the form lands",
+      "passed": true,
+      "evidence": "Line 75: 'get_screenshot()' in step 7."
+    },
+    {
+      "text": "States a brief plan before issuing batch_design ops",
+      "passed": false,
+      "evidence": "Plan rationale ('Why this shape') comes after the ops, not before. The agent does not state intent in plain language to the user before writing code."
+    },
+    {
+      "text": "Notes that the imports path is relative to the importing .pen, not the project root",
+      "passed": false,
+      "evidence": "Doesn't address path resolution. Also propagates the encryption myth (line 22: '.pen library files are encrypted on disk \u2014 I cannot Read them')."
+    }
+  ],
+  "summary": {
+    "pass_rate": 0.25,
+    "passed": 2,
+    "failed": 6,
+    "total": 8
+  }
+}
