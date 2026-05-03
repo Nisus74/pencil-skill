@@ -28,7 +28,43 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `.gitleaks.toml` simplified — empty `[allowlist]` block removed (gitleaks 8.x rejects it)
 - Plugin and skill versions bumped to `1.1.0`
 
-## [Unreleased]
+## [1.0.0] - 2026-05-03
+
+### Added
+
+- Full `pencil-design` skill content: mental model, default seven-step workflow, design intelligence, design-system convention, .lib.pen library guidance, batch_design grammar essentials, screenshot verification loop, and a six-case failure-mode runbook
+- `design-system/` markdown convention for user projects, with seven shippable templates in `skills/pencil-design/assets/design-system/` (`README.md`, `design-system.md`, `tokens.md`, `components.md`, `layout.md`, `voice.md`, `code-export.md`)
+- New reference files (flat per agentskills.io spec): `pen-schema.md`, `batch-design-grammar.md`, `pencil-cli.md`, `example-login-screen.md`, `example-import-library.md`, `example-scaffold-system.md`
+- Skill frontmatter conformance with the [Agent Skills standard](https://agentskills.io/specification): `name`, `description`, `license`, `compatibility`, `metadata.version`. Description follows `superpowers:writing-skills` style — imperative, intent-focused, ≤200 words, no workflow summary
+- Skill validated against the official `skills-ref validate` checker
+- Eval workflow run via Anthropic's `skill-creator` plugin: 3 test prompts × with-skill / baseline subagents → graded → benchmark.json with delta. Results: with-skill 100%, baseline 23%, delta +77pp
+
+### Changed
+
+- Corrected `.pen` file format claim: `.pen` is JSON conforming to a published schema, not encrypted. `AGENTS.md`, `README.md`, and the skill body all updated. MCP-first guidance retained for schema validation, screenshot feedback, and live-editor sync
+- Plugin description widened to mention design-system docs and `.lib.pen` libraries
+- Plugin and skill versions bumped to `1.0.0`
+
+### Fixed (live-test corrections)
+
+- Width/height sizing syntax: bare-string form (`"fill_container"`, `"fit_content"`, `"fill_container(320)"`) — not the older `{ sizing: ... }` object form, which the live server rejects with `expected one of: number, "$variable", sizing behavior...`
+- Stroke schema: singular `fill` (not plural `fills`); the live server rejects `fills` and top-level `alignment` as unexpected properties
+- All affected references and the SKILL.md failure-mode runbook updated
+
+### Added (discipline rules)
+
+New "Discipline rules (always apply)" section in SKILL.md covering six non-negotiable disciplines, plus matching template updates:
+
+- **Naming:** every node gets a meaningful PascalCase, role-bearing name (no default `Frame` / `Group` / `Text`). The agent also audits and renames default-named layers proactively when reading existing files — issuing a `U` op in the same `batch_design` call where it's already touching that area.
+- **Context:** every non-trivial node populates the Entity `context` field with one-sentence design intent — required for components, page-level frames, form fields, interactive elements. The agent also backfills missing context on existing nodes it reads, in passing.
+- **Components first:** before building from primitives, the agent scans (1) the open document for `reusable: true` nodes and (2) every imported `.lib.pen` library — using `batch_get({ patterns: [{ reusable: true }] })` in both. When a matching component exists, instantiate via `ref` with optional `descendants` overrides. Building from primitives only when no matching component exists, when the user explicitly asks for a one-off, or when the need is genuinely different — and even then, surfaces the gap to the user.
+- **Themes (light + dark):** every new document declares `themes: { mode: ["light", "dark"] }`; every color variable carries both values; verification re-screenshots under `theme: { mode: "dark" }`. `tokens.md` template now has Light/Dark columns plus `$focusRing`.
+- **Responsive:** canonical breakpoints (mobile 390×844, tablet 768×1024, desktop 1440×900). Two patterns documented: per-breakpoint frames and fluid auto-layout. `layout.md` template updated with the table and pattern guidance.
+- **Accessibility:** five non-negotiable verification checks — contrast ≥ AA in both modes, hit targets ≥ 44×44, color is never the only signal, semantic role-bearing names, every component covers default / hover / focus / active / disabled / loading / error states. `components.md` template updated with the state-coverage table and a11y role naming convention.
+
+Workflow steps 3 (load guidelines + inventory components), 5 (execute), and 6 (verify) updated to reference the discipline rules inline.
+
+## [0.2.0] - 2026-05-03
 
 ### Added
 

@@ -106,9 +106,11 @@ docs/
 
 ## The Pencil MCP Server
 
-pencil.dev stores designs in encrypted `.pen` files.
-**Never use `Read`, `Grep`, or any file tool on `.pen` files.**
-Always use the Pencil MCP tools:
+`.pen` files are JSON conforming to a published schema (`Document` with `version`,
+`themes`, `imports`, `variables`, `children`). They are version-controllable like
+any code file. While they can technically be read with file tools, **all reading
+and writing in this project goes through the Pencil MCP server** — it gives
+schema validation, live screenshots, and stays in sync with the running editor:
 
 | Tool | Purpose |
 |------|---------|
@@ -135,7 +137,7 @@ When writing or editing `skills/pencil-design/SKILL.md`:
 1. The `description` frontmatter field is the trigger mechanism — include exact phrases users say
 2. Keep `SKILL.md` under ~5,000 words; move detailed references to `references/`
 3. Use progressive disclosure: core workflow in `SKILL.md`, edge cases in `references/`
-4. Never instruct AI to use `Read`/`Grep` on `.pen` files — always use MCP tools
+4. Always route `.pen` reads/writes through the Pencil MCP tools — schema validation, screenshots, and live-editor sync depend on it
 5. Document tool sequencing (e.g., call `get_editor_state` before `batch_design`)
 6. Keep instructions **platform-agnostic**. Use generic verbs ("read", "write", "search")
    rather than tool names where possible. When tool names are necessary, default to the

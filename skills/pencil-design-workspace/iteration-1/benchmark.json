@@ -1,0 +1,433 @@
+{
+  "metadata": {
+    "skill_name": "pencil-design",
+    "skill_path": "<path/to/skill>",
+    "executor_model": "<model-name>",
+    "analyzer_model": "<model-name>",
+    "timestamp": "2026-05-03T02:58:08Z",
+    "evals_run": [
+      0,
+      1,
+      2
+    ],
+    "runs_per_configuration": 3
+  },
+  "runs": [
+    {
+      "eval_id": 0,
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1.0,
+        "passed": 10,
+        "failed": 0,
+        "total": 10,
+        "time_seconds": 71.4,
+        "tokens": 28087,
+        "tool_calls": 0,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "Mentions calling get_editor_state as the first step (host detection)",
+          "passed": true,
+          "evidence": "Line 8: 'get_editor_state({ include_schema: false })' explicitly described as 'First call would be:'"
+        },
+        {
+          "text": "Names the seven-step default workflow OR enumerates at least five of: detect host, locate context, load guidelines, plan, execute, verify, iterate",
+          "passed": true,
+          "evidence": "Sections 1-7 follow the workflow exactly: 'Detect the Pencil host', 'Locate context', 'Load guidelines', 'State the plan', 'Open the document if needed', 'First batch_design \u2014 skeleton + components', 'Verify with get_screenshot()', 'Iterate or report'"
+        },
+        {
+          "text": "Mentions checking for an open .pen file and creating one (via open_document) if none is open",
+          "passed": true,
+          "evidence": "Lines 25-26: 'No .pen open. I'd ask whether you want me to open an existing file (give me the path) or create a new one with open_document(\"new\")'"
+        },
+        {
+          "text": "Mentions checking for a design-system/ folder before designing",
+          "passed": true,
+          "evidence": "Line 21: 'Does the project root have a design-system/ folder?' plus all branch handling on lines 27-28"
+        },
+        {
+          "text": "States a concrete plan (form layout, dimensions, components) before describing batch_design ops",
+          "passed": true,
+          "evidence": "Lines 43-46: 'Centered single-column login at 1440x900. A ~360px-wide form card with title... an email Input and a password Input (instances of your library's Input component if present), a primary submit Button as a ref, and a Forgot password? link beneath it.'"
+        },
+        {
+          "text": "References batch_design with at least one specific op (I, C, R, U, or G) \u2014 bonus if it shows the foo=I(...) binding pattern",
+          "passed": true,
+          "evidence": "Lines 68-76 show I, C, R, U ops; explicit foo=I(...) binding pattern at lines 69, 70, 71. Line 79: 'The foo=I(...) binding form so later ops can reference nodes I just created'"
+        },
+        {
+          "text": "Mentions get_screenshot for verification after batch_design",
+          "passed": true,
+          "evidence": "Line 87: 'Verify with get_screenshot()' \u2014 entire section 6 is dedicated to it"
+        },
+        {
+          "text": "References variables ($primary, $space-N, $textBase or similar) rather than raw hex/px values",
+          "passed": true,
+          "evidence": "$surface, $surfaceMuted, $space-4, $space-6, $text2xl, $textBase, $textMuted all used throughout the batch_design example"
+        },
+        {
+          "text": "Mentions instantiating Input and ButtonPrimary as ref nodes from a library, NOT building them from primitives",
+          "passed": true,
+          "evidence": "Lines 73-76 use type: 'ref', ref: 'Input'/'ButtonPrimary'/'LinkText' with descendants overrides. Line 84: 'as soon as a project has more than one .pen, those components belong in a .lib.pen'"
+        },
+        {
+          "text": "Mentions stopping if MCP host is not connected (failure mode 1) \u2014 at least implicitly",
+          "passed": true,
+          "evidence": "Line 11: 'If this errors with something like transport not connected to app: desktop, I stop and ask you to open the Pencil desktop app or the Pencil IDE extension... I won't silently fall back to the CLI.'"
+        }
+      ],
+      "notes": []
+    },
+    {
+      "eval_id": 1,
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1.0,
+        "passed": 8,
+        "failed": 0,
+        "total": 8,
+        "time_seconds": 49.2,
+        "tokens": 26906,
+        "tool_calls": 0,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "Confirms with the user before scaffolding (or proceeds because the user explicitly asked)",
+          "passed": true,
+          "evidence": "Line 8: 'You asked explicitly, so I'm skipping the want me to scaffold? confirmation and going straight to the copy.'"
+        },
+        {
+          "text": "Names all 7 templates: README.md, design-system.md, tokens.md, components.md, layout.md, voice.md, code-export.md",
+          "passed": true,
+          "evidence": "Table at lines 14-22 names all 7 in a clean source/destination mapping."
+        },
+        {
+          "text": "Indicates the templates come from the skill's assets/design-system/ directory",
+          "passed": true,
+          "evidence": "Line 12: 'Seven markdown templates ship with the pencil-design skill at assets/design-system/'"
+        },
+        {
+          "text": "Targets design-system/ at the project root (not pencil/, not pen-design-system/)",
+          "passed": true,
+          "evidence": "Lines 16-22 destination paths all design-system/. Line 38 explicit: 'The folder is named design-system/ (not pencil/) on purpose.'"
+        },
+        {
+          "text": "Mentions collision detection \u2014 what to do if design-system/ already exists with code",
+          "passed": true,
+          "evidence": "Line 5: 'confirmed design-system/ doesn't exist yet, so there's no collision risk (no overwriting an existing code module named design-system/).'"
+        },
+        {
+          "text": "Tells the user which file(s) to fill in first (design-system.md and/or tokens.md typically)",
+          "passed": true,
+          "evidence": "Section 'What you'll want to edit first' lines 40-52 \u2014 names design-system.md and tokens.md as the priority."
+        },
+        {
+          "text": "Mentions that tokens.md / design-system.md contain placeholders the user must replace",
+          "passed": true,
+          "evidence": "Line 45: 'Replace the <path/to/library.lib.pen> placeholder.' Line 50: 'Rename the placeholders to match the tokens that exist (or will exist) in your .lib.pen.'"
+        },
+        {
+          "text": "Mentions the seven-file pattern is read progressively (README first, then others on demand)",
+          "passed": true,
+          "evidence": "Lines 56-60: 'every future Pencil task in this repo will: 1. Open design-system/README.md first. 2. Branch into design-system.md and tokens.md for the specifics it needs.'"
+        }
+      ],
+      "notes": []
+    },
+    {
+      "eval_id": 2,
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1.0,
+        "passed": 8,
+        "failed": 0,
+        "total": 8,
+        "time_seconds": 70.7,
+        "tokens": 30599,
+        "tool_calls": 0,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "Calls get_editor_state first to verify host and inspect the open document's imports field",
+          "passed": true,
+          "evidence": "Line 6: 'get_editor_state({ include_schema: false })' as step 1, line 9 explicit: 'It also tells me... the document's current imports field.'"
+        },
+        {
+          "text": "Adds the library to the document's imports (e.g. via U op on document root with imports: { ds: './design/system.lib.pen' }) when not already imported",
+          "passed": true,
+          "evidence": "Lines 38-49: 'U(\"doc\", { imports: { \"ds\": \"./design/system.lib.pen\" } })' with explicit reasoning that U merges (vs R which would wipe)."
+        },
+        {
+          "text": "Reads the library to discover available reusable components (batch_get with a cross-document pattern)",
+          "passed": true,
+          "evidence": "Lines 30-32: 'batch_get({ patterns: [{ where: { reusable: true } }] }, [], { documentPath: \"./design/system.lib.pen\" })'. Line 33: 'Component IDs in .lib.pen are case-sensitive and not guessable.'"
+        },
+        {
+          "text": "Instantiates Button and Input via ref nodes (type: 'ref', ref: '<componentId>') NOT by recreating them from primitives",
+          "passed": true,
+          "evidence": "Lines 67-70 use type: 'ref', ref: 'Input', ref: 'Button'. Line 77: 'type: \"ref\" with ref: \"<componentId>\" is how you instantiate a library component.'"
+        },
+        {
+          "text": "Uses descendants for instance-level overrides (label text, placeholders, etc.)",
+          "passed": true,
+          "evidence": "Lines 67-71 all use descendants: { label: { text: ... }, input: { ... } } pattern. Line 77 explains the convention."
+        },
+        {
+          "text": "Mentions screenshot verification after the form lands",
+          "passed": true,
+          "evidence": "Line 86: 'get_screenshot(form)' \u2014 section 8 'Verify' detailed with what to scan for."
+        },
+        {
+          "text": "States a brief plan before issuing batch_design ops",
+          "passed": true,
+          "evidence": "Section 6 'State the plan before building' lines 51-57 with a concrete sentence-long plan."
+        },
+        {
+          "text": "Notes that the imports path is relative to the importing .pen, not the project root",
+          "passed": true,
+          "evidence": "Line 18: '.lib.pen paths are relative to the importing .pen file (so I want to know where your open document lives before I write ./design/system.lib.pen vs ../design/system.lib.pen).'"
+        }
+      ],
+      "notes": []
+    },
+    {
+      "eval_id": 0,
+      "configuration": "without_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 0.2,
+        "passed": 2,
+        "failed": 8,
+        "total": 10,
+        "time_seconds": 42.2,
+        "tokens": 17979,
+        "tool_calls": 0,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "Mentions calling get_editor_state as the first step (host detection)",
+          "passed": false,
+          "evidence": "No mention of get_editor_state, host detection, or the MCP transport issue. Lines 4-13 ask the user generic context questions instead."
+        },
+        {
+          "text": "Names the seven-step default workflow OR enumerates at least five of: detect host, locate context, load guidelines, plan, execute, verify, iterate",
+          "passed": false,
+          "evidence": "Has a 7-section response but the steps are 'Understand context' / 'Set up Pencil document' / 'Sketch structure' / 'Decide component approach' / 'Build it' / 'Validate' / 'Confirm with you' \u2014 not the skill's workflow. No host detection step."
+        },
+        {
+          "text": "Mentions checking for an open .pen file and creating one (via open_document) if none is open",
+          "passed": true,
+          "evidence": "Line 16: 'Open the active .pen file (or create a new one if we're greenfield)' \u2014 though does not mention the open_document tool by name."
+        },
+        {
+          "text": "Mentions checking for a design-system/ folder before designing",
+          "passed": false,
+          "evidence": "Mentions 'existing design system' as a concept (line 8) but never the design-system/ folder convention or any markdown-folder check."
+        },
+        {
+          "text": "States a concrete plan (form layout, dimensions, components) before describing batch_design ops",
+          "passed": true,
+          "evidence": "Lines 22-43 sketch the structure: card width, hierarchy, spacing."
+        },
+        {
+          "text": "References batch_design with at least one specific op (I, C, R, U, or G) \u2014 bonus if it shows the foo=I(...) binding pattern",
+          "passed": false,
+          "evidence": "No reference to batch_design as a tool, no I/C/R/U/G ops, no binding syntax."
+        },
+        {
+          "text": "Mentions get_screenshot for verification after batch_design",
+          "passed": false,
+          "evidence": "Line 70 says 'I'd take a screenshot' but does not name the get_screenshot MCP tool."
+        },
+        {
+          "text": "References variables ($primary, $space-N, $textBase or similar) rather than raw hex/px values",
+          "passed": false,
+          "evidence": "Uses raw px values: '~360-400px wide', '16px within a field, 24px between fields, 32px before the button'. No $variable references."
+        },
+        {
+          "text": "Mentions instantiating Input and ButtonPrimary as ref nodes from a library, NOT building them from primitives",
+          "passed": false,
+          "evidence": "Line 47-49 mentions 'reuse existing components' as a principle but uses no Pencil-specific terms (ref, reusable, descendants). Falls back to 'build the screen with primitive nodes'."
+        },
+        {
+          "text": "Mentions stopping if MCP host is not connected (failure mode 1) \u2014 at least implicitly",
+          "passed": false,
+          "evidence": "No mention of MCP host, connection failures, or how to handle them."
+        }
+      ],
+      "notes": []
+    },
+    {
+      "eval_id": 1,
+      "configuration": "without_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 0.25,
+        "passed": 2,
+        "failed": 6,
+        "total": 8,
+        "time_seconds": 51.1,
+        "tokens": 18374,
+        "tool_calls": 0,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "Confirms with the user before scaffolding (or proceeds because the user explicitly asked)",
+          "passed": true,
+          "evidence": "Line 6: 'Tell me to proceed and I'll do it' \u2014 does ask for confirmation."
+        },
+        {
+          "text": "Names all 7 templates: README.md, design-system.md, tokens.md, components.md, layout.md, voice.md, code-export.md",
+          "passed": false,
+          "evidence": "Names a totally different set of files: foundations.pen, components.pen, patterns.pen, screens.pen, tokens.json, colors.css, typography.css, spacing.css, contributing.md, conventions.md. Zero overlap with the skill's seven markdown templates."
+        },
+        {
+          "text": "Indicates the templates come from the skill's assets/design-system/ directory",
+          "passed": false,
+          "evidence": "No reference to any skill or template source. The agent invents file structure from scratch."
+        },
+        {
+          "text": "Targets design-system/ at the project root (not pencil/, not pen-design-system/)",
+          "passed": true,
+          "evidence": "Line 11 uses 'design-system/' as the root folder name."
+        },
+        {
+          "text": "Mentions collision detection \u2014 what to do if design-system/ already exists with code",
+          "passed": false,
+          "evidence": "No collision check at all."
+        },
+        {
+          "text": "Tells the user which file(s) to fill in first (design-system.md and/or tokens.md typically)",
+          "passed": false,
+          "evidence": "Lists defaults to assume but doesn't direct the user to specific files to fill in. The defaults are baked into the .pen scaffolding, not user-edited markdown."
+        },
+        {
+          "text": "Mentions that tokens.md / design-system.md contain placeholders the user must replace",
+          "passed": false,
+          "evidence": "No tokens.md or design-system.md in the proposed structure."
+        },
+        {
+          "text": "Mentions the seven-file pattern is read progressively (README first, then others on demand)",
+          "passed": false,
+          "evidence": "No mention of the progressive-read pattern. Notably also propagates the encryption myth (lines 1, 34, 73): '.pen files are encrypted'."
+        }
+      ],
+      "notes": []
+    },
+    {
+      "eval_id": 2,
+      "configuration": "without_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 0.25,
+        "passed": 2,
+        "failed": 6,
+        "total": 8,
+        "time_seconds": 52.3,
+        "tokens": 18724,
+        "tool_calls": 0,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "Calls get_editor_state first to verify host and inspect the open document's imports field",
+          "passed": true,
+          "evidence": "Line 5: 'get_editor_state({ include_schema: true })' as step 1."
+        },
+        {
+          "text": "Adds the library to the document's imports (e.g. via U op on document root with imports: { ds: './design/system.lib.pen' }) when not already imported",
+          "passed": false,
+          "evidence": "Lines 21-23 use open_document on the library file instead of an imports entry. Misunderstands the cross-document model: 'open_document(\"design/system.lib.pen\")... this either makes the library available to the active document as a linked dependency, or simply gives me a readable handle to copy from.' Hand-wavy and wrong."
+        },
+        {
+          "text": "Reads the library to discover available reusable components (batch_get with a cross-document pattern)",
+          "passed": true,
+          "evidence": "Line 27: 'batch_get(patterns: [\"Button\", \"Input\"])' \u2014 does query the library."
+        },
+        {
+          "text": "Instantiates Button and Input via ref nodes (type: 'ref', ref: '<componentId>') NOT by recreating them from primitives",
+          "passed": false,
+          "evidence": "Lines 56-61 use C (copy) instead of ref. Line 68: 'C (copy/instance) for Button and Input' \u2014 the agent treats copy as instancing, but C duplicates the node, which doesn't create a live link to the library. The skill's pen-schema reference says ref is the instantiation primitive."
+        },
+        {
+          "text": "Uses descendants for instance-level overrides (label text, placeholders, etc.)",
+          "passed": false,
+          "evidence": "Uses 'props: { ... }' syntax (lines 56-61), which isn't the .pen schema. Pencil's override mechanism is descendants keyed by child id, not props."
+        },
+        {
+          "text": "Mentions screenshot verification after the form lands",
+          "passed": true,
+          "evidence": "Line 75: 'get_screenshot()' in step 7."
+        },
+        {
+          "text": "States a brief plan before issuing batch_design ops",
+          "passed": false,
+          "evidence": "Plan rationale ('Why this shape') comes after the ops, not before. The agent does not state intent in plain language to the user before writing code."
+        },
+        {
+          "text": "Notes that the imports path is relative to the importing .pen, not the project root",
+          "passed": false,
+          "evidence": "Doesn't address path resolution. Also propagates the encryption myth (line 22: '.pen library files are encrypted on disk \u2014 I cannot Read them')."
+        }
+      ],
+      "notes": []
+    }
+  ],
+  "run_summary": {
+    "with_skill": {
+      "pass_rate": {
+        "mean": 1.0,
+        "stddev": 0.0,
+        "min": 1.0,
+        "max": 1.0
+      },
+      "time_seconds": {
+        "mean": 63.7667,
+        "stddev": 12.62,
+        "min": 49.2,
+        "max": 71.4
+      },
+      "tokens": {
+        "mean": 28530.6667,
+        "stddev": 1886.052,
+        "min": 26906,
+        "max": 30599
+      }
+    },
+    "without_skill": {
+      "pass_rate": {
+        "mean": 0.2333,
+        "stddev": 0.0289,
+        "min": 0.2,
+        "max": 0.25
+      },
+      "time_seconds": {
+        "mean": 48.5333,
+        "stddev": 5.5175,
+        "min": 42.2,
+        "max": 52.3
+      },
+      "tokens": {
+        "mean": 18359.0,
+        "stddev": 372.7264,
+        "min": 17979,
+        "max": 18724
+      }
+    },
+    "delta": {
+      "pass_rate": "+0.77",
+      "time_seconds": "+15.2",
+      "tokens": "+10172"
+    }
+  },
+  "notes": []
+}
