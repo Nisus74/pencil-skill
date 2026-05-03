@@ -142,6 +142,59 @@ def check_description_substantive(path: Path) -> list[Finding]:
     return []
 
 
+_REQUIRED_PERMISSION_KEYS = ("mcp", "shell", "filesystem", "network")
+_ALLOWED_DEFAULTS = {
+    "shell": {"none"},
+    "filesystem": {"none", "project-only"},
+    "network": {"none"},
+}
+
+
+def check_permissions_block(path: Path) -> list[Finding]:
+    data = _load_frontmatter(path)
+    if data is None:
+        return []
+    perms = data.get("permissions")
+    if not isinstance(perms, dict):
+        return [Finding(
+            code="AST03",
+            severity=SEVERITY_ERROR,
+            location=str(path),
+            message="missing 'permissions:' block in frontmatter",
+        )]
+    findings: list[Finding] = []
+    for key in _REQUIRED_PERMISSION_KEYS:
+        if key not in perms:
+            findings.append(Finding(
+                code="AST03",
+                severity=SEVERITY_ERROR,
+                location=str(path),
+                message=f"permissions block missing required key '{key}'",
+            ))
+    justification = perms.get("allowlist-justification")
+    has_justification = isinstance(justification, str) and justification.strip() != ""
+    if "allowlist-justification" in perms and not has_justification:
+        findings.append(Finding(
+            code="AST03",
+            severity=SEVERITY_ERROR,
+            location=str(path),
+            message="allowlist-justification must be a non-empty string",
+        ))
+    for key, allowed in _ALLOWED_DEFAULTS.items():
+        value = perms.get(key)
+        if value is not None and value not in allowed and not has_justification:
+            findings.append(Finding(
+                code="AST03",
+                severity=SEVERITY_ERROR,
+                location=str(path),
+                message=(
+                    f"permissions.{key}={value!r} is outside the safe default "
+                    f"({sorted(allowed)}); add a non-empty 'allowlist-justification'"
+                ),
+            ))
+    return findings
+
+
 def lint_paths(paths: list[Path]) -> list[Finding]:
     """Return findings for the given paths. Empty list = clean."""
     findings: list[Finding] = []

@@ -145,5 +145,65 @@ class DescriptionSubstantiveTest(unittest.TestCase):
             self.assertEqual(findings[0].severity, "warn")
 
 
+class PermissionsBlockTest(unittest.TestCase):
+    def _skill(self, tmp: Path, perms_yaml: str) -> Path:
+        p = tmp / "SKILL.md"
+        p.write_text(
+            "---\nname: x\ndescription: " + ("y" * 60) + "\nlicense: MIT\n"
+            "version: '1'\n" + perms_yaml + "---\nbody\n"
+        )
+        return p
+
+    def test_minimal_permissions_block_passes(self):
+        import tempfile
+        with tempfile.TemporaryDirectory() as tmp:
+            p = self._skill(Path(tmp), (
+                "permissions:\n"
+                "  mcp: [pencil:get_editor_state]\n"
+                "  shell: none\n"
+                "  filesystem: project-only\n"
+                "  network: none\n"
+            ))
+            self.assertEqual(skill_lint.check_permissions_block(p), [])
+
+    def test_missing_block_is_error(self):
+        import tempfile
+        with tempfile.TemporaryDirectory() as tmp:
+            p = self._skill(Path(tmp), "")
+            findings = skill_lint.check_permissions_block(p)
+            self.assertTrue(any(f.code == "AST03" and "missing" in f.message for f in findings))
+
+    def test_shell_any_without_justification_is_error(self):
+        import tempfile
+        with tempfile.TemporaryDirectory() as tmp:
+            p = self._skill(Path(tmp), (
+                "permissions:\n  mcp: []\n  shell: any\n"
+                "  filesystem: none\n  network: none\n"
+            ))
+            findings = skill_lint.check_permissions_block(p)
+            self.assertTrue(any(f.code == "AST03" and "shell" in f.message for f in findings))
+
+    def test_shell_any_with_justification_is_ok(self):
+        import tempfile
+        with tempfile.TemporaryDirectory() as tmp:
+            p = self._skill(Path(tmp), (
+                "permissions:\n  mcp: []\n  shell: any\n"
+                "  filesystem: none\n  network: none\n"
+                "  allowlist-justification: 'documented reason'\n"
+            ))
+            self.assertEqual(skill_lint.check_permissions_block(p), [])
+
+    def test_empty_justification_is_error(self):
+        import tempfile
+        with tempfile.TemporaryDirectory() as tmp:
+            p = self._skill(Path(tmp), (
+                "permissions:\n  mcp: []\n  shell: any\n"
+                "  filesystem: none\n  network: none\n"
+                "  allowlist-justification: ''\n"
+            ))
+            findings = skill_lint.check_permissions_block(p)
+            self.assertTrue(any(f.code == "AST03" for f in findings))
+
+
 if __name__ == "__main__":
     unittest.main()
