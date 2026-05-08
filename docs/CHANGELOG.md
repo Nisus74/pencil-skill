@@ -4,6 +4,19 @@ All notable changes to this project will be documented here.
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Added
+
+- `.cursor-plugin/plugin.json`. Cursor 2.5 (released 2026-02-17) shipped a real plugin marketplace and manifest format, so Cursor users now get one-line install parity with Claude Code and Gemini CLI. The manifest mirrors the Claude one: same `name`, `version`, and `permissions` block.
+- Cursor manifest enforcement in `tools/skill-lint.py`. The cross-manifest consistency check (AST10) now validates `.cursor-plugin/plugin.json` when present. Three new unit tests in `tools/test_skill_lint.py` cover matching, divergent, and missing-permissions cases.
+- Three install paths in the `README.md`: plugin install (the one-liner), folder copy, and fork-and-install. Per-tool target directories listed for each. A new Customising section explains which path supports which kind of edit.
+- `AGENTS.md` Platform Support table now shows plugin install and folder-copy targets per platform, with a short Deployment and customisation section underneath.
+
+### Changed
+
+- Cursor's plugin schema doesn't document a `permissions` field. The manifest carries one anyway so `tools/skill-lint.py` can enforce consistency across all three platforms; Cursor ignores the unknown field.
+
 ## [1.4.0] - 2026-05-03
 
 ### Added

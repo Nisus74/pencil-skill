@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 """OWASP Agentic Skills Top 10 lint for the pencil-dev-skill repo.
 
-Runs against SKILL.md files, the Claude Code and Gemini CLI manifests, and
-all GitHub Actions workflows. Exits 0 if no error-severity findings, 1 otherwise.
-Warning-severity findings are printed but do not fail the run.
+Runs against SKILL.md files, the Claude Code / Gemini CLI / Cursor manifests,
+and all GitHub Actions workflows. Exits 0 if no error-severity findings, 1
+otherwise. Warning-severity findings are printed but do not fail the run.
 """
 from __future__ import annotations
 
@@ -274,12 +274,21 @@ def _load_json(path: Path) -> dict | None:
 
 
 def check_cross_manifest_consistency(paths: list[Path]) -> list[Finding]:
-    """Compare SKILL.md ↔ plugin.json ↔ gemini-extension.json.
+    """Compare SKILL.md ↔ Claude / Cursor / Gemini manifests.
 
-    Operates on whatever subset of the three is present in `paths`.
+    Claude (`.claude-plugin/plugin.json`) and Gemini (`gemini-extension.json`)
+    are required for the consistency check to run; Cursor
+    (`.cursor-plugin/plugin.json`) is checked when present.
     """
     skill_paths = [p for p in paths if p.name == "SKILL.md"]
-    plugin_path = next((p for p in paths if p.name == "plugin.json"), None)
+    plugin_path = next(
+        (p for p in paths if p.name == "plugin.json" and p.parent.name == ".claude-plugin"),
+        None,
+    )
+    cursor_path = next(
+        (p for p in paths if p.name == "plugin.json" and p.parent.name == ".cursor-plugin"),
+        None,
+    )
     gemini_path = next((p for p in paths if p.name == "gemini-extension.json"), None)
     if not (skill_paths and plugin_path and gemini_path):
         return []
@@ -287,20 +296,23 @@ def check_cross_manifest_consistency(paths: list[Path]) -> list[Finding]:
     findings: list[Finding] = []
     plugin = _load_json(plugin_path) or {}
     gemini = _load_json(gemini_path) or {}
+    cursor = _load_json(cursor_path) if cursor_path else None
 
-    for field in ("name", "description"):
-        if not plugin.get(field):
-            findings.append(Finding(
-                code="AST04", severity=SEVERITY_ERROR,
-                location=str(plugin_path),
-                message=f"plugin.json missing or empty '{field}'",
-            ))
-        if not gemini.get(field):
-            findings.append(Finding(
-                code="AST04", severity=SEVERITY_ERROR,
-                location=str(gemini_path),
-                message=f"gemini-extension.json missing or empty '{field}'",
-            ))
+    manifests: list[tuple[Path, dict, str]] = [
+        (plugin_path, plugin, ".claude-plugin/plugin.json"),
+        (gemini_path, gemini, "gemini-extension.json"),
+    ]
+    if cursor_path is not None:
+        manifests.append((cursor_path, cursor or {}, ".cursor-plugin/plugin.json"))
+
+    for manifest_path, manifest, label in manifests:
+        for field in ("name", "description"):
+            if not manifest.get(field):
+                findings.append(Finding(
+                    code="AST04", severity=SEVERITY_ERROR,
+                    location=str(manifest_path),
+                    message=f"{label} missing or empty '{field}'",
+                ))
 
     skill_dirnames = {p.parent.name for p in skill_paths}
     if plugin.get("name") and plugin["name"] not in skill_dirnames:
@@ -318,9 +330,7 @@ def check_cross_manifest_consistency(paths: list[Path]) -> list[Finding]:
         skill_perms = skill_data.get("permissions")
         if skill_perms is None:
             continue
-        for manifest_path, manifest in (
-            (plugin_path, plugin), (gemini_path, gemini),
-        ):
+        for manifest_path, manifest, _label in manifests:
             manifest_perms = manifest.get("permissions")
             if manifest_perms is None:
                 findings.append(Finding(
@@ -390,13 +400,17 @@ def lint_paths(paths: list[Path]) -> list[Finding]:
 
 def collect_canonical_paths() -> list[Path]:
     """Default lint set when no args are given."""
-    return [
+    paths = [
         *sorted(REPO_ROOT.glob("skills/*/SKILL.md")),
         REPO_ROOT / ".claude-plugin" / "plugin.json",
         REPO_ROOT / "gemini-extension.json",
-        *sorted(REPO_ROOT.glob(".github/workflows/*.yml")),
-        *sorted(REPO_ROOT.glob(".github/workflows/*.yaml")),
     ]
+    cursor_manifest = REPO_ROOT / ".cursor-plugin" / "plugin.json"
+    if cursor_manifest.exists():
+        paths.append(cursor_manifest)
+    paths.extend(sorted(REPO_ROOT.glob(".github/workflows/*.yml")))
+    paths.extend(sorted(REPO_ROOT.glob(".github/workflows/*.yaml")))
+    return paths
 
 
 def main(argv: list[str]) -> int:

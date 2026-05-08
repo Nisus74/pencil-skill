@@ -21,7 +21,7 @@ bug reports, workflow improvements, new trigger phrases, and platform-specific f
 ## Reporting Bugs
 
 Open a [bug report](https://github.com/Nisus74/pencil-skill/issues/new?template=bug_report.md).
-Include the exact prompt that triggered the issue and evidence of the incorrect behavior
+Include the exact prompt that triggered the issue and evidence of the incorrect behaviour
 (transcript or screenshot).
 
 ---
@@ -46,7 +46,7 @@ Describe the specific scenario where the skill falls short and what you'd want i
    - Test at least one edge case
 
 4. **Open a PR** using the pull request template and fill in all sections.
-   "It works" is not sufficient evidence — include specific before/after examples.
+   "It works" isn't sufficient evidence; include specific before/after examples.
 
 ---
 
@@ -56,7 +56,7 @@ This is a **general-purpose** pencil.dev skill. A change belongs here if it woul
 any pencil.dev user, regardless of their project.
 
 If your change is specific to your project's design system, component library, or workflow,
-it belongs in a fork — not here.
+it belongs in a fork, not here.
 
 ---
 
@@ -64,13 +64,13 @@ it belongs in a fork — not here.
 
 The skill lives in `skills/pencil-design/SKILL.md`. When editing it:
 
-- The `description` frontmatter field controls when the skill activates — be precise.
+- The `description` frontmatter field controls when the skill activates, so be precise.
   Include the exact phrases users are likely to say.
 - Keep the main `SKILL.md` focused on the core workflow. Move detailed edge cases
   or reference content to `skills/pencil-design/references/`.
 - Always route `.pen` reads and writes through the Pencil MCP tools. The format is
   JSON and technically readable with file tools, but the MCP path gives you schema
-  validation, screenshot feedback, and live-editor sync — and it's the contract the
+  validation, screenshot feedback, and live-editor sync. It's also the contract the
   skill teaches.
 - Document tool sequencing where it matters (e.g., call `get_editor_state` before
   `batch_design`).
@@ -99,7 +99,8 @@ The `tools/skill-lint.py` script enforces:
 - `name` matches the skill's directory
 - A `permissions:` block exists with `shell: none`, `network: none`,
   `filesystem: none|project-only`, and an explicit `mcp` allowlist
-- Both platform manifests (`plugin.json`, `gemini-extension.json`) carry a
+- All three platform manifests (`.claude-plugin/plugin.json`,
+  `.cursor-plugin/plugin.json`, `gemini-extension.json`) carry a
   `permissions` field equal to the SKILL.md block
 - No dangerous patterns in skill bodies (`curl | bash`, writes to
   `MEMORY.md` / `SOUL.md` / `AGENTS.md` / `CLAUDE.md` / `.env` / `~/.ssh`)
@@ -124,8 +125,11 @@ The full mapping of AST risks to controls lives in [SECURITY.md](./SECURITY.md).
 
 After any meaningful change, bump the version in:
 - `.claude-plugin/plugin.json`
+- `.cursor-plugin/plugin.json`
 - `skills/pencil-design/SKILL.md` frontmatter
 - Add an entry to `docs/CHANGELOG.md`
+
+(`gemini-extension.json` doesn't declare a version field.)
 
 Follow [Semantic Versioning](https://semver.org/):
 
