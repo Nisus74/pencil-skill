@@ -13,10 +13,10 @@ AI coding tools how to work with [pencil.dev](https://pencil.dev) design files (
 via the Pencil MCP server.
 
 **Core artifact:** `skills/pencil-design/SKILL.md`, the platform-agnostic skill content.
-**Platform adapters:** `.claude-plugin/plugin.json`, `.cursor-plugin/plugin.json`, and
-`gemini-extension.json` are the minimum files required by each platform's installer;
-they exist only so users on those platforms can run a one-line install command. They
-are not the substance of the project.
+**Platform adapters:** `.claude-plugin/plugin.json`, `.cursor-plugin/plugin.json`,
+`.codex-plugin/plugin.json`, and `gemini-extension.json` are the minimum files required
+by each platform's installer; they exist only so users on those platforms can run a
+one-line install command. They are not the substance of the project.
 
 ---
 
@@ -117,6 +117,7 @@ skills/pencil-design/              # The platform-agnostic core
 # Platform install adapters (required by each platform's installer)
 .claude-plugin/plugin.json         # Claude Code plugin manifest
 .cursor-plugin/plugin.json         # Cursor plugin manifest (Cursor 2.5+)
+.codex-plugin/plugin.json          # OpenAI Codex plugin manifest
 gemini-extension.json              # Gemini CLI extension manifest
 
 # Project context files
@@ -166,7 +167,7 @@ docs/
 | Claude Code | `/plugin install github:Nisus74/pencil-skill` (manifest at `.claude-plugin/plugin.json`) | `~/.claude/skills/` or `.claude/skills/` |
 | Google Gemini CLI | `gemini-extension.json` at repo root | `~/.gemini/skills/` or `.gemini/skills/` (alias `.agents/skills/`) |
 | Cursor (2.5+) | `/add-plugin` pointing at `github.com/Nisus74/pencil-skill` (manifest at `.cursor-plugin/plugin.json`) | `.cursor/skills/` (Cursor also reads `AGENTS.md` from project root) |
-| OpenAI Codex | (no plugin manifest) | `~/.codex/skills/` |
+| OpenAI Codex | `codex plugin install github:Nisus74/pencil-skill` (manifest at `.codex-plugin/plugin.json`) | `~/.codex/skills/` |
 | GitHub Copilot CLI | (no plugin manifest) | `~/.copilot/skills/` (alias `~/.agents/skills/`) or project `.github/skills/` |
 
 All platforms also accept a `SKILL.md` in their respective skills directory; folder copy works universally.
@@ -189,8 +190,9 @@ Don't edit files inside a plugin install directory (e.g. `~/.claude/plugins/.../
 
 - The Claude Code plugin manifest MUST live at `.claude-plugin/plugin.json`
 - The Cursor plugin manifest MUST live at `.cursor-plugin/plugin.json` (Cursor 2.5+)
+- The Codex plugin manifest MUST live at `.codex-plugin/plugin.json`
 - `gemini-extension.json` MUST live at the repo root (Gemini CLI requirement)
-- All three platform manifests MUST carry a `permissions` block matching SKILL.md (enforced by `tools/skill-lint.py`)
+- `.claude-plugin/plugin.json`, `.cursor-plugin/plugin.json`, and `gemini-extension.json` MUST carry a `permissions` block matching SKILL.md (enforced by `tools/skill-lint.py`)
 - `skills/` MUST be at the repo root
 - Each skill is a subdirectory under `skills/` containing one `SKILL.md`
 - The YAML frontmatter `description` field controls when the skill activates, so edit it carefully
@@ -253,7 +255,7 @@ The OWASP AST compliance map lives in [docs/SECURITY.md](./docs/SECURITY.md).
 
 ## Version Bumping
 
-Follow semantic versioning. Bump the `version` field in three places, keeping them in sync: `.claude-plugin/plugin.json`, `.cursor-plugin/plugin.json`, and the `skills/pencil-design/SKILL.md` frontmatter. (`gemini-extension.json` does not declare a version field.)
+Follow semantic versioning. Bump the `version` field in four places, keeping them in sync: `.claude-plugin/plugin.json`, `.cursor-plugin/plugin.json`, `.codex-plugin/plugin.json`, and the `skills/pencil-design/SKILL.md` frontmatter. (`gemini-extension.json` does not declare a version field.)
 
 - **PATCH** (`0.1.x`): Content fixes, typos, clarifications
 - **MINOR** (`0.x.0`): New capability documented, new trigger phrases added
@@ -278,7 +280,13 @@ After bumping, add an entry to `docs/CHANGELOG.md`.
 # Describe a pencil task; the skill activates via the description trigger
 ```
 
-**Codex / Copilot CLI:**
+**OpenAI Codex:**
+```bash
+codex plugin install github:Nisus74/pencil-skill
+# Then describe a pencil task; verify pencil-design skill triggers
+```
+
+**Copilot CLI:**
 ```bash
 # Skills are auto-discovered from skills/ — no install step needed
 ```

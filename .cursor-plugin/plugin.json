@@ -10,7 +10,6 @@
   "repository": "https://github.com/Nisus74/pencil-skill",
   "license": "MIT",
   "keywords": ["design", "pencil-dev", "ui", "mcp", "design-tool", "ai-skill"],
-  "skills": "./skills/",
   "permissions": {
     "mcp": [
       "pencil:get_editor_state",
