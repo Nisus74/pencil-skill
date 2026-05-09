@@ -21,7 +21,7 @@ foo=I("parent", { type: "frame", name: "Container", layout: "vertical", gap: "$s
 Duplicate an existing node into a parent, with optional overrides.
 
 ```
-btn2=C("PrimaryButton", "form", { x: 0, y: 80, descendants: { label: { content: "Sign up" } } })
+btn2=C("PrimaryButton", "form", { x: 0, y: 80, descendants: { label: { text: "Sign up" } } })
 ```
 
 - First arg: source node id (typically a `reusable` component or another node already on the canvas).
@@ -33,7 +33,7 @@ btn2=C("PrimaryButton", "form", { x: 0, y: 80, descendants: { label: { content: 
 Full property replacement on an existing node.
 
 ```
-R("heroTitle", { type: "text", content: "Welcome back", fontSize: "$text2xl", fontWeight: "700" })
+R("heroTitle", { type: "text", text: "Welcome back", fontSize: "$text2xl", fontWeight: 700 })
 ```
 
 - Wipes all current properties and applies the new object. Use sparingly — `U` is usually safer.
@@ -84,52 +84,15 @@ The `foo=I(...)` form is essential when a later op needs a parent you just creat
 
 ```
 form=I("page", { type: "frame", name: "LoginForm", layout: "vertical", gap: "$space-4", padding: "$space-6" })
-title=I(form, { type: "text", content: "Sign in", fontSize: "$text2xl" })
-emailInput=I(form, { type: "ref", ref: "Input", descendants: { label: { content: "Email" } } })
-passwordInput=I(form, { type: "ref", ref: "Input", descendants: { label: { content: "Password" } } })
-submit=I(form, { type: "ref", ref: "ButtonPrimary", descendants: { label: { content: "Sign in" } } })
+title=I(form, { type: "text", text: "Sign in", fontSize: "$text2xl" })
+emailInput=I(form, { type: "ref", ref: "Input", descendants: { label: { text: "Email" } } })
+passwordInput=I(form, { type: "ref", ref: "Input", descendants: { label: { text: "Password" } } })
+submit=I(form, { type: "ref", ref: "ButtonPrimary", descendants: { label: { text: "Sign in" } } })
 ```
 
 - Bindings are scoped to the current `batch_design` call only. They don't persist.
 - Don't reference a binding before it's been declared. Server reads top to bottom.
 - A returned binding's id can also be used after the call completes — the server reports the assigned id back in the response.
-
-### The `document` predefined binding
-
-`document` is a built-in binding that always resolves to the document root. Use it **only** when inserting top-level frames (screens, canvas-level containers):
-
-```
-page=I(document, { type: "frame", name: "LoginPage", width: 1440, height: 900 })
-```
-
-**Never name your own binding `document`** — it overwrites the predefined one and breaks all subsequent inserts into the root.
-
-## Placeholder frames
-
-**Every new top-level frame (screen) must carry `placeholder: true` for the entire duration you're building it.** The server uses this to signal to the editor that the frame is in-progress. Rules:
-
-- Set `placeholder: true` in the same `I` op that creates the frame.
-- You can update layout and size props on the placeholder frame while building its contents.
-- Remove it — `U("frameId", { placeholder: false })` — as soon as the frame is finished. Don't wait until all screens are done.
-- Do **not** set `placeholder: true` on inner content frames — only on top-level page frames.
-
-```
-page=I(document, { type: "frame", name: "LoginPage", width: 1440, height: 900, placeholder: true })
-card=I(page, { type: "frame", name: "LoginCard", width: 440, layout: "vertical" })
-// ... build contents ...
-U("page", { placeholder: false })
-```
-
-## Sizing and layout constraints
-
-These cause silent bugs or server errors if you get them wrong:
-
-- **`fill_container` requires a flex parent.** A child set to `width: "fill_container"` does nothing if its parent has `layout: "none"` (absolute positioning). The parent must have `layout: "vertical"` or `"horizontal"`.
-- **`fit_content` requires a flex node.** Same constraint — only meaningful on nodes with flex layout.
-- **Circular dependency.** A frame sized `fit_content` (shrink to children) whose *all* direct children are `fill_container` (grow to parent) creates a circular dependency. The server resolves it unpredictably. Always have at least one child with a fixed size or `fit_content` sizing when the parent is `fit_content`.
-- **`x`/`y` are ignored in flex children.** When a parent has `layout: "vertical"` or `"horizontal"`, child `x`/`y` values are completely ignored — position is determined by the parent's flex rules. Only set `x`/`y` on a child when its parent has `layout: "none"`.
-- **Text is invisible without `fill`.** Text nodes have no default color. Always set `fill: "$textColor"` (or a raw hex) explicitly — omitting it produces an invisible node with no error.
-- **There is no `image` node type.** Images are fills (`fill: { type: "image", url: "..." }`) applied to `frame` or `rectangle` nodes. To add an AI-generated image, create a frame first, then call `G(nodeId, "ai", "prompt")`.
 
 ## Chunking: the ≤25-ops rule
 
@@ -156,7 +119,6 @@ For big screens, plan the order:
 | `unknown type: button` | Used a UI-framework word as a node type | There is no `button` node type. A button is a `frame` with `reusable: true`, or a `ref` to one. |
 | `expected variable, got string` | Passed `"#1F6FEB"` where the document declares a variable for that role | Use `"$primary"` (or whatever the variable is). Raw colors are accepted, but if the schema for that property requires a variable, the server enforces it. |
 | `slot frame must be empty in origin` | Tried to put children directly inside a slot frame in the component origin | Slots are filled at the instance level, not the origin. Move the contents out of the origin's slot frame. |
-| `unexpected property: paddingTop` (or `paddingLeft`, `paddingRight`, `paddingBottom`) | Used CSS-style individual padding shorthands | There are no `paddingTop` etc. properties. Use `padding: [top, right, bottom, left]` (4-value array). To add only top padding while keeping others at 0: `padding: [8, 0, 0, 0]`. If other sides already have values, read them first via `batch_get` before overwriting. |
 
 ## Order-of-operations cheats
 
@@ -164,7 +126,7 @@ When a call mixes inserts and updates, put inserts first, then updates, so bindi
 
 ```
 hero=I("page", { type: "frame", layout: "vertical", padding: "$space-8" })
-title=I(hero, { type: "text", content: "Welcome", fontSize: "$text3xl" })
+title=I(hero, { type: "text", text: "Welcome", fontSize: "$text3xl" })
 U(hero, { gap: "$space-4" })          // safe — `hero` is bound already
 ```
 
@@ -172,7 +134,7 @@ When you need to copy then tweak, do both — copy reads source props as of the 
 
 ```
 copy=C("ButtonPrimary", "form")
-U(copy, { fill: "$accent" })
+U(copy, { backgroundColor: "$accent" })
 ```
 
 When deleting and re-creating, delete first:
@@ -187,14 +149,14 @@ hero=I("page", { ...new shape... })
 A login form, ~12 ops, in one call:
 
 ```
-page=I(document, { type: "frame", name: "LoginPage", layout: "vertical", justifyContent: "center", alignItems: "center", padding: "$space-8", width: "fill_container", height: "fill_container" })
-form=I(page, { type: "frame", name: "Form", layout: "vertical", gap: "$space-4", padding: "$space-6", width: 360, cornerRadius: 12, fill: "$surface" })
-title=I(form, { type: "text", content: "Sign in", fontSize: "$text2xl", fontWeight: "700" })
-sub=I(form, { type: "text", content: "Welcome back", fontSize: "$textBase", fill: "$textMuted" })
-email=I(form, { type: "ref", ref: "Input", descendants: { label: { content: "Email" }, input: { placeholder: "you@example.com" } } })
-pwd=I(form, { type: "ref", ref: "Input", descendants: { label: { content: "Password" }, input: { type: "password" } } })
-submit=I(form, { type: "ref", ref: "ButtonPrimary", descendants: { label: { content: "Sign in" } } })
-forgot=I(form, { type: "text", content: "Forgot password?", fontSize: "$textSm", href: "#", textGrowth: "fixed-width", width: "fill_container", textAlign: "center" })
+page=I("doc", { type: "frame", name: "LoginPage", layout: "vertical", justifyContent: "center", alignItems: "center", padding: "$space-8", width: "fill_container", height: "fill_container" })
+form=I(page, { type: "frame", name: "Form", layout: "vertical", gap: "$space-4", padding: "$space-6", width: 360, cornerRadius: 12, fill: [{ type: "solid_color", color: "$surface" }] })
+title=I(form, { type: "text", text: "Sign in", fontSize: "$text2xl", fontWeight: 700 })
+sub=I(form, { type: "text", text: "Welcome back", fontSize: "$textBase", fill: [{ type: "solid_color", color: "$textMuted" }] })
+email=I(form, { type: "ref", ref: "Input", descendants: { label: { text: "Email" }, input: { placeholder: "you@example.com" } } })
+pwd=I(form, { type: "ref", ref: "Input", descendants: { label: { text: "Password" }, input: { type: "password" } } })
+submit=I(form, { type: "ref", ref: "ButtonPrimary", descendants: { label: { text: "Sign in" } } })
+forgot=I(form, { type: "text", text: "Forgot password?", fontSize: "$textSm", href: "#", textAlign: "center" })
 ```
 
-After the call, verify structurally with `snapshot_layout(parentId: form, maxDepth: 2)`. Screenshot once as the final sign-off. If something looks off, iterate with `U` ops on the offending nodes.
+After the call, screenshot. If the form looks right, you're done. If not, iterate with `U` ops on the offending nodes.

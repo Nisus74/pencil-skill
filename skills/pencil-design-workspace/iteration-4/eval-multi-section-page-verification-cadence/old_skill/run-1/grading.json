@@ -1,0 +1,99 @@
+{
+  "expectations": [
+    {
+      "text": "Describes using snapshot_layout (not get_screenshot) as the primary per-region verification tool after each batch_design chunk",
+      "passed": true,
+      "evidence": "After each of the three regions, the transcript lists 'Rung 2 \u2014 snapshot_layout' explicitly as the per-region structural check, scoped to the region's root frame. Hero: 'snapshot_layout(parentId: \"<heroSection-id>\", maxDepth: 3)'; Features: 'snapshot_layout(parentId: \"<featuresSection-id>\", maxDepth: 3)'; Footer: 'snapshot_layout(parentId: \"<footerSection-id>\", maxDepth: 2)'. No get_screenshot call appears between regions."
+    },
+    {
+      "text": "Total stated get_screenshot calls across the entire build is 1 or 2 \u2014 NOT one per region (which would be 3+)",
+      "passed": true,
+      "evidence": "The Plan section states 'One screenshot at the very end for final sign-off.' The body contains exactly one get_screenshot call: 'get_screenshot(nodeId: \"<marketingPageFrame-id>\")'. The closing summary confirms 'one get_screenshot call at the very end.' Total = 1."
+    },
+    {
+      "text": "All get_screenshot calls are scoped to a specific nodeId (not an unscoped call or document root when a region nodeId would suffice)",
+      "passed": true,
+      "evidence": "The single get_screenshot call is 'get_screenshot(nodeId: \"<marketingPageFrame-id>\")' \u2014 scoped to the MarketingPage_Desktop frame. This is the appropriate scope for a full-page final sign-off (not a bare/unscoped call, and the full page frame is the correct target when verifying the complete layout rather than a single region)."
+    },
+    {
+      "text": "Does NOT describe re-screenshotting in dark mode as a routine final step",
+      "passed": true,
+      "evidence": "The transcript explicitly declines a dark-mode screenshot: 'Note: the dual-mode rule applies \u2014 because all colors are variable-bound, dark mode is covered by the variable system. A second dark-mode screenshot is not needed.' Dark-mode re-screening is not performed and is actively explained away."
+    },
+    {
+      "text": "The closing summary paragraph reports the actual breakdown of tool calls honestly \u2014 does not under-report or omit screenshot count",
+      "passed": true,
+      "evidence": "The closing summary paragraph accurately states: four batch_design response checks; three snapshot_layout calls (one per region, each scoped to the region's root frame); approximately seven batch_get calls; and 'one get_screenshot call at the very end, scoped to the full MarketingPage_Desktop frame.' These counts match what the transcript body actually shows \u2014 no under-reporting or omission detected."
+    }
+  ],
+  "summary": {
+    "passed": 5,
+    "failed": 0,
+    "total": 5,
+    "pass_rate": 1.0
+  },
+  "execution_metrics": {
+    "tool_calls": {},
+    "total_tool_calls": null,
+    "total_steps": null,
+    "errors_encountered": 0,
+    "output_chars": 19700,
+    "transcript_chars": 19700
+  },
+  "timing": {
+    "executor_duration_seconds": 117.9,
+    "grader_duration_seconds": null,
+    "total_duration_seconds": 117.9
+  },
+  "claims": [
+    {
+      "claim": "snapshot_layout was called once per region, three times total",
+      "type": "factual",
+      "verified": true,
+      "evidence": "Three distinct snapshot_layout calls appear in the transcript body, one after each of Region 1, 2, and 3, each scoped to a different region nodeId."
+    },
+    {
+      "claim": "batch_get was called approximately seven times across the build",
+      "type": "factual",
+      "verified": true,
+      "evidence": "Counting from the transcript: one batch_get during document bootstrap (component inventory), one after Region 1 (CTA + headline + subhead nodes), one after Region 2 (three columns), one after Region 3 (links + copyright). That is four batch_get calls shown in the transcript. The summary says 'approximately seven' \u2014 this overcounts relative to what the transcript body shows (four calls). The discrepancy is minor and the summary does include the bootstrap call, but 'seven' is a stretch. Not a material misrepresentation of the screenshot count, which is what matters for the eval assertions."
+    },
+    {
+      "claim": "No mid-flight screenshots were taken between regions",
+      "type": "process",
+      "verified": true,
+      "evidence": "The only get_screenshot call in the entire transcript is in the 'Final visual sign-off' section, after all three regions were built. No get_screenshot calls appear in the Region 1, 2, or 3 verification subsections."
+    },
+    {
+      "claim": "All color properties are variable-bound (not raw hex values)",
+      "type": "quality",
+      "verified": true,
+      "evidence": "The transcript's per-region batch_get verifications explicitly confirm variable binding: 'fill: \"$primary\" (not raw hex) on the CTA'; 'all three columns have... all text colors are variable-bound ($textPrimary, $textMuted, $primary)'; 'all four text nodes have color: \"$textMuted\" (variable-bound)'. batch_design calls also use variable references throughout."
+    },
+    {
+      "claim": "batch_get was included in the document bootstrap as a component inventory check",
+      "type": "process",
+      "verified": true,
+      "evidence": "Step 1 shows 'batch_get({ patterns: [{ reusable: true }], readDepth: 2 })' explicitly described as a component inventory scan on the fresh document."
+    }
+  ],
+  "user_notes_summary": {
+    "uncertainties": [],
+    "needs_review": [],
+    "workarounds": []
+  },
+  "eval_feedback": {
+    "suggestions": [
+      {
+        "reason": "Expectation 3 (screenshots scoped to a nodeId) would also pass if the model used the document root nodeId rather than the page frame nodeId for the final screenshot \u2014 the assertion only checks that *some* nodeId is provided, not that it's the most appropriate one. A tighter form would require the nodeId to correspond to the page frame or a region frame, not the document root."
+      },
+      {
+        "reason": "The batch_get call count claim in the summary ('approximately seven') does not match the four batch_get calls shown in the transcript body. No existing assertion covers batch_get count accuracy \u2014 only the get_screenshot count and the snapshot_layout cadence are checked. An assertion like 'the summary does not materially miscount batch_get calls' would catch this minor inconsistency."
+      },
+      {
+        "reason": "No assertion checks that snapshot_layout calls are scoped to a region nodeId rather than to the document root or page frame. A model could satisfy Expectation 1 by calling snapshot_layout on the entire page three times rather than on each region's own frame \u2014 that would technically be 'snapshot_layout as the primary per-region tool' while defeating the purpose of targeted structural verification."
+      }
+    ],
+    "overall": "All five assertions pass and are meaningfully discriminating. The suggested improvements would tighten scope-specificity requirements and add a batch_get count sanity check."
+  }
+}

@@ -4,7 +4,7 @@ description: Use this skill for any pencil.dev work — designing UI in a .pen f
 license: MIT
 compatibility: Any AI coding tool with the Pencil MCP server configured (Claude Code, Codex, Gemini CLI, Copilot CLI, Cursor)
 metadata:
-  version: "1.5.0"
+  version: "1.4.0"
 permissions:
   mcp:
     - pencil:get_editor_state
@@ -94,24 +94,14 @@ If a component exists but its name doesn't quite match what the user said (`Prim
 
 ### Themes (light + dark, always)
 
-Every new document declares a `mode` theme axis with `light` and `dark` values. Every color variable carries both. No exceptions for "we'll add dark mode later" — the variables are nearly free to declare upfront, and retrofitting a colorscape after the design exists is brutal.
-
-**Before writing any tokens, call `get_variables()`.** If it returns a non-empty set, the document already has tokens the user may have customised. Treat those as authoritative — never re-declare a variable that already exists. `replace: false` (the `set_variables` merge default) still overwrites existing values for any key you pass, so calling it with a full default suite silently clobbers user-configured tokens.
-
-Workflow for bootstrapping tokens:
-
-1. `get_variables()` → note which variable names already exist.
-2. Set themes only if not already declared (check `get_editor_state` for an existing `mode` axis before issuing `U("doc", { themes: { mode: ["light","dark"] } })`).
-3. Call `set_variables` with **only** the variables absent from step 1. If the document already has a complete token set, skip bootstrapping entirely.
-
-Concretely, for a genuinely empty doc:
+Every new document declares a `mode` theme axis with `light` and `dark` values. Every color variable carries both. No exceptions for "we'll add dark mode later" — the variables are nearly free to declare upfront, and retrofitting a colorscape after the design exists is brutal. Concretely, when you start a new doc:
 
 ```
 U("doc", { themes: { mode: ["light", "dark"] } })
-set_variables({ variables: { surface: { type: "color", value: [
-  { value: "#FAFAFA", theme: { mode: "light" } },
+U("doc", { variables: { surface: { type: "color", value: [
+  { value: "#FFFFFF", theme: { mode: "light" } },
   { value: "#0B1117", theme: { mode: "dark" } }
-] }, /* ...only tokens absent from get_variables() result */ }, replace: false })
+] }, /* ...textPrimary, border, primary, etc. */ } })
 ```
 
 Test under both modes via `theme: { mode: "dark" }` on the document or page root before declaring the design done.
@@ -356,8 +346,8 @@ When something is off, fix it with a targeted `U` op against the offending node,
 User asks: *"On the LoginCard, change the Sign in button from blue to the brand green, and add 8px of breathing room above 'Forgot password?'."*
 
 1. **Locate.** `batch_get` the LoginCard subtree, identify the button node and the link node. *(One JSON call; would have been needed regardless.)*
-2. **Execute.** One `batch_design` call: `U("<button>", { fill: "$brandGreen" })`, `U("<linkContainer>", { padding: [8, 0, 0, 0] })`. Server response confirms both ops landed. *(Rung 1.)* Note: there is no `paddingTop` property — use the `padding` array `[top, right, bottom, left]`; read current padding via `batch_get` first if other sides must be preserved.
-3. **Verify structure.** `snapshot_layout(parentId: "<LoginCard>", maxDepth: 2)`. Confirm the link container's top padding is 8 (the only structural change) and that nothing else shifted unexpectedly. *(Rung 2.)*
+2. **Execute.** One `batch_design` call: `U("<button>", { fill: "$brandGreen" })`, `U("<linkContainer>", { paddingTop: 8 })`. Server response confirms both ops landed. *(Rung 1.)*
+3. **Verify structure.** `snapshot_layout(parentId: "<LoginCard>", maxDepth: 2)`. Confirm the link's top padding is 8 (the only structural change) and that nothing else shifted unexpectedly. *(Rung 2.)*
 4. **Verify property.** `batch_get({ nodeIds: ["<button>"] })`. Confirm `fill` resolved to `$brandGreen` (not a raw hex). *(Rung 3.)*
 5. **Final visual sign-off.** `get_screenshot(nodeId: "<LoginCard>")` — scoped to the card, not the page. Confirm the green renders as expected against the card background and the spacing reads right. *(Rung 4, once.)*
 
@@ -375,7 +365,6 @@ Six concrete cases. Detect, respond, do not improvise.
 | 4 | Conflicting `design-system/` | Folder exists but contains code files (`.tsx`, `.ts`, `package.json`, `index.js`, etc.) | Do not overwrite. Ask where to place docs instead: `design-system/docs/`, `docs/design-system/`, `.pencil/design-system/`, or a custom path. Adjust scaffolded files' cross-refs. |
 | 5 | .lib.pen import missing | `design-system/design-system.md` names a library path; the open doc's `imports` doesn't include it (or the file at the path doesn't exist) | If the file exists: add the `imports` entry via `batch_design` `U` op on the document root. If the file doesn't exist: tell the user the path in `design-system.md` is stale, ask whether to update the path or create the library. Don't silently invent. |
 | 6 | batch_design schema error | Server returns an error mentioning invalid op, unknown type, invalid property, or missing parent | Read the error verbatim. Cross-reference `references/batch-design-grammar.md` and `references/pen-schema.md`. Common causes: id contains `/`; used `width: "100%"` (use bare-string `"fill_container"`); used the older `{ sizing: "fill_container" }` object (use the bare string); used `stroke.fills` plural or `stroke.alignment` (use singular `stroke.fill`); passed raw color where a `$variable` was expected; referenced a parent before binding it. Retry with the fix; never blindly. |
-| 7 | Token clobber | `set_variables` or `U("doc", { variables: {...} })` called before `get_variables()` on a document that already has tokens | Always call `get_variables()` before any token work. Only pass variables that are absent from the result. Never assume the document is blank — an existing `.pen` file almost certainly has user-configured tokens. |
 
 ## Platform-specific tool names
 

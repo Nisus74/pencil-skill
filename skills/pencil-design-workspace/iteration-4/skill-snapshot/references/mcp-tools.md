@@ -135,9 +135,7 @@ batch_get({ nodeIds: ["LoginPage"], readDepth: 4, resolveInstances: true, resolv
 
 **Purpose.** Read all document-level design tokens.
 
-**You must call this before any token work on an existing document.** Not optional — mandatory. If it returns a non-empty set, the user's tokens exist and may be customised. Treat them as authoritative; only bootstrap the variables that are absent from the result. This applies equally before `set_variables` calls and before `U("doc", { variables: {...} })` ops.
-
-Also reach for it: before adding a theme axis; before binding a color you're not sure exists; as a sanity check after `set_variables`.
+**Reach for it.** Before you author tokens for a new doc (so you don't duplicate). Before adding a theme axis. Before binding a color you're not sure exists. As a sanity check after `set_variables`.
 
 **Don't reach for it** for every single color usage — once you have the token list in mind, just bind by name (`"$primary"`).
 
@@ -283,8 +281,7 @@ set_variables({
 
 **Pitfalls.**
 
-- `replace: false` does **not** protect existing variable values. If you pass `surface: { value: "#FAFAFA" }` and the doc already has `surface` set to a user-configured `#E63946`, the `#E63946` is silently overwritten. Call `get_variables()` first and only pass variables that are absent from the response.
-- `replace: true` wipes the entire existing variable set and applies only what you pass. Almost never what you want — leave `replace: false` (the merge default) unless you're consciously resetting tokens.
+- `replace: true` wipes the existing variable set and applies only what you pass. Almost never what you want — leave `replace: false` (the merge default) unless you're consciously resetting tokens.
 - Theme-aware values require the document to declare matching theme axes first (`U("doc", { themes: { mode: ["light", "dark"] } })`). Set the axes, then call `set_variables`.
 - A theme-aware variable's `value` is an array; a flat variable's `value` is a scalar. Mixing the two shapes for the same variable across calls causes silent corruption.
 
@@ -431,7 +428,7 @@ The `search` → review → `replace` workflow:
 Setting up a brand-new `.pen`:
 
 1. `open_document({ path: "new" })` — get a fresh doc id.
-2. `U(document, { themes: { mode: ["light", "dark"] } })` via `batch_design` — declare the theme axis first.
+2. `U("doc", { themes: { mode: ["light", "dark"] } })` via `batch_design` — declare the theme axis first.
 3. `set_variables({ variables: { ... }, replace: false })` — declare the full token suite.
 4. First `batch_design` — page frame + skeleton (≤10 ops).
 5. `snapshot_layout({ parentId: "<page>", maxDepth: 2 })` — confirm structure.
@@ -442,12 +439,12 @@ Setting up a brand-new `.pen`:
 
 Pulling a `.lib.pen` into a doc and confirming components resolve:
 
-1. `U(document, { imports: { "ds": "./design/system.lib.pen" } })` via `batch_design`.
+1. `U("doc", { imports: { "ds": "./design/system.lib.pen" } })` via `batch_design`.
 2. `batch_get({ filePath: "./design/system.lib.pen", patterns: [{ reusable: true }], readDepth: 2 })` — see what the library exposes.
 3. Insert a single `ref` to a known component:
 
    ```
-   test=I(document, { type: "ref", ref: "ButtonPrimary", descendants: { label: { content: "Smoke" } } })
+   test=I("doc", { type: "ref", ref: "ButtonPrimary", descendants: { label: { text: "Smoke" } } })
    ```
 
 4. `batch_get({ nodeIds: ["test"], resolveInstances: true })` — confirm the library component resolved (not an error).
