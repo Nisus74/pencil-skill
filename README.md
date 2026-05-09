@@ -54,7 +54,7 @@ Most people want plugin install. If you plan to customise the skill's instructio
 
 **Cursor 2.5+:** in the editor, run `/add-plugin` and point it at `github.com/Nisus74/pencil-skill`.
 
-**Codex:** no plugin installer. Use folder copy below.
+**Codex:** use folder copy below. The Codex public plugin directory isn't available yet for third-party plugins.
 
 ---
 
@@ -98,7 +98,7 @@ Available for Claude Code and Cursor.
 3. Edit your fork, commit, and push. The next plugin update pulls your changes.
 4. To pull upstream changes, rebase your fork against `Nisus74/pencil-skill`.
 
-For Codex, use folder copy. The end result's the same; you just don't get an automatic update path.
+For Codex, use folder copy. Fork the repo, edit your fork, and re-run the copy command when you want to pull in your changes.
 
 ---
 

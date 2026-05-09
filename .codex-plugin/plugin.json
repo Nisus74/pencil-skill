@@ -1,0 +1,30 @@
+{
+  "name": "pencil-dev-skill",
+  "version": "1.4.0",
+  "description": "Teaches AI coding tools to design, edit, and validate pencil.dev UIs using .pen files, .lib.pen libraries, design-system docs, and the Pencil MCP server",
+  "author": {
+    "name": "Travis Polland",
+    "email": "tpolland@gmail.com",
+    "url": "https://github.com/Nisus74"
+  },
+  "homepage": "https://github.com/Nisus74/pencil-skill",
+  "repository": "https://github.com/Nisus74/pencil-skill",
+  "license": "MIT",
+  "keywords": ["design", "pencil-dev", "ui", "mcp", "design-tool", "ai-skill"],
+  "skills": "./skills/",
+  "interface": {
+    "displayName": "Pencil.dev Design Skill",
+    "shortDescription": "Teach your AI to design in pencil.dev",
+    "longDescription": "A full design workflow skill for pencil.dev. Covers all 13 Pencil MCP tools, 2026 design depth (user flows, component states, accessibility, modern patterns), 12 design-system scaffold templates, and 5 worked examples with real MCP tool sequences.",
+    "developerName": "Travis Polland",
+    "category": "Design",
+    "capabilities": ["Read", "Write"],
+    "websiteURL": "https://github.com/Nisus74/pencil-skill",
+    "defaultPrompt": [
+      "Design a login screen in pencil.dev",
+      "Open my .pen file and show me the layout",
+      "Generate a dashboard UI in pencil.dev",
+      "Use the pencil MCP to update the button colour"
+    ]
+  }
+}

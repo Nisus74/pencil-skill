@@ -13,9 +13,10 @@ AI coding tools how to work with [pencil.dev](https://pencil.dev) design files (
 via the Pencil MCP server.
 
 **Core artifact:** `skills/pencil-design/SKILL.md`, the platform-agnostic skill content.
-**Platform adapters:** `.claude-plugin/plugin.json` and `.cursor-plugin/plugin.json` are
-the minimum files required by each platform's installer; they exist only so users on
-those platforms can run a one-line install command. They are not the substance of the project.
+**Platform adapters:** `.claude-plugin/plugin.json`, `.cursor-plugin/plugin.json`, and
+`.codex-plugin/plugin.json` are the minimum files required by each platform's installer;
+they exist only so users on those platforms can run a one-line install command. They are
+not the substance of the project.
 
 ---
 
@@ -70,6 +71,7 @@ skills/pencil-design/              # The platform-agnostic core
 # Platform install adapters (required by each platform's installer)
 .claude-plugin/plugin.json         # Claude Code plugin manifest
 .cursor-plugin/plugin.json         # Cursor plugin manifest (Cursor 2.5+)
+.codex-plugin/plugin.json          # Codex plugin manifest
 
 # Project context files
 AGENTS.md                          # This file — canonical, platform-agnostic
@@ -87,7 +89,7 @@ LICENSE
 # Quality tooling
 tools/
   skill-lint.py                    # OWASP Agentic Skills Top 10 lint (CI + pre-commit)
-  test_skill_lint.py               # 36 unit tests for skill-lint
+  test_skill_lint.py               # 40 unit tests for skill-lint
   requirements.txt                 # pip deps for Dependabot
 
 # Documentation
@@ -117,7 +119,7 @@ docs/
 |----------|---------------|-------------------|
 | Claude Code | `/plugin install github:Nisus74/pencil-skill` (manifest at `.claude-plugin/plugin.json`) | `~/.claude/skills/` or `.claude/skills/` |
 | Cursor (2.5+) | `/add-plugin` pointing at `github.com/Nisus74/pencil-skill` (manifest at `.cursor-plugin/plugin.json`) | `.cursor/skills/` |
-| OpenAI Codex | (no plugin installer) | `~/.codex/skills/` |
+| OpenAI Codex | (public plugin directory coming soon — use folder copy for now) | `~/.codex/skills/` |
 
 ---
 
@@ -137,7 +139,8 @@ Don't edit files inside a plugin install directory (e.g. `~/.claude/plugins/.../
 
 - The Claude Code plugin manifest MUST live at `.claude-plugin/plugin.json`
 - The Cursor plugin manifest MUST live at `.cursor-plugin/plugin.json` (Cursor 2.5+)
-- Both platform manifests MUST carry a `permissions` block matching SKILL.md (enforced by `tools/skill-lint.py`)
+- The Codex plugin manifest MUST live at `.codex-plugin/plugin.json`
+- All three manifests MUST carry matching `name` and `version` fields (enforced by `tools/skill-lint.py`)
 - `skills/` MUST be at the repo root
 - Each skill is a subdirectory under `skills/` containing one `SKILL.md`
 - The YAML frontmatter `description` field controls when the skill activates, so edit it carefully
