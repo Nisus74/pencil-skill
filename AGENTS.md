@@ -8,6 +8,8 @@ context. Platform-specific files (`CLAUDE.md`) are thin pointers to this file.
 
 ## Project Purpose
 
+> **Unofficial community plugin.** This project is not affiliated with or endorsed by the Pencil.dev team. For the Pencil editor, MCP server, and official documentation, visit [pencil.dev](https://pencil.dev).
+
 This repository is a standalone, **platform-agnostic** AI coding skill plugin that teaches
 AI coding tools how to work with [pencil.dev](https://pencil.dev) design files (`.pen` format)
 via the Pencil MCP server.

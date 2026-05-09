@@ -5,6 +5,8 @@ A platform-agnostic AI coding skill plugin that teaches AI coding tools how to w
 
 Works with Claude Code, OpenAI Codex, Google Gemini CLI, GitHub Copilot CLI, and Cursor.
 
+> **Unofficial community plugin.** This project is not affiliated with or endorsed by the Pencil.dev team. For the Pencil editor, MCP server, and official documentation, visit [pencil.dev](https://pencil.dev). Issues with this skill belong in [this repo](https://github.com/Nisus74/pencil-skill); issues with the Pencil editor or MCP server belong with the Pencil.dev team.
+
 [Star the repo](https://github.com/Nisus74/pencil-skill) if it helps you, or
 [buy me a coffee or lunch](https://www.buymeacoffee.com/Nisus74) to support ongoing maintenance.
 
