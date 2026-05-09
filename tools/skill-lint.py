@@ -274,11 +274,10 @@ def _load_json(path: Path) -> dict | None:
 
 
 def check_cross_manifest_consistency(paths: list[Path]) -> list[Finding]:
-    """Compare SKILL.md ↔ Claude / Cursor / Gemini manifests.
+    """Compare SKILL.md ↔ Claude / Cursor manifests.
 
-    Claude (`.claude-plugin/plugin.json`) and Gemini (`gemini-extension.json`)
-    are required for the consistency check to run; Cursor
-    (`.cursor-plugin/plugin.json`) is checked when present.
+    Claude (`.claude-plugin/plugin.json`) is required for the consistency
+    check to run; Cursor (`.cursor-plugin/plugin.json`) is checked when present.
     """
     skill_paths = [p for p in paths if p.name == "SKILL.md"]
     plugin_path = next(
@@ -289,18 +288,15 @@ def check_cross_manifest_consistency(paths: list[Path]) -> list[Finding]:
         (p for p in paths if p.name == "plugin.json" and p.parent.name == ".cursor-plugin"),
         None,
     )
-    gemini_path = next((p for p in paths if p.name == "gemini-extension.json"), None)
-    if not (skill_paths and plugin_path and gemini_path):
+    if not (skill_paths and plugin_path):
         return []
 
     findings: list[Finding] = []
     plugin = _load_json(plugin_path) or {}
-    gemini = _load_json(gemini_path) or {}
     cursor = _load_json(cursor_path) if cursor_path else None
 
     manifests: list[tuple[Path, dict, str]] = [
         (plugin_path, plugin, ".claude-plugin/plugin.json"),
-        (gemini_path, gemini, "gemini-extension.json"),
     ]
     if cursor_path is not None:
         manifests.append((cursor_path, cursor or {}, ".cursor-plugin/plugin.json"))
@@ -403,7 +399,6 @@ def collect_canonical_paths() -> list[Path]:
     paths = [
         *sorted(REPO_ROOT.glob("skills/*/SKILL.md")),
         REPO_ROOT / ".claude-plugin" / "plugin.json",
-        REPO_ROOT / "gemini-extension.json",
     ]
     cursor_manifest = REPO_ROOT / ".cursor-plugin" / "plugin.json"
     if cursor_manifest.exists():

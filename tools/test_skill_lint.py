@@ -256,7 +256,7 @@ class DangerousContentTest(unittest.TestCase):
 
 class CrossManifestTest(unittest.TestCase):
     def _setup(
-        self, tmp: Path, skill_perms: dict, plugin_perms, gemini_perms,
+        self, tmp: Path, skill_perms: dict, plugin_perms,
         cursor_perms=...,
     ):
         skills_dir = tmp / "skills" / "myskill"
@@ -279,12 +279,7 @@ class CrossManifestTest(unittest.TestCase):
             "name": "myskill", "description": "ok",
             "permissions": plugin_perms,
         }))
-        gemini_json = tmp / "gemini-extension.json"
-        gemini_json.write_text(_json.dumps({
-            "name": "myskill", "description": "ok",
-            "permissions": gemini_perms,
-        }))
-        paths = [skill_md, plugin_json, gemini_json]
+        paths = [skill_md, plugin_json]
         if cursor_perms is not ...:
             cursor_dir = tmp / ".cursor-plugin"
             cursor_dir.mkdir()
@@ -296,12 +291,12 @@ class CrossManifestTest(unittest.TestCase):
             paths.append(cursor_json)
         return paths
 
-    def test_all_three_match(self):
+    def test_claude_and_cursor_match(self):
         import tempfile
         with tempfile.TemporaryDirectory() as tmp:
             perms = {"mcp": ["pencil:x"], "shell": "none",
                      "filesystem": "project-only", "network": "none"}
-            paths = self._setup(Path(tmp), perms, perms, perms)
+            paths = self._setup(Path(tmp), perms, perms, cursor_perms=perms)
             self.assertEqual(skill_lint.check_cross_manifest_consistency(paths), [])
 
     def test_plugin_missing_permissions(self):
@@ -309,7 +304,7 @@ class CrossManifestTest(unittest.TestCase):
         with tempfile.TemporaryDirectory() as tmp:
             perms = {"mcp": [], "shell": "none",
                      "filesystem": "project-only", "network": "none"}
-            paths = self._setup(Path(tmp), perms, None, perms)
+            paths = self._setup(Path(tmp), perms, None)
             findings = skill_lint.check_cross_manifest_consistency(paths)
             self.assertTrue(any(f.code in ("AST04", "AST10") for f in findings))
 
@@ -320,7 +315,7 @@ class CrossManifestTest(unittest.TestCase):
                        "filesystem": "project-only", "network": "none"}
             perms_b = {"mcp": ["pencil:y"], "shell": "none",
                        "filesystem": "project-only", "network": "none"}
-            paths = self._setup(Path(tmp), perms_a, perms_b, perms_a)
+            paths = self._setup(Path(tmp), perms_a, perms_b)
             findings = skill_lint.check_cross_manifest_consistency(paths)
             self.assertTrue(any(f.code == "AST10" for f in findings))
 
@@ -329,7 +324,7 @@ class CrossManifestTest(unittest.TestCase):
         with tempfile.TemporaryDirectory() as tmp:
             perms = {"mcp": ["pencil:x"], "shell": "none",
                      "filesystem": "project-only", "network": "none"}
-            paths = self._setup(Path(tmp), perms, perms, perms, cursor_perms=perms)
+            paths = self._setup(Path(tmp), perms, perms, cursor_perms=perms)
             self.assertEqual(skill_lint.check_cross_manifest_consistency(paths), [])
 
     def test_cursor_divergent_permissions_flagged(self):
@@ -339,7 +334,7 @@ class CrossManifestTest(unittest.TestCase):
                        "filesystem": "project-only", "network": "none"}
             perms_b = {"mcp": ["pencil:y"], "shell": "none",
                        "filesystem": "project-only", "network": "none"}
-            paths = self._setup(Path(tmp), perms_a, perms_a, perms_a, cursor_perms=perms_b)
+            paths = self._setup(Path(tmp), perms_a, perms_a, cursor_perms=perms_b)
             findings = skill_lint.check_cross_manifest_consistency(paths)
             cursor_finding = next(
                 (f for f in findings if ".cursor-plugin" in f.location), None,
@@ -352,7 +347,7 @@ class CrossManifestTest(unittest.TestCase):
         with tempfile.TemporaryDirectory() as tmp:
             perms = {"mcp": ["pencil:x"], "shell": "none",
                      "filesystem": "project-only", "network": "none"}
-            paths = self._setup(Path(tmp), perms, perms, perms, cursor_perms=None)
+            paths = self._setup(Path(tmp), perms, perms, cursor_perms=None)
             findings = skill_lint.check_cross_manifest_consistency(paths)
             self.assertTrue(any(
                 f.code == "AST10" and ".cursor-plugin" in f.location
