@@ -39,7 +39,7 @@ skill is the capability the AI invokes.
 
 ```
 skills/pencil-design/              # The platform-agnostic core
-  SKILL.md                         # The skill: YAML frontmatter + instructions (v1.10.0)
+  SKILL.md                         # The skill: YAML frontmatter + instructions (v1.11.0)
   references/                      # On-demand references loaded by the skill
     mcp-tools.md                   # Cookbook for all 13 MCP tools + composite recipes
     states.md                      # Component states + screen-level fault states + onboarding/settings states

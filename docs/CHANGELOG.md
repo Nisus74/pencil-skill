@@ -17,6 +17,43 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Cursor's plugin schema doesn't document a `permissions` field. The manifest carries one anyway so `tools/skill-lint.py` can enforce consistency across all three platforms; Cursor ignores the unknown field.
 
+## [1.11.0] - 2026-05-09
+
+### Added
+
+Phase 5 of the world-class overhaul. The eval suite expands from 6 to 20 evals covering the skill's full surface. Plus an in-app review requirement for evaluation, and an explicit Pencil CLI deviation pointer in SKILL.md so the agent loads the CLI reference when the context is headless.
+
+- **Fourteen new evals** appended to `evals/evals.json` (IDs 6 through 19):
+  - `clarify-intent-before-designing` (id 6): open-ended request triggers three clarifying questions before any batch_design.
+  - `shadow-and-color-architecture` (id 7): pricing card with two-role colour, layered shadow, hover increases contrast, nested radius child ≤ parent.
+  - `form-design-discipline` (id 8): multi-field signup form with visible labels, on-blur validation, autocomplete attrs, mobile font-size ≥ 16px.
+  - `compound-component-design` (id 9): Composer.Provider / Frame / Header / Input / Footer slot pattern; explicit variants over boolean props.
+  - `marketing-page-archetypes` (id 10): marketing page that avoids the three-card grid; uses alternating image-text or bento; static testimonials.
+  - `mobile-bottom-sheet-vs-modal` (id 11): correct sheet vs modal per use case; safe areas; tab bar ≤ 5 items; haptics.
+  - `data-viz-dashboard` (id 12): chart picked per data shape; Okabe-Ito + Viridis; never pie > 5, 3D, or dual y-axes; sparklines inline.
+  - `microcopy-quality` (id 13): error / empty / success / loading copy that guides the exit; action-specific button labels.
+  - `reference-image-translation` (id 14): names layout pattern, extracts palette and type pairing, preserves vs deliberately changes, recreates with project tokens.
+  - `industry-aware-saas` (id 15): developer-tools dashboard uses developer conventions; not fintech, healthcare, or e-commerce voice.
+  - `iteration-rescue-too-busy` (id 16): diagnoses busyness; subtracts (not adds) to fix; the most common second-iteration failure.
+  - `command-palette-pattern` (id 17): proper command-palette UI (search, grouped results, keyboard nav indicators, recent commands).
+  - `file-architecture-cover-and-sections` (id 18): Cover frame at origin, section regions, hierarchical naming for multi-screen flows.
+  - `saas-completeness-pressure-test` (id 19): full state coverage (empty / loading / error / no-permission / plan-restricted) plus admin surface.
+- **`evals/README.md`** documenting the eval workflow and the in-app review requirement: programmatic grading catches structural patterns; design quality demands opening every `.pen` artifact in the Pencil app and checking visual hierarchy, token rendering in both modes, layered shadows, spacing rhythm, microcopy, component states, mobile safe areas, and accessibility patterns. Without the in-app review, an eval can pass programmatic assertions while shipping a visually broken design.
+- **SKILL.md updates**:
+  - New deviation pointer in `Design intelligence: when to deviate` for headless / CI / batch / scripted contexts: load `references/pencil-cli.md` when the user mentions `pencil` command, `@pencil.dev/cli`, headless workflows, or asks for design without opening the editor. Default policy stays no-auto-fall-back: when MCP isn't connected, stop and ask the user; only invoke the CLI when explicitly directed or the context is unambiguously headless.
+  - `compatibility` field broadened to acknowledge headless workflows via `@pencil.dev/cli` alongside the MCP server, with a pointer to the When CLI vs MCP decision table.
+
+### Changed
+
+- Plugin and skill versions bumped to `1.11.0` (`.claude-plugin/plugin.json`, `.cursor-plugin/plugin.json`, `SKILL.md` frontmatter).
+
+### Quality gates
+
+- Em-dash count: 0 across all added lines.
+- Australian English throughout new prose.
+- No third-party AI skill citations anywhere in the repo.
+- Eval `expected_output` strings cite the relevant references (forms.md, layout-patterns.md, microcopy.md, mobile-patterns.md, data-viz.md, industry-patterns.md, iteration-patterns.md, file-architecture.md, composition-patterns.md, modern-patterns.md, etc.) so a grader can trace each requirement to its canonical source.
+
 ## [1.10.0] - 2026-05-09
 
 ### Added
