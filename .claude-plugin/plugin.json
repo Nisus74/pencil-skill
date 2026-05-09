@@ -2,7 +2,7 @@
   "name": "pencil-dev-skill",
   "displayName": "Pencil.dev Design Skill",
   "description": "Teaches AI coding tools to design, edit, and validate pencil.dev UIs using .pen files, .lib.pen libraries, design-system docs, and the Pencil MCP server",
-  "version": "1.8.0",
+  "version": "1.9.0",
   "author": {
     "name": "Travis Polland",
     "email": "tpolland@gmail.com",

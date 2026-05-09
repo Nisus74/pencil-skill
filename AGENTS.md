@@ -39,7 +39,7 @@ skill is the capability the AI invokes.
 
 ```
 skills/pencil-design/              # The platform-agnostic core
-  SKILL.md                         # The skill: YAML frontmatter + instructions (v1.8.0)
+  SKILL.md                         # The skill: YAML frontmatter + instructions (v1.9.0)
   references/                      # On-demand references loaded by the skill
     mcp-tools.md                   # Cookbook for all 13 MCP tools + composite recipes
     states.md                      # Component states + screen-level fault states + onboarding/settings states
@@ -58,11 +58,19 @@ skills/pencil-design/              # The platform-agnostic core
     layout-patterns.md             # Hero variations, feature sections beyond three-card grid, pricing, dashboards, settings, list-detail, empty pages (cited 2025/2026 exemplars)
     iteration-patterns.md          # Failure-mode rescues (too busy/sparse/generic/un-premium), self-critique gate, reference-image translation, three-iteration limit
     microcopy.md                   # Voice/tone framework, action-specific CTAs, error message anatomy, empty/success/confirmation copy, loading copy, localisation
+    mobile-patterns.md             # Safe areas, sheets vs modals, sheet detents, gestures, haptics, tab bars, native conventions per platform
+    iconography.md                 # Stroke weight, sizing, semantic icons, accessibility (aria-hidden vs accessible name), family consistency
+    performance-design.md          # Network budgets, Core Web Vitals (LCP/CLS/INP), virtualisation, image and font optimisation, theme-color
+    industry-patterns.md           # 8 industry families with 15-20 rules each + completeness pressure tests for SaaS / Website / Mobile
+    data-viz.md                    # 25-chart selection matrix, colour-blind palettes (Okabe-Ito, ColorBrewer, Viridis), dashboard tiles, anti-patterns
+    style-catalogue.md             # 30+ named UI styles (menu) organised by family with mood, when-to-use, anti-pattern, exemplars
+    colour-palettes.md             # 40+ palette recipes (menu) tagged by industry/mood; recipes point to Tailwind/Radix/IBM Carbon/Material 3/Apple HIG
+    font-pairings.md               # 30+ typography pairings (menu); recipes point to Google Fonts/Vercel/GitHub/commercial foundries
     codex-tools.md                 # OpenAI Codex tool name mappings
     gemini-tools.md                # Google Gemini CLI tool name mappings
     copilot-tools.md               # GitHub Copilot CLI tool name mappings
   assets/
-    design-system/                 # 12 core + 4 optional scaffold templates: copy into any project
+    design-system/                 # 12 core + 5 optional scaffold templates: copy into any project
       README.md                    # Index + how to use
       design-system.md             # Top-level design system doc
       tokens.md                    # Colour, spacing, type tokens
@@ -79,13 +87,15 @@ skills/pencil-design/              # The platform-agnostic core
       data-viz.md                  # Optional: chart palettes, default chart types
       brand.md                     # Optional: logo lockups, OG / social imagery
       imagery.md                   # Optional: photo / illustration style, AI-imagery rules
-    examples/                      # 6 worked examples with real MCP tool sequences
+      visual-style.md              # Optional: project's chosen style identity (style + palette + font picks from references catalogues)
+    examples/                      # 7 worked examples with real MCP tool sequences
       example-login-screen.md      # Greenfield auth screen
       example-import-library.md    # Import .lib.pen library + instantiate components
       example-scaffold-system.md   # Bootstrap a full design-system scaffold
       example-error-screen.md      # 404 + offline page pair
       example-form-flow.md         # Multi-step signup with email verification
       example-component-deep-dive.md # Full read→understand→instantiate cycle
+      example-style-selection.md   # Catalogue (style + palette + fonts) → set_variables MCP → tokens commit → starter components
 
 # Platform install adapters (required by each platform's installer)
 .claude-plugin/plugin.json         # Claude Code plugin manifest

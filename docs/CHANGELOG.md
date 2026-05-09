@@ -17,6 +17,46 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Cursor's plugin schema doesn't document a `permissions` field. The manifest carries one anyway so `tools/skill-lint.py` can enforce consistency across all three platforms; Cursor ignores the unknown field.
 
+## [1.9.0] - 2026-05-09
+
+### Added
+
+Phase 3 of the world-class overhaul. Eight new reference files (five principle-led, three catalogue-shaped) plus one new design-system template and one new worked example to complete the catalogue architecture end-to-end. Every rule cited to authoritative 2025/2026 sources per the source-validation policy.
+
+- **Three new principle-led reference files**:
+  - `references/mobile-patterns.md` (262 lines): safe areas with `env(safe-area-inset-*)` and `viewport-fit=cover`, bottom sheets vs modals decision criteria, sheet detents (peek / half / full / custom), pull-to-refresh expectations, swipe gestures (edge swipe vs row swipe), haptic feedback (success / selection / error / impact), tab bars (≤ 5 items, semantic order, Dynamic Type), iOS vs Android native conventions, FAB usage criteria, keyboard avoidance with accessory bar.
+  - `references/iconography.md` (155 lines): stroke weight per context (1.5 / 2 / 1px), size relative to text (cap-height matching, 16 / 20 / 24 / 32px), icon-only vs paired patterns, semantic icon conventions (warning, error, success, info, lock, time, delete, edit, settings, favourite), decorative-vs-meaningful (`aria-hidden` vs accessible name), family consistency (Phosphor / Lucide / Material Symbols / Heroicons / Tabler / SF Symbols), custom icons matching optical weight at 24px base, Pencil's `icon_font` and `icon_image` node types.
+  - `references/performance-design.md` (141 lines): network budgets (POST/PATCH/DELETE < 500ms; GET < 200ms above-fold), Core Web Vitals 2025 baseline (LCP < 2.5s; CLS < 0.1; INP < 200ms; INP replaced FID in March 2024), virtualisation for lists > 50 items, image optimisation (explicit width/height for CLS, AVIF / WebP / lazy-load, LQIP/blur-up, responsive `srcset`), font loading (preload critical, `font-display: swap`, subset to actual character range, self-host where possible), `<meta name="theme-color">` matching per mode, skeleton vs spinner choices, perceived performance patterns.
+- **Three new catalogue-shaped reference files** (recipe menus, not value definitions):
+  - `references/style-catalogue.md` (307 lines): 30+ named UI styles organised by family (Modernist, Expressive, Technical, Retro / Revival, Atmospheric, Hand-crafted). Each entry: mood, when to use, anti-pattern, sample component cues, real-world exemplars (Linear, Vercel, Stripe, Notion, Apple, Things, Cron, Raycast, Arc, Pitch, Cursor, Spotify, Discord, Aēsop, Glossier, Mailchimp, etc.). Includes picking shortcuts by industry.
+  - `references/colour-palettes.md` (263 lines): 40+ palette *recipes* tagged by industry and mood. Each recipe names a neutral family + accent scale from established source systems (Tailwind v4, Radix Colors, IBM Carbon v11, Material 3, Apple HIG). The agent commits picks to `assets/design-system/tokens.md` and the `.pen` file's `variables` via `set_variables` MCP; designs reference `$tokens`, never literal hex.
+  - `references/font-pairings.md` (217 lines): 30+ typography pairings across families (Sans + Mono, Sans + Sans, Serif + Sans, Display + Sans, Modern grotesque, Serif + Serif, Casual). Each entry: weights, mood, industry fit, anti-pattern, real-world exemplar, source (mostly Google Fonts; some Vercel Geist, GitHub Mona Sans, or commercial foundries with free alternatives).
+- **Two expanded reference files**:
+  - `references/industry-patterns.md` (416 lines): 8 industry families (SaaS, fintech, healthcare, e-commerce, creative tools, social, education, communication) with 15-20 rules per family. Each family: sub-categories, per-industry rules, anti-patterns, recommended catalogue picks (style + palette + fonts), exemplars. Plus the brutal-honesty completeness pressure tests for SaaS / Website / Mobile projects.
+  - `references/data-viz.md` (229 lines): 25-chart selection matrix (sparkline, big-number, bar/horizontal/stacked/grouped/100% stacked, line, area / stacked area, scatter, bubble, heatmap, treemap, sankey, funnel, radar, gauge, progress, candlestick, boxplot, histogram, chord, ridgeline, network, choropleth) with data shape, ideal use case, failure mode, alternative for each. Colour-blind-safe palette recommendations (Okabe-Ito, ColorBrewer, Viridis). Dashboard tile shapes (KPI / chart / table). Default chart styling rules. Chart anti-patterns (3D, pie > 5 slices, dual y-axes, red-green only).
+- **One new design-system template**:
+  - `assets/design-system/visual-style.md` (93 lines): the project's chosen style identity. Records the picks from the three catalogues (style + palette recipe + font pairing), deviations from the catalogue defaults, contrast verification, colour-blind safety status. The agent reads this at the start of every greenfield design pass to constrain output to the chosen direction.
+- **One new worked example**:
+  - `assets/examples/example-style-selection.md` (292 lines): full workflow from user brief ('developer-tools dashboard, feel like Linear') through catalogue pick (Swiss / International + Linear Dark + Inter + JetBrains Mono), `tokens.md` population, `set_variables` MCP invocation, `visual-style.md` commitment, and starter component scaffolding. Demonstrates the catalogue → MCP → tokens → designs flow that the catalogue layer enables.
+- **SKILL.md additions**:
+  - Eight new deviation pointers in `Design intelligence: when to deviate` for mobile patterns, iconography, performance design, industry patterns, data viz, style catalogue, colour palettes, font pairings.
+  - Eight new entries in the Reference index.
+  - Reference to the new `example-style-selection.md` worked example.
+  - `assets/design-system/` template count updated to mention `visual-style.md` (now 5 optional templates).
+
+### Changed
+
+- Plugin and skill versions bumped to `1.9.0` (`.claude-plugin/plugin.json`, `.cursor-plugin/plugin.json`, `SKILL.md` frontmatter).
+- AGENTS.md structure listing updated to reflect the new references, the new design-system template, and the new worked example.
+- Catalogue architecture clarified across `colour-palettes.md` and `font-pairings.md`: each catalogue is a *menu of recipes*, not a value source. Hex codes and font names live in `assets/design-system/tokens.md` (project-owned) and the `.pen` file's `variables` (mirrored via `set_variables`). Designs reference `$tokens`, never literal values from the catalogues.
+
+### Quality gates
+
+- Em-dash count: 0 across all new and extended files.
+- Australian English throughout new content.
+- No third-party AI skill citations anywhere in the repo.
+- Source-validation policy applied: every catalogue entry and rule cited to authoritative 2025/2026 sources (Apple HIG, Material 3, WCAG 2.2, Refactoring UI, Linear, Vercel, Stripe, Tailwind, Radix Colors, IBM Carbon, Nielsen Norman Group, web.dev, Google Fonts, Klim Type Foundry, Pangram Pangram, Grilli Type, Okabe-Ito 2002, ColorBrewer 2.0, Viridis 2015, Tufte's *Visual Display of Quantitative Information*, Microcopy: The Complete Guide, Mailchimp Content Style Guide, Shopify Polaris, Atlassian Design System, Stripe Style Guide, ICU MessageFormat).
+
 ## [1.8.0] - 2026-05-09
 
 ### Added
