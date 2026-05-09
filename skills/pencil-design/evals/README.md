@@ -74,6 +74,6 @@ After running the evals:
 
 ## See also
 
-- `references/SKILL.md`: the canonical skill content this eval suite tests.
+- `../SKILL.md`: the canonical skill content this eval suite tests.
 - The skill-creator skill: workflow for spawning runs, grading, aggregating, and viewing.
 - `assets/examples/`: worked examples that show the agent the patterns the evals test.

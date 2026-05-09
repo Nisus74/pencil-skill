@@ -38,10 +38,23 @@ This progressive loading keeps the agent's context small while still giving it t
 | `data-viz.md` | Designing a chart, sparkline, or dashboard tile. | Your project doesn't render charts. |
 | `brand.md` | Placing a logo, designing OG/social-share imagery, applying brand identity. | Your project has no marketing surface and no distinct brand mark. |
 | `imagery.md` | Choosing photo style, illustration style, AI-imagery treatment, avatar fallbacks. | Your project is mostly chrome and data. |
+| `visual-style.md` | Locking in a specific aesthetic direction — style family, palette recipe, type pairing. | No fixed visual style has been chosen. |
+| `micro-interactions.md` | Specifying per-interaction animation values beyond the motion.md defaults. | You have no detailed animation requirements. |
+| `empty-states.md` | Designing the lockup and copy for empty lists, dashboards, and post-action states. | The defaults from `states.md` are sufficient. |
+| `onboarding.md` | Designing a sign-up or guided first-use flow. | Your product has no onboarding sequence. |
+| `navigation.md` | Specifying sidebar, top bar, breadcrumb, or mobile nav patterns. | Your navigation is simple and needs no formal spec. |
+| `search.md` | Designing instant search, submit-driven search, suggestions, and empty-results states. | Your product has no search feature. |
+| `forms.md` | Specifying validation timing, error display, save patterns, and multi-step behaviour. | You have no forms, or the defaults are fine. |
+| `accessibility.md` | Setting compliance targets, keyboard nav requirements, and screen-reader patterns. | No accessibility targets have been set yet. |
+| `file-architecture.md` | Organising multiple `.pen` files — naming, section regions, status taxonomy. | Your project has only one design file. |
 
 ## Editing this folder
 
-Everything here is plain Markdown. Edit any file by hand — agents re-read on each task. Two principles for keeping it useful:
+Everything here is plain Markdown. Edit any file by hand — agents re-read on each task.
+
+**Not a developer or designer?** See [CUSTOMISING.md](./CUSTOMISING.md) for a plain-English walkthrough that explains each file and where to start.
+
+Two principles for keeping it useful:
 
 1. **Decisions, not exhaustive documentation.** "Use `$primary` for any interactive accent color" is more useful than "We have these 47 colors." The agent can look up colors; it can't easily learn taste.
 2. **Short and decision-shaped.** Most files top out at ~500 words. If a file grows past that, split it or trim ruthlessly. Long files get skipped or skimmed.
