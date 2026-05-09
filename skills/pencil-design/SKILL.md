@@ -70,17 +70,13 @@ If a component exists but its name doesn't quite match what the user said (`Prim
 
 ### Themes (light + dark, always)
 
-Every new document declares a `mode` theme axis with `light` and `dark` values. Every color variable carries both. No exceptions for "we'll add dark mode later" — the variables are nearly free to declare upfront, and retrofitting a colorscape after the design exists is brutal. Concretely, when you start a new doc:
+Every new document declares a `mode` theme axis with `light` and `dark` values. Every color variable carries both. No exceptions for "we'll add dark mode later" — the variables are nearly free to declare upfront, and retrofitting a colorscape after the design exists is brutal.
 
-```
-U("doc", { themes: { mode: ["light", "dark"] } })
-U("doc", { variables: { surface: { type: "color", value: [
-  { value: "#FFFFFF", theme: { mode: "light" } },
-  { value: "#0B1117", theme: { mode: "dark" } }
-] }, /* ...textPrimary, border, primary, etc. */ } })
-```
+**Setting themes and variables:** `U("document", ...)` is not supported by `batch_design` — the `document` binding is insert-only. Use `set_variables` (the dedicated MCP tool) to write design tokens, or set them directly in the document JSON. To activate a theme on a frame (e.g. render in dark mode), use `U("frameId", { theme: { mode: "dark" } })`.
 
-Test under both modes via `theme: { mode: "dark" }` on the document or page root before declaring the design done.
+Test under both modes by updating the page frame's `theme` property before declaring the design done.
+
+**No raw hex on rendered elements.** Every `fill`, `stroke`, and text colour on a node that renders must resolve to a `$variableName`. The variable's declaration carries both light and dark values. If a screenshot review surfaces raw hex on a rendered node (`#FFFFFF`, `#000000`, `#3B82F6`), that is a bug; fix it with a `U` op binding to the appropriate variable. Do not ship raw hex.
 
 ### Responsive
 
@@ -126,16 +122,6 @@ A design that ships only the default state of every component or the happy path 
 ## Aesthetic defaults
 
 The Discipline rules govern *correctness*; this section governs *taste*. These are **defaults that lose to the project's `design-system/`** — when `tokens.md`, `design-system.md`, or `voice.md` says something specific, follow them. Use these defaults only when the project is silent (no `design-system/` folder, the relevant file is empty, or the task is a one-off sketch).
-
-### Name the atmosphere before you plan
-
-In step 4 (Plan), commit to a one-line vibe before any `batch_design` call. Pick one adjective from each axis:
-
-- **Density:** airy / balanced / dense
-- **Variance:** symmetric / offset / chaotic
-- **Motion:** static / fluid / cinematic
-
-Example: *"Dense dashboard, symmetric, static."* This forces a stance the rest of the design has to honor; without it, the model defaults to "balanced / symmetric / fluid" for everything and the work reads generic.
 
 ### Color
 
@@ -191,10 +177,10 @@ This is the reflex sequence for any design task. Follow it; deviate only at the 
 
 1. **Detect host.** `get_editor_state({ include_schema: false })`. Failure → stop and instruct the user (see Failure modes §1).
 2. **Locate context.** From the result, determine: is a `.pen` file open? What's selected? Then check the project filesystem for a `design-system/` folder (use a directory listing, not the MCP). The combination of these three facts shapes everything that follows.
-3. **Load guidelines + inventory components.** Call `get_guidelines()` with no arguments first — the server reports which categories exist for this document. Read the ones that match the task (e.g. `Web App`, `Mobile App`, `Landing Page`, `Table`, `Tailwind`, `Design System`). See `references/mcp-tools.md` § `get_guidelines` for the full live-as-of-2026-05 category list and the *for task X load category Y* decision table. If the project has `design-system/README.md`, read it next; then read whichever specific files it points at (typically `design-system.md` and `tokens.md`). **Then inventory components** per the Components-first rule above: `batch_get({ patterns: [{ reusable: true }], readDepth: 2 })` against the open doc, and again with `filePath` set against each `.lib.pen` in the document's `imports`. Hold the resulting list in mind for step 4 — when planning, name which existing components you'll instantiate vs. anything you'll have to build from primitives.
-4. **Plan.** State a 2–3 sentence plan to the user before any `batch_design` call. Name the top-level frames you'll create, the components you'll instantiate (by id from the `.lib.pen`), and roughly the layout. This is the moment to catch bad assumptions cheaply.
-5. **Execute.** One or more `batch_design` calls. Each call ≤25 ops. Use the `foo=I("parent", {...})` binding form whenever a later op needs to reference a node you just created. For images, use `G(nodeId, "ai", "<prompt>")` rather than placeholder rectangles. **Apply the discipline rules at every op:** every node gets a meaningful `name`; every non-trivial node gets a `context`; theme-aware colors come from variables that have light AND dark values; designs target a canonical breakpoint (or breakpoints). See `references/batch-design-grammar.md` for the full op grammar.
-6. **Verify (structural-first).** Walk the verification ladder, stopping at the cheapest rung that answers the question: (a) did the `batch_design` response report success? (b) `snapshot_layout` on the affected subtree to confirm structure landed (gaps, padding, child order, sizing); (c) `batch_get` on specific nodes to confirm property-level changes (color variables bound, text content, refs instantiated); (d) `get_screenshot` on the most specific `nodeId` containing the change — only when the question is genuinely visual (rhythm, contrast in render, image quality, reference-image match) or as the final sign-off before handing back. **Dual-mode rule:** screenshot the primary mode only. Re-screenshot the alternate mode only if the design uses mode-conditional colors *and* you have reason to suspect they were set wrong (e.g. raw hex used instead of a variable). Routine theme-aware designs — those built entirely from variables with both light/dark values — do not need a second screenshot to "confirm both modes hold up"; the variable system guarantees it.
+3. **Load guidelines + inventory components.** Call `get_guidelines()` with no arguments first — the server reports which categories exist for this document. Read the ones that match the task (e.g. `Web App`, `Mobile App`, `Landing Page`, `Table`, `Tailwind`, `Design System`). See `references/mcp-tools.md` § `get_guidelines` for the full live-as-of-2026-05 category list and the *for task X load category Y* decision table. If the project has `design-system/README.md`, read it next; then read whichever specific files it points at (typically `design-system.md` and `tokens.md`). **Then inventory components** per the Components-first rule above: `batch_get({ patterns: [{ reusable: true }], readDepth: 2 })` against the open doc, and again with `filePath` set against each `.lib.pen` in the document's `imports`. By the end of this step, hold a written list of: (a) the components available in the open document and any imported `.lib.pen`, by id; and (b) the colour, spacing, and type tokens declared. If either list is empty, name that to the user before continuing. Example: *'your `.lib.pen` has no Button; I will build one from primitives unless you point me at an existing one'*. Step 4 must reference these lists when planning; step 5 must reference them when issuing ops. An agent that names 'a button' instead of `ButtonPrimary` has not done step 3.
+4. **Plan.** State a plan to the user before any `batch_design` call. It must include four things: (a) the top-level frames by name; (b) the library component ids you will instantiate, from step 3's inventory; (c) an atmosphere stance, one adjective from each axis: density (airy / balanced / dense), variance (symmetric / offset / chaotic), motion (static / fluid / cinematic), e.g. 'airy, symmetric, static'; (d) the layout shape in one phrase. If you cannot name (a) through (d), the plan is incomplete; return to step 3 and read more. The atmosphere stance is what stops the model defaulting to 'balanced, symmetric, fluid' for everything and producing generic work.
+5. **Build, screenshot, react.** Work in small chunks: **≤8 ops per `batch_design` call for visual work** (up to 15 ops only for non-visual sweeps such as renames, context backfills, metadata). After each visual chunk: screenshot the affected subtree, narrate what you see in one or two sentences (*'the form card landed at 360px wide; the title sits tight against the subtitle, gap looks about 4px when it should be 16'*), then either keep building or issue a small adjustment. The user is watching; they should see the design take shape on the canvas as you work, with each chunk visible. **First chunk on a new document:** declare the mode theme axis with `U(docRootId, { themes: { mode: ["light", "dark"] } })`, add imports, declare tokens via `set_variables`. Do this before placing frames so every colour resolves to a variable downstream, never raw hex. Use the `foo=I("parent", {...})` binding form for in-call references. For images, use `G(nodeId, "ai", "<prompt>")` rather than placeholder rectangles. **Apply the discipline rules at every op:** every node gets a meaningful `name`; every non-trivial node gets a `context`; theme-aware colours come from variables with both light and dark values; designs target a canonical breakpoint. See `references/batch-design-grammar.md` for the full op grammar.
+6. **Final pass.** Once visual chunks are done, run the five accessibility checks: contrast under both modes, 44×44 hit targets, colour-not-only signal, semantic names, focus states declared. Take one screenshot of the design in dark mode if it uses theme-conditional colours. If a check fails, fix it and re-screenshot. `snapshot_layout` and `batch_get` are available for structural debugging when a screenshot reveals something off and you need numbers; they are not the verification path.
 7. **Iterate or report.** If verification surfaced issues, return to step 5 with targeted `R` (replace) or `U` (update) ops. If clean, summarize what landed in one paragraph and stop. Do not keep polishing past the user's stated requirements.
 
 ## Design intelligence: when to deviate
@@ -215,7 +201,7 @@ The default workflow assumes a fresh, end-to-end design. Most tasks aren't that.
 - **User mentions container queries, fluid type, AI UI affordances, optimistic updates, real-time presence, or "modern" patterns.** Load `references/modern-patterns.md`. It surfaces the patterns the model under-uses by default and flags the AI defaults (glassmorphism, three-card grids, parallax-everywhere) that read as already-dated.
 - **User wants to use a Pencil MCP tool you haven't touched recently** (`get_variables`, `set_variables`, `search_all_unique_properties`, `replace_all_matching_properties`, `find_empty_space_on_canvas`, `export_nodes`). Load `references/mcp-tools.md` — it's a per-tool cookbook with worked invocations and composite recipes (token audit, greenfield bootstrap, library smoke test).
 
-**Verification cadence.** Screenshots are the most expensive thing this skill does — each one returns a sizeable image payload to the model, costing tokens and consuming context. Do not screenshot "to check progress." Walk the verification ladder (workflow step 6) and stop at the cheapest rung. A typical end-to-end design task should need **one or two screenshots** total: optionally one mid-flight if a structural snapshot reveals something pixel-only can resolve, and one at the end before handing back. Stop when: no rhythm-breaking issues remain, components match the library, contrast OK, the user's stated requirements are covered. Hand back with a one-paragraph summary of what landed.
+**Screenshot cadence.** Screenshots are how the user watches you design. Take one after every chunk that changes visible state. Each one answers: 'what landed, what needs to change before I keep going?'. Narrate what you see in plain language, then either keep building or issue a small adjustment. A typical design task produces five to fifteen screenshots; that *is* the design loop, not waste. Skip screenshots only on edits that change no rendered pixels (a `name` rename, a `context` backfill, a metadata-only update). Hand back with a one-paragraph summary once the requirements are covered and accessibility passes.
 
 ## Design-system convention
 
@@ -280,54 +266,63 @@ When to import a library on the user's behalf: only when `design-system/design-s
 
 `batch_design` takes a single string of ops, one per line. Five op functions cover most work:
 
-- **Insert:** `foo=I("parent", { type: "frame", ... })` — creates a child of `parent`. The `foo=` binding lets later ops reference the new node's id.
+- **Insert:** `foo=I("parent", { type: "frame", ... })` — creates a child of `parent`. The `foo=` binding lets later ops reference the new node's id. Use `I(document, ...)` to create top-level frames.
 - **Copy:** `bar=C("sourceId", "parent", { ...overrides })` — duplicates an existing node into `parent`, optionally overriding properties.
 - **Replace:** `R("nodeId", { ...newProps })` — full replacement of a node's properties.
 - **Update:** `U("nodeId", { ...partialProps })` — merges partial property changes.
 - **AI image:** `G(nodeId, "ai", "<prompt>")` — fills an existing node with an AI-generated image (use Unsplash mode `"unsplash"` for stock photos).
 
-**Rules:**
+**Rules (verified live 2026-05):**
 
-- Aim for ≤25 ops per call. More than 25 risks ordering bugs and slow round trips.
+- Cap calls at **≤8 ops for visually-significant changes** so each call advances visible state by an amount the user can scan in one screenshot. Up to 25 ops is acceptable only for non-visual sweeps (renames, context backfills, metadata updates) where there is nothing to screenshot. Crossing 25 risks ordering bugs and slow round trips even for non-visual work.
 - IDs cannot contain `/`. The server rejects them.
 - Use the `foo=I(...)` binding pattern — never hardcode a node id you just created in the same call.
-- For sizing, use `width: "fill_container"` or `width: "fit_content"` (bare strings) — not `"100%"`, not `"auto"`, and not the older `{ sizing: ... }` object form (the live server rejects it). With fallback: `width: "fill_container(320)"`. Numeric pixel values fine when intentional.
+- **Text content:** the property is `content`, not `text` or `value`. Both are rejected. Example: `{ type: "text", content: "Hello", fontFamily: "Geist", fontSize: 14, fill: "#F1F5F9" }`.
+- **Text has no colour by default — always set `fill` on text nodes or they render invisible.**
+- **Padding:** takes a number, `[horizontal, vertical]`, or `[top, right, bottom, left]` array. Object form `{ top: N, left: N }` and individual `paddingTop`/`paddingLeft` props are both rejected.
+- **`justifyContent`** values use underscores: `"space_between"`, `"space_around"` — not hyphens.
+- **Fill object type** is `"color"` not `"solid_color"`. Plain color strings (`"#RRGGBB"` or `"$variable"`) are accepted as shorthand and preferred.
+- For sizing, use `width: "fill_container"` or `width: "fit_content"` (bare strings) — not `"100%"`. With fallback: `width: "fill_container(320)"`.
+- `U("document", ...)` is not supported — use `set_variables` for tokens; `document` binding is insert-only.
 - For colors, prefer `"$variableName"` over raw `#RRGGBB`. Raw colors are accepted but lose theme-axis behavior.
 
 See `references/batch-design-grammar.md` for the complete grammar including delete and move ops, ordering rules, and common error fixes.
 
-## Verification ladder
+## Screenshot loop
 
-Verification answers one of two questions: *did the change land?* (structural) or *does it look right?* (visual). Use the cheapest tool that answers the actual question. The ladder, in order:
+The design loop runs in chunks: build a small `batch_design` call, screenshot, narrate, then either keep building or adjust. The screenshot after each chunk is how the user watches the design unfold.
 
-1. **`batch_design` response** — confirms ops succeeded. Free.
-2. **`snapshot_layout(parentId, maxDepth: 2)`** — confirms structural intent (positions, sizes, gaps, child order). Returns numbers; cheap.
-3. **`batch_get({ nodeIds: [...] })`** — confirms property-level intent (variable bindings, text, refs). Returns JSON; cheap.
-4. **`get_screenshot(nodeId)`** — confirms visual intent. Returns an image; **expensive**. Always pass the most specific `nodeId` that contains the change — never the page frame when a card subtree would do. Reserve for: WCAG contrast under real rendering, image content (AI-generated assets, photos), spacing/type rhythm at scale, final sign-off.
+After each visual `batch_design` chunk:
 
-When you've decided rung 4 is needed, scan the rendered image in this order:
+1. Call `get_screenshot({ nodeId: "<most specific node containing the change>" })`. Never screenshot the whole document when a card subtree will do.
+2. Narrate what you see in one or two sentences. Be specific: name what landed correctly, and what needs fixing. Example: *'the form card lands at 360px, title is tight against the subtitle (gap reads about 4px, should be 16), submit button looks 12px shorter than the inputs'*. This is the part the user reads to know what you are seeing.
+3. Decide: keep building (next chunk) or adjust (one small `U` op, screenshot again).
 
-1. **Layout integrity** — does the page hold together at the intended viewport? Any element off-canvas, wildly oversized, or visibly missing?
-2. **Spacing rhythm** — gaps between sections should match `tokens.md`. If they don't, the auto-layout `gap` is wrong, not the surrounding margin.
-3. **Type rhythm** — heading sizes step in the order `tokens.md` declares. Body text legible at the rendered size.
-4. **Contrast** — body text passes WCAG AA (4.5:1) against its background. Buttons pass against their fill.
-5. **Component fidelity** — anything that should be a `ref` to a library component is one (no hand-built buttons drifting from the library style).
+Skip screenshots on non-visual changes (renames, `context` backfills, metadata updates). They have nothing to show.
 
-When something is off, fix it with a targeted `U` op against the offending node, screenshot again, move on. If three iterations don't converge on a single issue, stop and ask the user — the requirement is probably ambiguous.
+When scanning a rendered screenshot, look in this order: layout integrity (any element off-canvas, oversized, or missing), spacing rhythm (gaps match `tokens.md`), type rhythm (heading sizes step as `tokens.md` declares; body legible), contrast (WCAG AA 4.5:1 on body text and buttons), component fidelity (every library component is a `ref`, no hand-built lookalikes drifting from the library style).
 
-**`snapshot_layout` is your default verification tool, not a niche one.** It returns positions, sizes, and layout relationships as numbers — perfect for "did the gap change to 12px?", "is the button 44px tall?", "is the form column the width I asked for?". Use it after every meaningful structural change. Reach for `get_screenshot` only when the question genuinely needs pixels: visual rhythm, real-rendered contrast, image content, or final sign-off. The reflex from older versions of this skill — "screenshot after every chunk" — is wrong; it burns tokens to confirm things the structural snapshot already proved.
+If three iterations on the same issue do not converge, stop and ask the user; the requirement is probably ambiguous.
 
-### Worked example: a 6-op edit, zero pre-final screenshots
+### Structural debugging
 
-User asks: *"On the LoginCard, change the Sign in button from blue to the brand green, and add 8px of breathing room above 'Forgot password?'."*
+When a screenshot shows something is off but you cannot tell exactly what (*'the gap between sections looks wrong but I cannot read the pixels'*), drop to numbers:
 
-1. **Locate.** `batch_get` the LoginCard subtree, identify the button node and the link node. *(One JSON call; would have been needed regardless.)*
-2. **Execute.** One `batch_design` call: `U("<button>", { fill: "$brandGreen" })`, `U("<linkContainer>", { paddingTop: 8 })`. Server response confirms both ops landed. *(Rung 1.)*
-3. **Verify structure.** `snapshot_layout(parentId: "<LoginCard>", maxDepth: 2)`. Confirm the link's top padding is 8 (the only structural change) and that nothing else shifted unexpectedly. *(Rung 2.)*
-4. **Verify property.** `batch_get({ nodeIds: ["<button>"] })`. Confirm `fill` resolved to `$brandGreen` (not a raw hex). *(Rung 3.)*
-5. **Final visual sign-off.** `get_screenshot(nodeId: "<LoginCard>")` — scoped to the card, not the page. Confirm the green renders as expected against the card background and the spacing reads right. *(Rung 4, once.)*
+- `snapshot_layout({ parentId, maxDepth: 2 })`: positions, sizes, gaps as numbers.
+- `batch_get({ nodeIds: [...] })`: property values like variable bindings, ref instances, text content.
 
-Total screenshots: **1**, scoped to the smallest meaningful subtree. The pre-skill version of this same task would typically have produced 2–3 (one mid-flight, one full-canvas final, possibly one in dark mode).
+These are debugging tools. The verification path is the screenshot loop above.
+
+### Worked example: a 4-op visual edit, three screenshots
+
+User asks: *'On the LoginCard, change the Sign in button from blue to the brand green, and add 8px of breathing room above the Forgot password? link.'*
+
+1. **Locate.** `batch_get` the LoginCard subtree, identify the button node and the link node.
+2. **Chunk 1.** `U("<button>", { fill: "$brandGreen" })`. Screenshot the LoginCard. Narrate: *'button is green now; reads correctly against the card surface, contrast looks fine at a glance, will check formally in the final pass.'*
+3. **Chunk 2.** `U("<linkContainer>", { padding: [8, 0, 0, 0] })`. Screenshot the LoginCard. Narrate: *'forgot-password link now sits 8px below the button; reads as a distinct row instead of pressed against the CTA.'*
+4. **Final pass.** Run the contrast check on the green button at WCAG AA. Pass. Hand back.
+
+Three screenshots for a 4-op edit. Each one was the conversation point with the user; that is the work, not overhead on top of the work.
 
 ## Failure modes
 
@@ -339,8 +334,8 @@ Six concrete cases. Detect, respond, do not improvise.
 | 2 | No .pen file open | `get_editor_state` succeeds but reports no active document | Ask the user: *"No `.pen` file is open. Should I (a) open an existing one — give me the path, or (b) create a new one with `open_document('new')`?"* Wait for the answer. |
 | 3 | No `design-system/` folder | Folder absent in the project root AND the task implies real project work (not a sketch) | Offer once: *"This repo doesn't have a `design-system/` folder yet. I have 12 core templates I can drop in, plus 4 optional ones (`mobile.md`, `data-viz.md`, `brand.md`, `imagery.md`) for projects that ship those surfaces. Want me to scaffold the core, plus any optional ones that fit your project?"* On yes, copy from `assets/design-system/` per the conditional rules in the Design-system convention section above. On no, proceed without; do not ask again this session. |
 | 4 | Conflicting `design-system/` | Folder exists but contains code files (`.tsx`, `.ts`, `package.json`, `index.js`, etc.) | Do not overwrite. Ask where to place docs instead: `design-system/docs/`, `docs/design-system/`, `.pencil/design-system/`, or a custom path. Adjust scaffolded files' cross-refs. |
-| 5 | .lib.pen import missing | `design-system/design-system.md` names a library path; the open doc's `imports` doesn't include it (or the file at the path doesn't exist) | If the file exists: add the `imports` entry via `batch_design` `U` op on the document root. If the file doesn't exist: tell the user the path in `design-system.md` is stale, ask whether to update the path or create the library. Don't silently invent. |
-| 6 | batch_design schema error | Server returns an error mentioning invalid op, unknown type, invalid property, or missing parent | Read the error verbatim. Cross-reference `references/batch-design-grammar.md` and `references/pen-schema.md`. Common causes: id contains `/`; used `width: "100%"` (use bare-string `"fill_container"`); used the older `{ sizing: "fill_container" }` object (use the bare string); used `stroke.fills` plural or `stroke.alignment` (use singular `stroke.fill`); passed raw color where a `$variable` was expected; referenced a parent before binding it. Retry with the fix; never blindly. |
+| 5 | .lib.pen import missing | `design-system/design-system.md` names a library path; the open doc's `imports` doesn't include it (or the file at the path doesn't exist) | If the file exists: add the `imports` entry via `U(docRootId, { imports: { "ds": "./path.lib.pen" } })` where `docRootId` is the actual node ID returned by `open_document` (not the literal `"document"` binding, which is insert-only). If the file doesn't exist: tell the user the path in `design-system.md` is stale, ask whether to update the path or create the library. Don't silently invent. |
+| 6 | batch_design schema error | Server returns an error mentioning invalid op, unknown type, invalid property, or missing parent | Read the error verbatim. Cross-reference `references/batch-design-grammar.md` and `references/pen-schema.md`. Common causes: id contains `/`; used `width: "100%"` (use `"fill_container"`); used `padding: { top: N }` object form (use array `[top, right, bottom, left]`); used `text:` or `value:` on a text node (use `content:`); used `solid_color` fill type (use `"color"`); used `iconName`/`iconLibrary` on icon_font (use `iconFontName`/`iconFontFamily`); set `x`/`y` on a child in a flex parent (they're ignored); referenced a parent before binding it. Retry with the fix; never blindly. |
 
 ## Platform-specific tool names
 
