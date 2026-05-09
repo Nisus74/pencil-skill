@@ -4,7 +4,7 @@ description: Use this skill for any pencil.dev work — designing UI in a .pen f
 license: MIT
 compatibility: Any AI coding tool with the Pencil MCP server configured (Claude Code, Codex, Gemini CLI, Copilot CLI, Cursor)
 metadata:
-  version: "1.5.0"
+  version: "1.6.0"
 permissions:
   mcp:
     - pencil:get_editor_state
@@ -83,6 +83,14 @@ The check has two parts and you do both at the start of every design task:
    ```
    batch_get({ filePath: "./design/system.lib.pen", patterns: [{ reusable: true }], readDepth: 2 })
    ```
+
+**Reading an unfamiliar component.** If the inventory surfaces a component you haven't used before, inspect it deeply before instantiating:
+
+```
+batch_get({ nodeIds: ["ComponentId"], readDepth: 4 })
+```
+
+In the result, look for: `slot` frames (content holes you fill via `descendants`), named children (their `id` values are valid `descendants` keys), and `theme` values (active states). A child at path `a → b → c` is addressable as `"a/b/c"` in `descendants`. See [`references/component-anatomy.md`](references/component-anatomy.md) for the complete guide with a worked example at [`assets/examples/example-component-deep-dive.md`](assets/examples/example-component-deep-dive.md).
 
 Build a short mental inventory: what components exist, what they're called, what they're for. When the user asks for X (button, input, card, badge, modal), reach for a matching component first via a `ref` node with optional `descendants` overrides. Build from primitives only when:
 
@@ -387,6 +395,7 @@ The Pencil MCP tool names (`get_editor_state`, `batch_design`, etc.) are identic
 
 ## Reference index
 
+- `references/component-anatomy.md` — how to read a component's structure before using it: inspecting via `batch_get`, identifying slots, building `descendants` paths (including nested `/` syntax), discoverable properties, and activating component states
 - `references/pen-schema.md` — full `.pen` data model: every node type, properties, layout/sizing/variables, theme axes, components, slots
 - `references/batch-design-grammar.md` — complete `batch_design` op syntax and chunking rules
 - `references/mcp-tools.md` — cookbook for all 13 Pencil MCP tools, the 8 `get_guidelines` categories, composite recipes (token audit, greenfield bootstrap, library smoke test), and a tool-cost cheatsheet
@@ -400,6 +409,7 @@ The Pencil MCP tool names (`get_editor_state`, `batch_design`, etc.) are identic
 - `assets/examples/example-scaffold-system.md` — worked example: scaffolding `design-system/` into a fresh project
 - `assets/examples/example-error-screen.md` — worked example: 404 + offline page pair using `get_variables`/`set_variables` and a shared lockup
 - `assets/examples/example-form-flow.md` — worked example: multi-step signup with email verification across three sibling frames
+- `assets/examples/example-component-deep-dive.md` — worked example: full read→understand→instantiate cycle using an existing card component (slot fill, nested path, state variant)
 - `references/codex-tools.md`, `references/gemini-tools.md`, `references/copilot-tools.md` — platform tool-name mappings
 - `assets/design-system/` — the 12 core markdown templates copied into user projects on scaffold (`README.md`, `design-system.md`, `tokens.md`, `components.md`, `layout.md`, `motion.md`, `elevation.md`, `iconography.md`, `patterns.md`, `states.md`, `voice.md`, `code-export.md`), plus 4 optional templates scaffolded conditionally (`mobile.md`, `data-viz.md`, `brand.md`, `imagery.md`)
 - `assets/examples/` — worked walkthroughs the agent loads on demand (greenfield design, library import, scaffolding, error screens, multi-step form flows)
