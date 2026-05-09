@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """OWASP Agentic Skills Top 10 lint for the pencil-dev-skill repo.
 
-Runs against SKILL.md files, the Claude Code / Gemini CLI / Cursor manifests,
+Runs against SKILL.md files, the Claude Code / Cursor manifests,
 and all GitHub Actions workflows. Exits 0 if no error-severity findings, 1
 otherwise. Warning-severity findings are printed but do not fail the run.
 """

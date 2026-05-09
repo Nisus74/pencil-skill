@@ -1,6 +1,6 @@
 # Design System
 
-This folder is read by AI coding tools (Claude Code, Codex, Gemini CLI, Copilot CLI, Cursor, and any other agent that supports the [agentskills.io](https://agentskills.io) standard) when working on this project's UI — whether designing in pencil.dev or writing the code that ships from those designs.
+This folder is read by AI coding tools (Claude Code, Cursor, Codex, and any other agent that supports the [agentskills.io](https://agentskills.io) standard) when working on this project's UI, whether designing in pencil.dev or writing the code that ships from those designs.
 
 ## How agents use it
 

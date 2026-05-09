@@ -56,7 +56,7 @@ This repo's controls against the [OWASP Agentic Skills Top 10](https://owasp.org
 | AST07 | Update drift | Same SHA-pin rule as AST02. Dependabot opens grouped weekly bumps (`github-actions`, `pip`) so pins stay current with reviewable diffs. |
 | AST08 | Poor scanning | The lint + pre-commit + CI is the scanning layer. PR template requires the contributor to confirm a green run. |
 | AST09 | No governance | `CODEOWNERS`, `SECURITY.md` (this file), `CHANGELOG.md`, semver, PR template gate, and branch protection (manual). |
-| AST10 | Cross-platform reuse | Lint runs against all four faces (`SKILL.md` frontmatter, `.claude-plugin/plugin.json`, `.cursor-plugin/plugin.json`, and `gemini-extension.json`), so a divergent compromise on one platform is caught. |
+| AST10 | Cross-platform reuse | Lint runs against both platform manifests (`SKILL.md` frontmatter, `.claude-plugin/plugin.json`, and `.cursor-plugin/plugin.json`), so a divergent compromise on one platform is caught. |
 
 ## Reporting a malicious skill update
 

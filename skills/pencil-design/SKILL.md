@@ -2,7 +2,7 @@
 name: pencil-design
 description: Use this skill for any pencil.dev work — designing UI in a .pen file, editing an open Pencil canvas, sketching or mocking screens, instantiating components from a .lib.pen library, scaffolding a project's design-system/ folder, fixing batch_design schema errors, or recovering from Pencil MCP host-not-connected issues. Pick it on any mention of pencil.dev, .pen, .lib.pen, "the Pencil MCP", "the Pencil canvas", or a design-system/ folder in a Pencil context — even when the user phrases it casually, mid-sentence, or doesn't name the tool. This is the canonical skill for all Pencil tasks; reach for it before any general design or frontend skill when Pencil signals are present.
 license: MIT
-compatibility: Any AI coding tool with the Pencil MCP server configured (Claude Code, Codex, Gemini CLI, Copilot CLI, Cursor)
+compatibility: Any AI coding tool with the Pencil MCP server configured (Claude Code, Cursor, Codex)
 metadata:
   version: "1.4.0"
 permissions:
@@ -371,8 +371,6 @@ Six concrete cases. Detect, respond, do not improvise.
 The Pencil MCP tool names (`get_editor_state`, `batch_design`, etc.) are identical across all platforms. Where this skill mentions Claude Code-specific tool names like `Read` or `Bash`, see:
 
 - **OpenAI Codex:** `references/codex-tools.md`
-- **Google Gemini CLI:** `references/gemini-tools.md`
-- **GitHub Copilot CLI:** `references/copilot-tools.md`
 
 ## Reference index
 
@@ -389,6 +387,6 @@ The Pencil MCP tool names (`get_editor_state`, `batch_design`, etc.) are identic
 - `assets/examples/example-scaffold-system.md` — worked example: scaffolding `design-system/` into a fresh project
 - `assets/examples/example-error-screen.md` — worked example: 404 + offline page pair using `get_variables`/`set_variables` and a shared lockup
 - `assets/examples/example-form-flow.md` — worked example: multi-step signup with email verification across three sibling frames
-- `references/codex-tools.md`, `references/gemini-tools.md`, `references/copilot-tools.md` — platform tool-name mappings
+- `references/codex-tools.md` — Codex tool-name mappings
 - `assets/design-system/` — the 12 core markdown templates copied into user projects on scaffold (`README.md`, `design-system.md`, `tokens.md`, `components.md`, `layout.md`, `motion.md`, `elevation.md`, `iconography.md`, `patterns.md`, `states.md`, `voice.md`, `code-export.md`), plus 4 optional templates scaffolded conditionally (`mobile.md`, `data-viz.md`, `brand.md`, `imagery.md`)
 - `assets/examples/` — worked walkthroughs the agent loads on demand (greenfield design, library import, scaffolding, error screens, multi-step form flows)
