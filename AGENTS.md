@@ -1,4 +1,4 @@
-# pencil-dev-skill — Project Context
+# pencil-dev-skill: Project Context
 
 This is the canonical project-context file. All AI coding tools (Claude Code, OpenAI Codex,
 Google Gemini CLI, GitHub Copilot CLI, Cursor, etc.) should read this file for project
@@ -12,16 +12,17 @@ This repository is a standalone, **platform-agnostic** AI coding skill plugin th
 AI coding tools how to work with [pencil.dev](https://pencil.dev) design files (`.pen` format)
 via the Pencil MCP server.
 
-**Core artifact:** `skills/pencil-design/SKILL.md` — the platform-agnostic skill content.
-**Platform adapters:** `.claude-plugin/plugin.json` and `gemini-extension.json` are the
-minimum files required by each platform's installer; they exist only so users on those
-platforms can run a one-line install command. They are not the substance of the project.
+**Core artifact:** `skills/pencil-design/SKILL.md`, the platform-agnostic skill content.
+**Platform adapters:** `.claude-plugin/plugin.json`, `.cursor-plugin/plugin.json`, and
+`gemini-extension.json` are the minimum files required by each platform's installer;
+they exist only so users on those platforms can run a one-line install command. They
+are not the substance of the project.
 
 ---
 
 ## Naming Conventions
 
-Three names appear in this project — each scoped to a different layer:
+Three names appear in this project, each scoped to a different layer:
 
 | Name | Scope | Where it appears |
 |------|-------|-----------------|
@@ -71,6 +72,7 @@ skills/pencil-design/              # The platform-agnostic core
 
 # Platform install adapters (required by each platform's installer)
 .claude-plugin/plugin.json         # Claude Code plugin manifest
+.cursor-plugin/plugin.json         # Cursor plugin manifest (Cursor 2.5+)
 gemini-extension.json              # Gemini CLI extension manifest
 
 # Project context files
@@ -115,23 +117,39 @@ docs/
 
 ## Platform Support
 
-| Platform | How it consumes the skill |
-|----------|--------------------------|
-| OpenAI Codex | Reads `AGENTS.md`; auto-discovers `skills/` |
-| GitHub Copilot CLI | Reads `AGENTS.md`; auto-discovers `skills/` |
-| Cursor | Reads `AGENTS.md`; uses Pencil MCP server natively |
-| Claude Code | Reads `CLAUDE.md` (which points here); installs via `.claude-plugin/plugin.json` |
-| Google Gemini CLI | Loads `AGENTS.md` via `gemini-extension.json` |
+| Platform | Plugin install | Folder-copy target |
+|----------|---------------|-------------------|
+| Claude Code | `/plugin install github:Nisus74/pencil-skill` (manifest at `.claude-plugin/plugin.json`) | `~/.claude/skills/` or `.claude/skills/` |
+| Google Gemini CLI | `gemini-extension.json` at repo root | `~/.gemini/skills/` or `.gemini/skills/` (alias `.agents/skills/`) |
+| Cursor (2.5+) | `/add-plugin` pointing at `github.com/Nisus74/pencil-skill` (manifest at `.cursor-plugin/plugin.json`) | `.cursor/skills/` (Cursor also reads `AGENTS.md` from project root) |
+| OpenAI Codex | (no plugin manifest) | `~/.codex/skills/` |
+| GitHub Copilot CLI | (no plugin manifest) | `~/.copilot/skills/` (alias `~/.agents/skills/`) or project `.github/skills/` |
+
+All platforms also accept a `SKILL.md` in their respective skills directory; folder copy works universally.
+
+---
+
+## Deployment and customisation
+
+The full per-platform install instructions live in [README.md](./README.md#installing). At a glance:
+
+- **Plugin install** is the right default. Users editing only the design-system scaffolds are unaffected by `/plugin update`, because the skill copies those scaffolds out into the user's project (e.g. `docs/design/`).
+- **Folder copy** suits users who want to own the skill files from day one. They edit anything, fetch updates by re-downloading and merging by hand.
+- **Fork and install** suits users who want both: full edit access and an automatic update path. Install your fork as a plugin; rebase against upstream when you want changes.
+
+Don't edit files inside a plugin install directory (e.g. `~/.claude/plugins/.../skills/pencil-design/`); the next `/plugin update` will overwrite them. The README spells this out for each path.
 
 ---
 
 ## Plugin System Rules
 
-- `plugin.json` MUST live at `.claude-plugin/plugin.json` (Claude Code requirement)
+- The Claude Code plugin manifest MUST live at `.claude-plugin/plugin.json`
+- The Cursor plugin manifest MUST live at `.cursor-plugin/plugin.json` (Cursor 2.5+)
 - `gemini-extension.json` MUST live at the repo root (Gemini CLI requirement)
+- All three platform manifests MUST carry a `permissions` block matching SKILL.md (enforced by `tools/skill-lint.py`)
 - `skills/` MUST be at the repo root
 - Each skill is a subdirectory under `skills/` containing one `SKILL.md`
-- The YAML frontmatter `description` field controls when the skill activates — edit carefully
+- The YAML frontmatter `description` field controls when the skill activates, so edit it carefully
 - Skills may have a `references/` subdirectory for supplementary docs loaded on demand
 
 ---
@@ -141,7 +159,7 @@ docs/
 `.pen` files are JSON conforming to a published schema (`Document` with `version`,
 `themes`, `imports`, `variables`, `children`). They are version-controllable like
 any code file. While they can technically be read with file tools, **all reading
-and writing in this project goes through the Pencil MCP server** — it gives
+and writing in this project goes through the Pencil MCP server**. It gives you
 schema validation, live screenshots, and stays in sync with the running editor:
 
 | Tool | Purpose |
@@ -166,10 +184,10 @@ schema validation, live screenshots, and stays in sync with the running editor:
 
 When writing or editing `skills/pencil-design/SKILL.md`:
 
-1. The `description` frontmatter field is the trigger mechanism — include exact phrases users say
+1. The `description` frontmatter field is the trigger mechanism, so include exact phrases users say
 2. Keep `SKILL.md` under ~5,000 words; move detailed references to `references/`
 3. Use progressive disclosure: core workflow in `SKILL.md`, edge cases in `references/`
-4. Always route `.pen` reads/writes through the Pencil MCP tools — schema validation, screenshots, and live-editor sync depend on it
+4. Always route `.pen` reads/writes through the Pencil MCP tools. Schema validation, screenshots, and live-editor sync depend on it
 5. Document tool sequencing (e.g., call `get_editor_state` before `batch_design`)
 6. Keep instructions **platform-agnostic**. Use generic verbs ("read", "write", "search")
    rather than tool names where possible. When tool names are necessary, default to the
@@ -191,7 +209,7 @@ The OWASP AST compliance map lives in [docs/SECURITY.md](./docs/SECURITY.md).
 
 ## Version Bumping
 
-Follow semantic versioning in `.claude-plugin/plugin.json` (and mirror in `SKILL.md` frontmatter):
+Follow semantic versioning. Bump the `version` field in three places, keeping them in sync: `.claude-plugin/plugin.json`, `.cursor-plugin/plugin.json`, and the `skills/pencil-design/SKILL.md` frontmatter. (`gemini-extension.json` does not declare a version field.)
 
 - **PATCH** (`0.1.x`): Content fixes, typos, clarifications
 - **MINOR** (`0.x.0`): New capability documented, new trigger phrases added

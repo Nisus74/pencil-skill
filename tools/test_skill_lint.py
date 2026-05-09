@@ -255,7 +255,10 @@ class DangerousContentTest(unittest.TestCase):
 
 
 class CrossManifestTest(unittest.TestCase):
-    def _setup(self, tmp: Path, skill_perms: dict, plugin_perms, gemini_perms):
+    def _setup(
+        self, tmp: Path, skill_perms: dict, plugin_perms, gemini_perms,
+        cursor_perms=...,
+    ):
         skills_dir = tmp / "skills" / "myskill"
         skills_dir.mkdir(parents=True)
         skill_md = skills_dir / "SKILL.md"
@@ -281,7 +284,17 @@ class CrossManifestTest(unittest.TestCase):
             "name": "myskill", "description": "ok",
             "permissions": gemini_perms,
         }))
-        return [skill_md, plugin_json, gemini_json]
+        paths = [skill_md, plugin_json, gemini_json]
+        if cursor_perms is not ...:
+            cursor_dir = tmp / ".cursor-plugin"
+            cursor_dir.mkdir()
+            cursor_json = cursor_dir / "plugin.json"
+            cursor_json.write_text(_json.dumps({
+                "name": "myskill", "description": "ok",
+                "permissions": cursor_perms,
+            }))
+            paths.append(cursor_json)
+        return paths
 
     def test_all_three_match(self):
         import tempfile
@@ -310,6 +323,41 @@ class CrossManifestTest(unittest.TestCase):
             paths = self._setup(Path(tmp), perms_a, perms_b, perms_a)
             findings = skill_lint.check_cross_manifest_consistency(paths)
             self.assertTrue(any(f.code == "AST10" for f in findings))
+
+    def test_cursor_manifest_when_matching_passes(self):
+        import tempfile
+        with tempfile.TemporaryDirectory() as tmp:
+            perms = {"mcp": ["pencil:x"], "shell": "none",
+                     "filesystem": "project-only", "network": "none"}
+            paths = self._setup(Path(tmp), perms, perms, perms, cursor_perms=perms)
+            self.assertEqual(skill_lint.check_cross_manifest_consistency(paths), [])
+
+    def test_cursor_divergent_permissions_flagged(self):
+        import tempfile
+        with tempfile.TemporaryDirectory() as tmp:
+            perms_a = {"mcp": ["pencil:x"], "shell": "none",
+                       "filesystem": "project-only", "network": "none"}
+            perms_b = {"mcp": ["pencil:y"], "shell": "none",
+                       "filesystem": "project-only", "network": "none"}
+            paths = self._setup(Path(tmp), perms_a, perms_a, perms_a, cursor_perms=perms_b)
+            findings = skill_lint.check_cross_manifest_consistency(paths)
+            cursor_finding = next(
+                (f for f in findings if ".cursor-plugin" in f.location), None,
+            )
+            self.assertIsNotNone(cursor_finding)
+            self.assertEqual(cursor_finding.code, "AST10")
+
+    def test_cursor_missing_permissions_flagged(self):
+        import tempfile
+        with tempfile.TemporaryDirectory() as tmp:
+            perms = {"mcp": ["pencil:x"], "shell": "none",
+                     "filesystem": "project-only", "network": "none"}
+            paths = self._setup(Path(tmp), perms, perms, perms, cursor_perms=None)
+            findings = skill_lint.check_cross_manifest_consistency(paths)
+            self.assertTrue(any(
+                f.code == "AST10" and ".cursor-plugin" in f.location
+                for f in findings
+            ))
 
 
 class WorkflowPinTest(unittest.TestCase):
