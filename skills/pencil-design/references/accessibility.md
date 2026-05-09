@@ -2,7 +2,9 @@
 
 SKILL.md § Accessibility names five non-negotiable checks (contrast, hit targets, color-as-only-signal, names-map-to-roles, focus states). This file extends them — the topics that matter for shipping accessible products in 2026 but don't fit in a one-page rule list.
 
-**What this file owns:** ARIA semantics, focus order, keyboard navigation, screen-reader content, the deeper-cut contrast cases (gradients, text on photos), the `prefers-*` media queries, dynamic type, RTL & internationalization, color-blindness, motor accessibility.
+**Standards baseline.** Target [WCAG 2.2 AA](https://www.w3.org/TR/WCAG22/), the current W3C recommendation, also published as [ISO/IEC 40500:2025](https://www.w3.org/WAI/news/2025-10-21/wcag22-iso/). 2.2 adds nine new success criteria over 2.1; the ones most relevant for design are target size minimum (2.5.8), focus appearance (2.4.11 / 2.4.12), focus not obscured (2.4.13), dragging movements (2.5.7), consistent help (3.2.6), redundant entry (3.3.7), and accessible authentication (3.3.8 / 3.3.9). Where a project has no stated standard, default to 2.2 AA. WCAG 2.1 is acceptable for projects under existing certification; older versions (2.0) are not.
+
+**What this file owns:** ARIA semantics, focus order, keyboard navigation, app-level keyboard shortcuts, screen-reader content, ARIA live regions, the deeper-cut contrast cases (gradients, text on photos, APCA as alternative), the `prefers-*` media queries, dynamic type, RTL & internationalisation, colour-blindness, motor accessibility.
 
 **What this file does NOT own:** the SKILL.md baseline (already enforced). Reduced-motion timing — that's [`motion.md`](../assets/design-system/motion.md). Token-level contrast values — that's [`tokens.md`](../assets/design-system/tokens.md). Hit-target sizes for native — that's [`mobile.md`](../assets/design-system/mobile.md). Color-blind chart palettes — that's [`data-viz.md`](../assets/design-system/data-viz.md). Decorative-vs-meaningful icons — that's [`iconography.md`](../assets/design-system/iconography.md). This file links rather than duplicates.
 
@@ -75,6 +77,31 @@ Design implications:
 
 **Visible focus outline.** Mentioned in SKILL.md and `components.md`; restating: every interactive element gets a 2px `$focusRing` outline with 2px offset on `:focus-visible`. Visible against any surface in both modes. Don't ship `outline: none` without a replacement — that's a keyboard accessibility regression.
 
+### App-level keyboard shortcuts
+
+Beyond per-component keyboard semantics, modern apps ship app-wide shortcuts. The discipline:
+
+- **Discoverable.** Every app shortcut needs a way to find it without reading the source. Common pattern: a `?` keyboard shortcut opens a "Keyboard shortcuts" overlay listing every shortcut grouped by area. Linear, GitHub, Notion, Slack, and Vercel all use this pattern.
+- **Documented in UI.** Where a control has a keyboard shortcut, surface it in the UI: a tooltip on hover, a hint next to a menu item, or a `⌘+K` chip inside a search input. Never make the user guess.
+- **Don't conflict with browser / OS shortcuts.** `⌘+W`, `⌘+T`, `⌘+R`, `⌘+L`, `⌘+P`, `⌘+S`, `⌘+Q`, `⌘+H`, `⌘+M` belong to the browser or OS. Custom handlers for these break user expectations and accessibility (a custom `⌘+S` that doesn't actually save anything in your app is hostile).
+- **Use `⌘` on Mac, `Ctrl` on Windows / Linux.** Display the right key per platform: `⌘+K` on Mac, `Ctrl+K` on Windows / Linux. The browser exposes the OS via `navigator.platform`; the engineer ships the conditional. Document the expectation in component `context`.
+- **Modifier stacking.** Combine modifiers in a consistent order: `Ctrl` → `Alt` → `Shift` → key. Display: `⌘+Shift+K`, not `Shift+⌘+K`.
+- **Don't shadow `Esc`.** Esc closes overlays, dismisses tooltips, and cancels selections. Don't intercept Esc for a custom action that prevents the user from dismissing what's currently open.
+
+**Common app-wide shortcuts** (with conventions established by widely-used apps; adopt where you can):
+
+| Shortcut | Common action |
+|----------|---------------|
+| `⌘+K` / `Ctrl+K` | Open command palette |
+| `⌘+/` / `Ctrl+/` | Toggle help / show shortcuts |
+| `?` | Show keyboard-shortcuts overlay |
+| `⌘+,` / `Ctrl+,` | Open settings / preferences |
+| `⌘+Enter` | Submit forms with multi-line inputs |
+| `Esc` | Close current overlay / dismiss / cancel |
+| `g` then `letter` | Navigate (`g h` for home, `g s` for settings; see GitHub, Linear) |
+
+In Pencil, design the keyboard-shortcuts overlay as a component (likely a modal-style panel) with grouped sections, and document each shortcut in the relevant component's `context`: *"Keyboard shortcut: ⌘+K (Mac), Ctrl+K (Windows/Linux). Opens command palette."*
+
 ## Screen reader content
 
 Pencil designs are visual; screen readers consume code. The bridge is what the engineer ships, but design choices push them toward good or bad output.
@@ -89,6 +116,27 @@ The code generator picks up the latter and emits `alt=""` on the `<img>`.
 **Icon buttons.** A button that's only an icon (search, close, menu) needs an accessible name. In Pencil, the icon button's `name` *is* that name: `IconButton_Search`, `IconButton_Close`. The code generator emits `aria-label="Search"` on the button.
 
 **Live regions for toasts and async announcements.** A toast that appears asynchronously (form saved, error returned) needs to be announced to screen readers. Mark the toast component's `context`: *"Live region. Announces its content when it appears. Polite (not interrupting)."* The engineer ships `aria-live="polite"` on the toast container.
+
+ARIA live regions come in two main flavours. Pick the right one per use case:
+
+| Pattern | When to use | ARIA |
+|---------|-------------|------|
+| `role="status"` / `aria-live="polite"` | Non-urgent updates the user benefits from knowing about: "Saved 2 minutes ago", form-submit success, search-results-updated, "12 new items loaded". The screen reader announces *after* the user finishes their current speech. | `aria-live="polite"` (or `role="status"` which implies polite) |
+| `role="alert"` / `aria-live="assertive"` | Urgent updates that demand immediate attention: form-validation errors on submit, session-about-to-expire warnings, critical system errors. The screen reader interrupts the current speech. Use sparingly; assertive overuse is the screen-reader equivalent of alert fatigue. | `aria-live="assertive"` (or `role="alert"` which implies assertive) |
+| `aria-live="off"` (default) | Anything that doesn't need announcement. The default for most content. | (none; default) |
+
+**Other live-region patterns:**
+
+- **Form error count on submit.** When a user submits a form with validation errors, focus moves to the first invalid field *and* a live region near the form announces the count: *"3 fields need attention."* Polite (the user is now reviewing the errors). See [`forms.md`](forms.md) § Error display.
+- **Loading state with announcement.** Long-running operations (export, generation) announce their state changes: *"Export started"*, *"Export 50% complete"*, *"Export complete"*. Polite. Don't announce on every percentage tick; chunk to milestones.
+- **Search results updated.** A search input that filters a list as the user types announces the new result count: *"Showing 12 of 89 results"*. Polite, debounced (announce after typing stops, not on every keystroke).
+- **Real-time presence updates.** When a teammate joins or leaves a collaborative surface, announce: *"Sarah joined the document"*. Polite. Critical for screen-reader users in collaborative tools who otherwise have no way to know.
+
+In Pencil, document the live-region pattern in the component's `context`:
+
+```
+"context": "Live region. Announces error count on submit (e.g. '3 fields need attention'). aria-live='polite'. Announce only on submit, not on field-level validation."
+```
 
 **Headings.** Heading hierarchy matters for screen-reader navigation. In Pencil, you don't author HTML heading levels directly — you author text styles (`$text2xl`, `$text3xl`, etc.). The relationship between visual size and heading level should be consistent and obvious to the engineer:
 
@@ -112,6 +160,8 @@ The SKILL.md baseline (4.5:1 body, 3:1 large/UI components) and `tokens.md`'s pe
 **Disabled states.** Disabled controls relax to ≥ 3:1 because they're not interactive. But don't drop below 3:1 — disabled labels at 1.5:1 are unreadable. The 50% opacity recipe in [`states.md`](states.md) hits ≥ 3:1 against most surfaces; verify in both modes.
 
 **UI components against surfaces.** A button against a card against a page — three layers. Each pair needs to clear 3:1. The most-missed case: a card border (`$border`) against the card surface (`$surfaceMuted`) against the page surface (`$surface`). All three contrasts matter; the page-to-card border is what makes the card visible at all.
+
+**APCA as an alternative metric.** WCAG 2 contrast ratios are based on relative luminance and have known perceptual blind spots: they can flag perceptually-fine combinations as failing (dark grey on medium grey) and pass perceptually-poor ones (certain saturated hue pairings). The [Accessible Perceptual Contrast Algorithm (APCA)](https://apca.info), a candidate metric for WCAG 3, is more perceptually accurate. For projects under existing certification (WCAG 2.1 / 2.2 AA), keep using the 4.5:1 / 3:1 thresholds for compliance. For new projects without a certification requirement, APCA is the better measurement tool: a score of `Lc 75` or above is broadly comparable to AA for body text, `Lc 60` for large text and UI components. When you reach for an APCA score, document the choice in the project's `tokens.md` so the contract is explicit.
 
 ## `prefers-*` media queries
 

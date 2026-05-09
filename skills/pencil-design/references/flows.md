@@ -88,6 +88,59 @@ Decisions:
 
 **Skip non-essential steps.** Every step that isn't strictly required should have a Skip option. A flow that forces seven decisions before first use loses users. Be honest with yourself about which steps actually block and which are aspirational.
 
+## Onboarding flows
+
+The user just signed up. Two goals are at play: the user wants to reach the product's core value as quickly as possible, and the product needs to build enough familiarity that the user returns.
+
+Two patterns dominate, picked by the product's complexity:
+
+- **Sign-up → first action.** The user lands directly on the product after sign-up. No intermediate screens. Works for products where the first action is obvious (a chat app drops the user into the chat; a writing app opens a blank document). The product itself is the onboarding.
+- **Sign-up → guided onboarding → first action.** Two to four short screens between sign-up and the product. Each screen makes one decision (workspace name, role, integrations). The user lands in the product with the workspace pre-configured. Works for products with significant setup (CRMs, project management tools, analytics).
+
+Either way, design for two paths through onboarding:
+
+- **With sample data.** The user lands in a pre-populated workspace with realistic example content. They can explore without committing. A 'Replace with my own' CTA stays visible. Right for products where the value is hard to see in an empty state (analytics dashboards, project boards, design tools).
+- **Blank slate.** The user lands in an empty workspace with a clear first-action prompt. Right for products where the user already knows what they're making (writing apps, single-purpose utilities).
+
+Most products benefit from offering both. The sign-up flow asks 'Would you like to start with sample data, or set up your own workspace?' and routes accordingly. The product doesn't need to commit to one shape.
+
+For onboarding state visual recipes (welcome, sample data, coach marks), see [`states.md`](states.md) § Onboarding states. For onboarding microcopy patterns (encouraging, action-led), see [`microcopy.md`](microcopy.md) § Empty state copy.
+
+## Settings flows
+
+Settings have their own flow patterns distinct from forms. The dominant pattern is autosave; explicit-save is reserved for high-stakes changes.
+
+**Autosave (default).** The user changes a value, the value persists immediately. No Save button. Visual feedback: a brief 'Saved' indicator (per [`states.md`](states.md) § Settings states), then back to ambient. Right for: profile fields, preferences, notification toggles, display options.
+
+**Explicit-save (high-stakes only).** The user changes values; a Save button collects them. Right for: billing, security, anything compliance-sensitive, settings that fan out to other systems (webhook URLs, API keys). The form has a clear dirty state; the browser warns on unsaved navigation.
+
+Per-field vs form-level autosave:
+
+- **Per-field autosave** (the modern default) saves each field independently as the user blurs or toggles. Faster feedback. Risk: partial saves where the user wanted to coordinate multiple changes. Mitigation: optimistic UI with rollback, plus a 'Recent changes' panel for review.
+- **Form-level autosave** (the older pattern) saves the whole form on a debounce after any change. Slower feedback but coherent. Risk: the user makes one change and waits 2 seconds for confirmation. Mitigation: shorten the debounce; surface the in-flight state.
+
+Most B2B SaaS uses per-field autosave for routine settings and explicit-save for the high-stakes set.
+
+For the conflict state (another session changed the same setting), see [`states.md`](states.md) § Settings states.
+
+## Search flows
+
+Search is its own flow with its own decisions. The first decision: instant search or submit-driven?
+
+**Instant search.** Results update as the user types (debounced ~150-300ms). The search bar is the entry; results appear inline below or in a panel. Right for: known-item search (the user knows what they're looking for), autocomplete, filtering. Examples: Linear command palette, GitHub repository search, macOS Spotlight.
+
+**Submit-driven search.** The user types a query and presses Enter. Results appear on a results page. Right for: exploratory search (the user is browsing), search that crosses many sources, search that requires server-side processing. Examples: Google, e-commerce product search, Notion's search modal.
+
+Many products combine both: instant suggestions appear as the user types (top 5 matches, plus categories like 'Recent searches', 'Suggested searches'); pressing Enter takes the user to a full results page.
+
+**Results vs suggestions.** Suggestions are the dropdown of what the system predicts the user means. Results are the page of what the system actually found. They can coexist: suggestions appear instantly as the user types, results appear after the user presses Enter.
+
+**Empty results state.** When a search returns nothing, the empty state should: name the query, suggest refinements ('Try a broader search', 'Check spelling'), offer a fallback action ('Browse all', 'Contact support'). Don't just say 'No results' and leave the user stuck. See [`microcopy.md`](microcopy.md) § Empty state copy and [`states.md`](states.md) § Empty state taxonomy.
+
+**URL state.** Search queries belong in the URL. A user who refreshes the page should see the same results. The query is shareable and bookmarkable. See § Deep links & shareable URLs below.
+
+For the search results layout (instant dropdown, results page), see [`layout-patterns.md`](layout-patterns.md) § Settings pages (search-driven variant) and dashboard layouts.
+
 ## Back-stack & navigation model
 
 Web and mobile use different mental models — designs that ignore the difference produce navigation that feels broken on one platform.

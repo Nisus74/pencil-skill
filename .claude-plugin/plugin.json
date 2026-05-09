@@ -1,8 +1,7 @@
 {
   "name": "pencil-dev-skill",
-  "displayName": "Pencil.dev Design Skill",
   "description": "Teaches AI coding tools to design, edit, and validate pencil.dev UIs using .pen files, .lib.pen libraries, design-system docs, and the Pencil MCP server",
-  "version": "1.4.0",
+  "version": "1.11.0",
   "author": {
     "name": "Travis Polland",
     "email": "tpolland@gmail.com",
@@ -12,7 +11,6 @@
   "repository": "https://github.com/Nisus74/pencil-skill",
   "license": "MIT",
   "keywords": ["design", "pencil-dev", "ui", "mcp", "design-tool", "ai-skill"],
-  "skills": "./skills/",
   "permissions": {
     "mcp": [
       "pencil:get_editor_state",

@@ -1,0 +1,7 @@
+{
+  "eval_id": 15,
+  "eval_name": "industry-aware-saas",
+  "prompt": "Design a dashboard for a developer-tools SaaS. The audience is professional engineers. Make it feel right for them.",
+  "expected_output": "Per references/industry-patterns.md \u00a7 SaaS \u00a7 Developer tools: agent uses developer-tool conventions. Style: Swiss / International + Terminal/Hacker (per style-catalogue.md). Palette: Cursor Dark or Linear Dark (Pure Slate dark + Tailwind Cyan or Indigo accent; dark mode default per references/colour-palettes.md \u00a7 Dark-mode-first variations). Typography: Inter + JetBrains Mono OR Geist + Geist Mono (per font-pairings.md \u00a7 Sans + Mono). Density: high information density; dense table rows, narrow chrome, monospace numerics where applicable. Keyboard-first: \u2318+K command palette mentioned and designed; keyboard shortcuts visible in tooltips and a dedicated reference accessible via '?'. Syntax-highlighted code blocks where applicable. Cites Linear, Vercel, Cursor, GitHub as exemplars. Does NOT use fintech conservatism (Banking Navy palette, formal microcopy, large white space). Does NOT use healthcare warmth (Patient Warm Teal palette, large body type, calming illustrations). Does NOT use e-commerce DTC editorial aesthetic (serif display fonts, photo-forward hero).",
+  "assertions": []
+}

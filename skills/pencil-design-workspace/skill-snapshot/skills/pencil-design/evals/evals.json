@@ -1,0 +1,47 @@
+{
+  "skill_name": "pencil-design",
+  "evals": [
+    {
+      "id": 0,
+      "name": "login-screen-greenfield",
+      "prompt": "I need to design a login screen in pencil. It should have email + password inputs, a primary submit button, and a 'forgot password?' link. Walk me through what you'd do step by step before touching any tools.",
+      "expected_output": "Agent describes the seven-step workflow: detects host first, locates context (open .pen, design-system/ folder, selection), loads guidelines, plans, executes via batch_design, verifies via the verification ladder (structural-first: batch_design response → snapshot_layout → batch_get → get_screenshot reserved for visual-only questions or final sign-off), iterates. References design-system/ check and library import. Plans before executing. Does NOT prescribe screenshotting after every chunk. Treats dual-mode (light + dark) screenshotting as conditional on mode-specific color usage, not mandatory. Describes calling get_variables() as a mandatory pre-execution step before any batch_design call to check existing tokens.",
+      "files": []
+    },
+    {
+      "id": 1,
+      "name": "design-system-scaffold",
+      "prompt": "Set up a pencil design system in this project. The repo currently has no design-system/ folder.",
+      "expected_output": "Agent confirms before scaffolding; copies all 12 core templates from assets/design-system/ to design-system/ (README.md, design-system.md, tokens.md, components.md, layout.md, motion.md, elevation.md, iconography.md, patterns.md, states.md, voice.md, code-export.md); mentions the 4 optional templates that are conditionally included (mobile.md, data-viz.md, brand.md, imagery.md) and the signals or opt-in that triggers each; mentions collision detection if a code-bearing design-system/ already exists; tells the user which fields to fill in first.",
+      "files": []
+    },
+    {
+      "id": 2,
+      "name": "import-library-and-use",
+      "prompt": "I have a design library at design/system.lib.pen with Button and Input components. Add a sign-up form to my open .pen file using those components. Explain the tools you'd call and why.",
+      "expected_output": "Agent verifies the document's imports field, adds an imports entry via U op on document root if missing, queries the library's reusable components, instantiates Button and Input via ref nodes (not from primitives), uses descendants for instance-level overrides. Verifies via the verification ladder: snapshot_layout or batch_get on the instantiated refs first to confirm structure and bindings, then a single get_screenshot scoped to the form/card subtree (via nodeId) — never the page frame — only as final sign-off.",
+      "files": []
+    },
+    {
+      "id": 3,
+      "name": "edit-existing-card-verification-ladder",
+      "prompt": "I want to test how you verify edits. First, create a brand-new .pen scratch document with a single LoginCard frame containing: a 'Sign in' heading, an Email input, a Password input, a primary 'Sign in' button (blue fill), and a 'Forgot password?' link below the button. Once that's in place, perform this edit: change the Sign in button's fill to a brand green color, and add 8px of paddingTop to the link's container so it has more breathing room. After the edit, explain — step by step — exactly which MCP tools you called to verify the edit landed correctly, in what order, and why you chose each. Be precise about which nodeId you passed to each verification call.",
+      "expected_output": "Agent first creates the scratch design via batch_design (this phase is not graded). For the edit phase: identifies the specific node IDs to edit before the batch_design call — either by capturing them from prior construction response bindings (preferred) or via an explicit batch_get lookup. Performs the two-op edit in a single batch_design call. Verification follows the four-rung ladder: (1) acknowledges the batch_design response confirmed both ops landed; (2) calls snapshot_layout scoped to the LoginCard (parentId is the card, not the document root) to confirm the link's paddingTop is 8 and the button's geometry is unchanged; (3) calls batch_get on the button node to confirm fill resolved to the brand green variable (not a raw hex); (4) calls get_screenshot AT MOST ONCE, scoped to the LoginCard nodeId (NOT the document root or page frame), as a final visual sign-off. Total get_screenshot calls in the edit phase: exactly 1. Does NOT re-screenshot in dark mode (the change is structural + a variable-bound color, not mode-conditional). Does NOT screenshot the document root.",
+      "files": []
+    },
+    {
+      "id": 4,
+      "name": "multi-section-page-verification-cadence",
+      "prompt": "Build a marketing landing page in a new .pen document at 1440x900 with three regions: (1) a top hero section with a centered headline, subhead, and a primary CTA button; (2) a three-column features section below the hero, each column with an icon, a heading, and one paragraph of body text; (3) a footer with a copyright line and three text links. Use placeholder copy. Aim for clean spacing rhythm and consistent typography. Build it incrementally — region by region — and after each region tell me what you verified and how you verified it (which MCP tools, in what order, with which nodeId). At the end, give me a one-paragraph summary of the total verification calls you made across the whole build, broken down by tool type.",
+      "expected_output": "Agent builds the page in 3+ batch_design chunks (one per region, possibly more for dense regions). Verification across the whole build follows the four-rung ladder. Critical metric: total get_screenshot calls across the entire build is 1 or 2 — NOT one per region. Most per-region verification is structural (snapshot_layout on the just-built region's parent frame, sometimes batch_get to confirm ref instantiation or property bindings). When get_screenshot is used, it is scoped to a specific nodeId (the region just built or the page root for final sign-off), never an unscoped call. The agent does NOT re-screenshot in dark mode. The closing paragraph reports the breakdown honestly — if the agent took more than 2 screenshots, it should say so rather than under-report. The pattern that distinguishes new-skill behavior from old-skill behavior is: structural-first verification per region, with screenshots reserved for the page-level final sign-off and any genuinely-visual question (e.g., did an AI image generate as expected). Old-skill behavior would screenshot after each region (3+ screenshots, typically full-page).",
+      "files": []
+    },
+    {
+      "id": 5,
+      "name": "preserve-existing-variables",
+      "prompt": "I have a .pen file open that already has design tokens configured — my brand uses a custom $primary (#E63946 red) and $surface (#F8F9FA near-white). I want you to add a login screen to this file. Walk me through exactly what you'd do before calling set_variables or batch_design — specifically how you'd make sure my existing token values aren't overwritten.",
+      "expected_output": "Agent MUST describe calling get_variables() first to read the existing token set before any batch_design or set_variables call. Agent MUST state it will only add tokens that are absent from the existing set — not re-declare $primary or $surface. Agent must NOT propose calling set_variables with a full default token suite (surface, primary, etc.) without first diffing against what get_variables() returns. Agent may describe the diff process: comparing returned keys against a default suite and only passing the missing ones. Does NOT call or propose replace: true. Optionally mentions that if get_variables() shows a full suite, bootstrapping can be skipped entirely and design can proceed directly to batch_design using the existing token names.",
+      "files": []
+    }
+  ]
+}

@@ -1,0 +1,101 @@
+{
+  "expectations": [
+    {
+      "text": "Asks for confirmation or offers the scaffold before writing any files (does not silently scaffold)",
+      "passed": true,
+      "evidence": "The response opens with: 'This repo doesn't have a design-system/ folder yet. I have 12 core templates I can drop in — they teach me your tokens, components, voice, motion, patterns, and tech stack. I can also include optional ones for mobile (mobile.md), charts (data-viz.md), brand identity (brand.md), or imagery treatment (imagery.md). Want me to scaffold the core, plus any optional ones that fit your project?' This is clearly an offer asking for confirmation before acting."
+    },
+    {
+      "text": "Names all 12 core templates to be created: README.md, design-system.md, tokens.md, components.md, layout.md, motion.md, elevation.md, iconography.md, patterns.md, states.md, voice.md, code-export.md",
+      "passed": true,
+      "evidence": "The response lists all 12 core files in a table under '### Core (always scaffolded — 12 files)': README.md, design-system.md, tokens.md, components.md, layout.md, motion.md, elevation.md, iconography.md, patterns.md, states.md, voice.md, code-export.md. All 12 are present and accounted for."
+    },
+    {
+      "text": "Mentions the 4 optional templates (mobile.md, data-viz.md, brand.md, imagery.md) and the signals or opt-in that triggers each",
+      "passed": true,
+      "evidence": "The response lists all 4 optional files in a table under '### Optional (scaffolded based on project signals or user opt-in — 4 files)' with explicit trigger signals for each: mobile.md triggered by react-native/expo/flutter in package.json or iOS/Android folder; data-viz.md by charting library or user opt-in; brand.md by marketing surface detection; imagery.md by user opt-in or brand.md being included. Additionally, an earlier paragraph also explains the scanning logic for these signals."
+    },
+    {
+      "text": "Mentions handling the case where a design-system/ folder already exists containing code files (does not blindly overwrite)",
+      "passed": true,
+      "evidence": "Under '## What I do NOT do': 'I do not touch any existing files. If the folder already has source code (.tsx, package.json, etc.) I stop and ask where to put the docs instead.' This explicitly handles the case of existing code files in the folder."
+    },
+    {
+      "text": "Tells the user which fields or sections to fill in first (e.g. tokens.md, design-system.md path)",
+      "passed": true,
+      "evidence": "Under '## What I tell the user after scaffolding', the response lists three priority files with clear rationale: '1. design-system.md — add your .lib.pen path and tech stack. Without this I can't import your library or know what framework to target when generating code. 2. tokens.md — add your actual hex values and font choices. Until then I'll fall back to the skill's aesthetic defaults. 3. components.md — add entries for any components already in your .lib.pen.' The response also notes everything else can be filled incrementally."
+    }
+  ],
+  "summary": {
+    "passed": 5,
+    "failed": 0,
+    "total": 5,
+    "pass_rate": 1.0
+  },
+  "execution_metrics": {
+    "tool_calls": {},
+    "total_tool_calls": 0,
+    "total_steps": 1,
+    "errors_encountered": 0,
+    "output_chars": 7106,
+    "transcript_chars": 7106
+  },
+  "timing": {
+    "executor_duration_seconds": 84.3,
+    "grader_duration_seconds": null,
+    "total_duration_seconds": 84.3,
+    "total_tokens": 30070
+  },
+  "claims": [
+    {
+      "claim": "The repo does not already have a design-system/ folder",
+      "type": "factual",
+      "verified": false,
+      "evidence": "The response states 'This repo doesn't have a design-system/ folder yet' but this is an assumption made in the simulated eval context — the actual repo state is not confirmed from the transcript. Not verifiable without knowing what repo was used."
+    },
+    {
+      "claim": "Files are copied from the skill's bundled assets/design-system/ templates, not generated from scratch",
+      "type": "process",
+      "verified": false,
+      "evidence": "The response says 'I copy them directly from the skill's bundled assets/design-system/ templates' but this is a description of intended behavior. No tool calls are shown actually copying files, and the outputs directory contains only response.md — no scaffolded files were written in this run."
+    },
+    {
+      "claim": "The response includes guidance that the user can delete optional files they don't need",
+      "type": "quality",
+      "verified": true,
+      "evidence": "At the end of the post-scaffold message: 'If your project ends up not needing one of the optional files, just delete it.' Also noted earlier: 'a user can delete a file in two seconds; reconstructing one they didn't know existed is harder.'"
+    },
+    {
+      "claim": "The skill will not ask twice in the same session if the user declines",
+      "type": "quality",
+      "verified": true,
+      "evidence": "Stated under '## What I do NOT do': 'I do not ask twice in the same session if the user declines the scaffold offer.'"
+    },
+    {
+      "claim": "For a fresh repo with no detected signals, all 4 optional files are still included with a delete-if-unneeded note",
+      "type": "process",
+      "verified": true,
+      "evidence": "Response states: 'For a fresh repo with no signals in any of those places, I include the 4 optional files anyway with a \"delete this file if your project doesn't ship this surface\" note at the top of each.'"
+    }
+  ],
+  "user_notes_summary": {
+    "uncertainties": [],
+    "needs_review": [],
+    "workarounds": []
+  },
+  "eval_feedback": {
+    "suggestions": [
+      {
+        "assertion": "Mentions handling the case where a design-system/ folder already exists containing code files (does not blindly overwrite)",
+        "reason": "The response handles code files (.tsx, package.json) in an existing folder but doesn't address the case where design-system/ already contains some of the 12 markdown docs (e.g. partial scaffold). The eval could add a separate expectation for that partial-overwrite case."
+      },
+      {
+        "reason": "No expectation checks that the skill actually writes files to disk. The response describes the correct behavior in prose, but the outputs directory contains only response.md — no scaffolded markdown files. Since this is a planning/description response rather than an execution run, evals that verify file creation would expose whether the skill actually scaffolds vs. just describes scaffolding. This is the most significant gap."
+      },
+      {
+        "reason": "No expectation checks the quality of what lands inside the template files (e.g. that tokens.md actually contains a color variable table, or that states.md includes the error/skeleton/empty-state taxonomy). Currently the assertions only verify that the skill's response mentions the correct filenames — a skill that listed the right filenames but wrote empty stubs would pass all five."
+      }
+    ],
+    "overall": "All 5 expectations pass with clear evidence. The evals are well-targeted at the planning/communication behavior of the skill, but they don't verify that files are actually written or that template content is correct. The most important gap is the absence of any assertion about actual file creation and content quality."
+  }
+}

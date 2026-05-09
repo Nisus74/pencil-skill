@@ -1,0 +1,7 @@
+{
+  "eval_id": 18,
+  "eval_name": "file-architecture-cover-and-sections",
+  "prompt": "Set up a new .pen for our customer portal redesign. It will have multiple flows: auth, dashboard, billing, settings. Get the file architecture right from the start.",
+  "expected_output": "Per references/file-architecture.md and SKILL.md \u00a7 Discipline rules \u00a7 File architecture: agent creates a Cover frame at canvas origin (0, 0) as the first action. Cover contains: file owner (name + role), status (one of Discovery / In design / Design review / Engineering review / Ready for build / In build / QA / Shipped / Deprecated), version, last updated date, scope (in / out), links (brief, ticket, prototype, design-system). Cover's context reads 'File operating manual: owner, status, version, scope, links.' Section regions established as the frames are added: Source of Truth (row 1, after Cover), Build Ready (row 2), UX States (row 3), Responsive (row 4), Exploration (far-right region), Archive (bottom region). Uses find_empty_space_on_canvas between sections to honour the layout. Hierarchical naming applied to multi-screen flows: 'Customer / Auth / 01 / Email / Default / Desktop', 'Customer / Billing / 02 / EnterPayment / Default / Desktop', etc. Slashes allowed in name field; never in id. design-system.lib.pen added to imports. No Exploration frames placed in Source of Truth region.",
+  "assertions": []
+}

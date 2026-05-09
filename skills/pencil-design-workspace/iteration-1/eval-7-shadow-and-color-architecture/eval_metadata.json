@@ -1,0 +1,7 @@
+{
+  "eval_id": 7,
+  "eval_name": "shadow-and-color-architecture",
+  "prompt": "Design a three-tier pricing card section (Free, Pro, Team). Highlight the Pro tier as the recommended option.",
+  "expected_output": "Per SKILL.md \u00a7 Aesthetic defaults (Colour, Shadows): two-role colour architecture ($surface neutral + one accent; no third hue competing). The highlighted Pro tier carries: a coloured border using $accent, a layered shadow (\u2265 2 layers: ambient e.g. 0 1px 2px rgba(0,0,0,0.04) + direct e.g. 0 8px 24px rgba(0,0,0,0.08)), and either a 'Most popular' badge OR a slight scale-up. Does NOT combine all four treatments (border + scale + badge + extra shadow + colour shift). Coloured border + badge is the canonical pair. Hover state increases contrast (lighter accent in dark mode, or darker accent in light mode), never decreases. Nested border-radius rule honoured: child corner radius \u2264 parent (concentric). CTA copy is action-specific ('Start Pro trial', not 'Get started').",
+  "assertions": []
+}

@@ -5,6 +5,8 @@ A platform-agnostic AI coding skill plugin that teaches AI coding tools how to w
 
 Works with Claude Code, OpenAI Codex, Google Gemini CLI, GitHub Copilot CLI, and Cursor.
 
+> **Unofficial community plugin.** This project is not affiliated with or endorsed by the Pencil.dev team. For the Pencil editor, MCP server, and official documentation, visit [pencil.dev](https://pencil.dev). Issues with this skill belong in [this repo](https://github.com/Nisus74/pencil-skill); issues with the Pencil editor or MCP server belong with the Pencil.dev team.
+
 [Star the repo](https://github.com/Nisus74/pencil-skill) if it helps you, or
 [buy me a coffee or lunch](https://www.buymeacoffee.com/Nisus74) to support ongoing maintenance.
 
@@ -14,12 +16,12 @@ Works with Claude Code, OpenAI Codex, Google Gemini CLI, GitHub Copilot CLI, and
 
 - Guides the AI through a seven-step design workflow: detect host, orient, load guidelines, plan, execute, verify, report
 - Teaches all 13 Pencil MCP tools with worked invocations, cost cheatsheet, and composite recipes
-- Provides 2026 design depth: user flows, component + screen states, full accessibility coverage, and modern patterns (container queries, fluid type, AI-UI affordances)
-- Includes 12 design-system scaffold templates users copy into their project (`tokens.md`, `components.md`, `layout.md`, `states.md`, …)
-- Ships 5 worked examples showing real MCP tool sequences from scratch
+- Provides 2026 design depth: user flows, component and screen states, full accessibility coverage, and modern patterns (container queries, fluid type, AI-UI affordances)
+- Includes 25 scaffold templates (12 core + 13 optional) that users copy into their project: `tokens.md`, `components.md`, `layout.md`, `voice.md`, `navigation.md`, `forms.md`, and more
+- Ships 16 worked examples showing real MCP tool sequences from scratch
 - Includes per-platform tool-name mappings so the same skill works everywhere
 
-> **Status:** `v1.4.0`, production-ready.
+> **Status:** `v1.11.0`, production-ready.
 
 ---
 
@@ -129,7 +131,7 @@ For Codex and Copilot CLI, use folder copy. The end result is the same; you just
 
 Two parts can be customised.
 
-The **design-system files** in [skills/pencil-design/assets/design-system/](skills/pencil-design/assets/design-system/) are starting points. The skill copies them into your project (typically at `docs/design/`), and you edit those copies to match your brand. They live with your code, so plugin updates never touch them; plugin install is fine here.
+The **design-system files** in [skills/pencil-design/assets/design-system/](skills/pencil-design/assets/design-system/) are starting points. The skill copies them into your project (typically at `docs/design/`), and you edit those copies to match your brand. They live with your code, so plugin updates never touch them; plugin install is fine here. If you're not a developer or designer, [CUSTOMISING.md](skills/pencil-design/assets/design-system/CUSTOMISING.md) walks you through each file in plain English.
 
 The **skill content** (`SKILL.md`, the references, the worked examples) tells the AI how to do its work. To rewrite it for your team's workflow, pick folder copy or fork-and-install. Editing it inside a plugin install will be wiped on the next update.
 
@@ -177,15 +179,17 @@ skills/pencil-design/
     batch-design-grammar.md         # batch_design op syntax reference
     (platform tool mappings)        # codex-tools.md, gemini-tools.md, copilot-tools.md
   assets/
-    design-system/                  # 12 scaffold templates to copy into any project
-      README.md, tokens.md, components.md, layout.md, patterns.md,
-      voice.md, code-export.md, states.md, …
-    examples/                       # 5 worked examples with real MCP sequences
+    design-system/                  # 25 scaffold templates (12 core + 13 optional)
+      README.md                     # Agent loading guide
+      CUSTOMISING.md                # Plain-English guide for non-technical editors
+      tokens.md, components.md, layout.md, patterns.md,
+      voice.md, navigation.md, forms.md, code-export.md, states.md, …
+    examples/                       # 16 worked examples with real MCP sequences
       example-login-screen.md
-      example-import-library.md
-      example-scaffold-system.md
-      example-error-screen.md
+      example-dashboard.md
+      example-marketing-page.md
       example-form-flow.md
+      (and 12 more)
 
 AGENTS.md                           # Canonical project context (cross-platform)
 .claude-plugin/plugin.json          # Required by Claude Code's installer
