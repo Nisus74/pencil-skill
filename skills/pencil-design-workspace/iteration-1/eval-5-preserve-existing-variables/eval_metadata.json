@@ -1,0 +1,7 @@
+{
+  "eval_id": 5,
+  "eval_name": "preserve-existing-variables",
+  "prompt": "I have a .pen file open that already has design tokens configured. My brand uses a custom $primary (#E63946 red) and $surface (#F8F9FA near-white). I want you to add a login screen to this file. Walk me through exactly what you'd do before calling set_variables or batch_design, specifically how you'd make sure my existing token values aren't overwritten.",
+  "expected_output": "Agent MUST describe calling get_variables() first to read the existing token set before any batch_design or set_variables call. Agent MUST state it will only add tokens that are absent from the existing set, and will not re-declare $primary or $surface. Agent must NOT propose calling set_variables with a full default token suite (surface, primary, etc.) without first diffing against what get_variables() returns. Agent may describe the diff process: comparing returned keys against a default suite and only passing the missing ones. Does NOT call or propose replace: true. Optionally mentions that if get_variables() shows a full suite, bootstrapping can be skipped entirely and design can proceed directly to batch_design using the existing token names.",
+  "assertions": []
+}

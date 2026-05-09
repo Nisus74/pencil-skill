@@ -2,14 +2,6 @@
   "eval_id": 2,
   "eval_name": "import-library-and-use",
   "prompt": "I have a design library at design/system.lib.pen with Button and Input components. Add a sign-up form to my open .pen file using those components. Explain the tools you'd call and why.",
-  "assertions": [
-    { "text": "Calls get_editor_state first to verify host and inspect the open document's imports field" },
-    { "text": "Adds the library to the document's imports (e.g. via U op on document root with imports: { ds: './design/system.lib.pen' }) when not already imported" },
-    { "text": "Reads the library to discover available reusable components (batch_get with a cross-document pattern)" },
-    { "text": "Instantiates Button and Input via ref nodes (type: 'ref', ref: '<componentId>') NOT by recreating them from primitives" },
-    { "text": "Uses descendants for instance-level overrides (label text, placeholders, etc.)" },
-    { "text": "Mentions screenshot verification after the form lands" },
-    { "text": "States a brief plan before issuing batch_design ops" },
-    { "text": "Notes that the imports path is relative to the importing .pen, not the project root" }
-  ]
+  "expected_output": "Agent verifies the document's imports field, adds an imports entry via U op on document root if missing, queries the library's reusable components, instantiates Button and Input via ref nodes (not from primitives), uses descendants for instance-level overrides. Verifies via the verification ladder: snapshot_layout or batch_get on the instantiated refs first to confirm structure and bindings, then a single get_screenshot scoped to the form/card subtree (via nodeId), never the page frame, only as final sign-off.",
+  "assertions": []
 }

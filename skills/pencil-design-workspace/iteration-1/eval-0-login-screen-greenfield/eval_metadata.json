@@ -2,16 +2,6 @@
   "eval_id": 0,
   "eval_name": "login-screen-greenfield",
   "prompt": "I need to design a login screen in pencil. It should have email + password inputs, a primary submit button, and a 'forgot password?' link. Walk me through what you'd do step by step before touching any tools.",
-  "assertions": [
-    { "text": "Mentions calling get_editor_state as the first step (host detection)" },
-    { "text": "Names the seven-step default workflow OR enumerates at least five of: detect host, locate context, load guidelines, plan, execute, verify, iterate" },
-    { "text": "Mentions checking for an open .pen file and creating one (via open_document) if none is open" },
-    { "text": "Mentions checking for a design-system/ folder before designing" },
-    { "text": "States a concrete plan (form layout, dimensions, components) before describing batch_design ops" },
-    { "text": "References batch_design with at least one specific op (I, C, R, U, or G) — bonus if it shows the foo=I(...) binding pattern" },
-    { "text": "Mentions get_screenshot for verification after batch_design" },
-    { "text": "References variables ($primary, $space-N, $textBase or similar) rather than raw hex/px values" },
-    { "text": "Mentions instantiating Input and ButtonPrimary as ref nodes from a library, NOT building them from primitives" },
-    { "text": "Mentions stopping if MCP host is not connected (failure mode 1) — at least implicitly" }
-  ]
+  "expected_output": "Agent describes the seven-step workflow: detects host first, locates context (open .pen, design-system/ folder, selection), loads guidelines, plans, executes via batch_design, verifies via the verification ladder (structural-first: batch_design response \u2192 snapshot_layout \u2192 batch_get \u2192 get_screenshot reserved for visual-only questions or final sign-off), iterates. References design-system/ check and library import. Plans before executing. Does NOT prescribe screenshotting after every chunk. Treats dual-mode (light + dark) screenshotting as conditional on mode-specific color usage, not mandatory. Describes calling get_variables() as a mandatory pre-execution step before any batch_design call to check existing tokens.",
+  "assertions": []
 }
