@@ -39,36 +39,50 @@ skill is the capability the AI invokes.
 
 ```
 skills/pencil-design/              # The platform-agnostic core
-  SKILL.md                         # The skill — YAML frontmatter + instructions (v1.4.0)
+  SKILL.md                         # The skill: YAML frontmatter + instructions (v1.7.0)
   references/                      # On-demand references loaded by the skill
     mcp-tools.md                   # Cookbook for all 13 MCP tools + composite recipes
     states.md                      # Component states + screen-level fault states
     flows.md                       # Transitions between screens (modal, validation, back-stack)
-    accessibility.md               # ARIA, focus order, RTL, prefers-*, dynamic type
-    modern-patterns.md             # Container queries, fluid type, AI-UI, perceived perf
+    accessibility.md               # ARIA, focus order, APCA, ARIA live regions, keyboard shortcuts, WCAG 2.2
+    modern-patterns.md             # Container queries, fluid type, AI-UI, animation timing, command palette, perceived perf
     pencil-cli.md                  # Full Pencil CLI reference + When CLI vs MCP table
     pen-schema.md                  # .pen file JSON schema reference
     batch-design-grammar.md        # batch_design op syntax (I/C/R/U/G/D/M)
+    component-anatomy.md           # Reading component structure: slots, descendants paths, state activation
+    composition-patterns.md        # Compound components, slot design, variant naming, status workflow
+    file-architecture.md           # Cover frame, section regions, hierarchical naming, multi-.pen layouts
+    forms.md                       # Submit behaviour, validation, error display, autofill, mobile inputs
+    interactions.md                # Keyboard, focus, hit targets, loading timing, destructive actions, URL-as-state
+    visual-hierarchy.md            # Six levers, eye-flow patterns, whitespace, density strategy
     codex-tools.md                 # OpenAI Codex tool name mappings
     gemini-tools.md                # Google Gemini CLI tool name mappings
     copilot-tools.md               # GitHub Copilot CLI tool name mappings
   assets/
-    design-system/                 # 12 scaffold templates — copy into any project
+    design-system/                 # 12 core + 4 optional scaffold templates: copy into any project
       README.md                    # Index + how to use
       design-system.md             # Top-level design system doc
-      tokens.md                    # Color, spacing, type tokens
+      tokens.md                    # Colour, spacing, type tokens
       components.md                # Component catalogue + state table
       layout.md                    # Grid, breakpoints, spacing
-      patterns.md                  # Page-level templates (landing, dashboard, auth, …)
+      motion.md                    # Durations, easings, skeleton shimmer
+      elevation.md                 # Shadow scale + dark-mode treatment
+      iconography.md               # Stroke weight, sizes per context
+      patterns.md                  # Page-level templates (landing, dashboard, auth, ...)
+      states.md                    # Per-component state matrix + screen fault coverage
       voice.md                     # Copy tone + empty/error copy rules
       code-export.md               # Token export to CSS/Tailwind
-      states.md                    # Per-component state matrix + screen fault coverage
-    examples/                      # 5 worked examples with real MCP tool sequences
+      mobile.md                    # Optional: native-mobile patterns
+      data-viz.md                  # Optional: chart palettes, default chart types
+      brand.md                     # Optional: logo lockups, OG / social imagery
+      imagery.md                   # Optional: photo / illustration style, AI-imagery rules
+    examples/                      # 6 worked examples with real MCP tool sequences
       example-login-screen.md      # Greenfield auth screen
       example-import-library.md    # Import .lib.pen library + instantiate components
       example-scaffold-system.md   # Bootstrap a full design-system scaffold
       example-error-screen.md      # 404 + offline page pair
       example-form-flow.md         # Multi-step signup with email verification
+      example-component-deep-dive.md # Full read→understand→instantiate cycle
 
 # Platform install adapters (required by each platform's installer)
 .claude-plugin/plugin.json         # Claude Code plugin manifest

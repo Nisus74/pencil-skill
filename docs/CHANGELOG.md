@@ -17,6 +17,53 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Cursor's plugin schema doesn't document a `permissions` field. The manifest carries one anyway so `tools/skill-lint.py` can enforce consistency across all three platforms; Cursor ignores the unknown field.
 
+## [1.7.0] - 2026-05-09
+
+### Added
+
+Phase 1 of the world-class overhaul. After reviewing four external skill repositories (`vercel-labs/agent-skills`, `vercel-labs/web-interface-guidelines`, `nextlevelbuilder/ui-ux-pro-max-skill`, `bencium/bencium-marketplace`) plus a comprehensive Figma file-architecture standard, the skill now covers depth across five new domains while keeping `SKILL.md` lean (around 500 lines).
+
+- **Five new on-demand reference files** filling major gaps in design craft:
+  - `references/forms.md`: submit behaviour (Enter focused-if-single / last-if-many; ⌘+Enter for textarea), label patterns, validation timing (on-blur vs on-submit; never block keystrokes), error display (inline + focus first error + aria-describedby), input attributes (type / inputmode / autocomplete / name / autocapitalise / spellcheck), submit-state choreography (idempotency, password managers, 2FA paste), mobile inputs (16px to defeat iOS zoom, OTP autofill), hit zones, multi-step forms, unsaved-changes warnings, placeholder conventions.
+  - `references/interactions.md`: keyboard everywhere (WAI-ARIA APG patterns by component), focus management (`focus-visible`, `focus-within`, focus traps, restore on dismissal), hit targets (≥24/44/48), loading state choreography (150–300ms show-delay, 300–500ms min-visible-time), ellipsis conventions (`Rename…`, `Saving…`, `Loading…`), destructive actions (confirmation OR undo, never both), URL as state, optimistic UI, tooltips, toasts, modals, selection patterns, native context menus.
+  - `references/composition-patterns.md`: compound components vs boolean prop explosion (worked Composer example), generic state/actions/meta interface, explicit variants instead of boolean modes, slot anatomy (named by content not position; default vs required), descendants override discipline, component status workflow (`draft` / `ready` / `stable` / `needs-review` / `deprecated`), when to extract to `.lib.pen`, library-hygiene anti-patterns.
+  - `references/visual-hierarchy.md`: the six levers (size, weight, colour, position, spacing, motion) and when to reach for which, primary/secondary/tertiary order, eye-flow patterns (F / Z / Gutenberg / centre-out), reading order = DOM order = focus order, whitespace as a tool (macro / micro / padding scales), composition principles (rule of thirds, golden ratio, optical centre vs geometric centre, visual weight balance, symmetry vs asymmetry, tension and resolution), density calibration per audience.
+  - `references/file-architecture.md`: Cover frame template (owner / status / version / scope / links), section-region layout (`SourceOfTruth` / `BuildReady` / `UXStates` / `Responsive` / `Exploration` / `Archive`), hierarchical naming patterns (`[Area] / [Flow] / [Step] / [Screen] / [State] / [Breakpoint]`), file-level status taxonomy (Discovery → In design → Design review → Engineering review → Ready for build → In build → QA → Shipped → Deprecated), single-`.pen` vs multi-`.pen` decision tree, recommended file sets per project size (early / growing / large), what NOT to put in a `.pen` (research transcripts, full PRDs, inspiration boards), per-project-type completeness pressure tests for SaaS / Website / Mobile, AI-readiness as a meta-principle.
+- **`references/modern-patterns.md` extended** with two new sections:
+  - **Animation & motion.** Timing tables by interaction type (micro 100–150ms, state 200–300ms, page 300–500ms), GPU-accelerated properties only, never `transition: all`, loading-state flicker rule (150–300ms show-delay + 300–500ms min-visible-time), interruptible transitions, never autoplay, hover micro-pattern (`translateY(-2px) scale(1.01)`), reduced-motion contract.
+  - **Modern UI affordances.** Command palette / `⌘+K` anatomy, slash commands, AI input affordances (sparkle icons, suggestion chips), streaming response patterns (cursor blink, abort control), attachment affordances (drag-and-drop, paperclip, paste images).
+- **`references/accessibility.md` extended** with WCAG 2.2 / ISO/IEC 40500:2025 baseline (2.4.11 focus appearance, 2.5.7 dragging, 2.5.8 target size, 3.3.7 redundant entry, 3.3.8/9 accessible authentication), APCA as alternative contrast metric (`Lc 75 ~ AA` for body), ARIA live region patterns table (`role="status"` polite vs `role="alert"` assertive with use cases), expanded live-region examples (form error count on submit, loading state announcements, search results updated, real-time presence), app-level keyboard shortcuts subsection (discoverable via `?`, documented in UI, don't conflict with browser/OS, `⌘`/`Ctrl` per platform, common shortcut conventions table).
+- **SKILL.md additions** (around 85 lines, total around 500):
+  - New **File architecture** discipline rule covering Cover frame, section regions, and hierarchical naming.
+  - New **annotation discipline** added to Context rule: annotate behaviour, not visual specs.
+  - **Colour** expanded: two-role architecture (4–5 neutrals + 1–3 accents), hue tinting on non-neutral surfaces, interactions increase contrast (hover/focus carry *more* contrast than rest, never less), colour-blind safety.
+  - **Typography** expanded: tabular numerics for columns, `text-wrap: balance` for headings, non-breaking spaces for unit pairs, optical sizing for variable fonts.
+  - New **Shadows & elevation** subsection: layered shadows (ambient + direct, ≥2 layers), nested border-radius rule (child ≤ parent, concentric).
+  - New **Optical precision** subsection: ±1–2px adjustments where the eye disagrees with the maths, icon-text contrast balance, optical centre vs geometric centre.
+  - New **Content & microcopy** subsection: active voice, second person, title case, action-specific button labels, error messages guide the exit, empty state copy encourages and guides.
+  - New **Self-critique gate** subsection: 60-second four-question gate before declaring done.
+  - New deviation pointers in `Design intelligence: when to deviate` for: open-ended requests (clarify-intent protocol), forms, interactions, composition, visual hierarchy, file architecture.
+- **Reference index in SKILL.md updated** to include all new and extended references.
+- **Writing-style sweep** applied to all new content. Em-dash count: 0 across the new and extended files. Australian English throughout. Slop dictionary clean.
+
+### Changed
+
+- Plugin and skill versions bumped to `1.7.0` (`.claude-plugin/plugin.json`, `.cursor-plugin/plugin.json`, `SKILL.md` frontmatter).
+
+## [1.6.0] - 2026-05-09
+
+### Added
+
+- `references/component-anatomy.md` and `assets/examples/example-component-deep-dive.md`: fills the gap between component discovery and component use. Adds a mandatory inspect-before-use step in SKILL.md, covers structure-reading, slot identification, descendant path syntax (including nested `/` paths), state activation, and the full read→understand→instantiate cycle with three instantiation patterns.
+
+## [1.5.0] - 2026-05-09
+
+### Changed
+
+- Live MCP execution corrections to `batch-design-grammar.md`, `pen-schema.md`, `mcp-tools.md` (text uses `content` not `text`; `fill` required; `document` predefined binding; `placeholder: true` on top-level frames; `padding` array-only; `alignItems` start/centre/end only; `justifyContent` uses underscores; `fontWeight` string; fill types: colour/gradient/image/mesh_gradient; `stroke.align` valid; `stroke.fill` not plural; `group` supports layout; sizing constraints; common gotchas).
+- SKILL.md and `mcp-tools.md` mandate `get_variables()` before token work; explain `replace: false` still clobbers values for keys passed; bootstrap only absent tokens.
+- Eval coverage expanded to validate live execution discipline.
+
 ## [1.4.0] - 2026-05-03
 
 ### Added

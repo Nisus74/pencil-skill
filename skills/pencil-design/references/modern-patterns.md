@@ -2,13 +2,13 @@
 
 Patterns the model under-uses by default. SKILL.md's discipline rules cover the perennials (themes, responsive, accessibility, naming). This file covers what's *currently* table stakes for shipping product UI in 2026 — patterns the model wouldn't reach for unprompted.
 
-**What this file owns:** container queries (vs media queries), fluid type with `clamp()`, AI-UI affordances, perceived performance (skeleton, optimistic UI, LQIP, staggered reveal), modern dark-mode controls, defaults the model reaches for that are already dated.
+**What this file owns:** container queries (vs media queries), fluid type with `clamp()`, AI-UI affordances, animation & motion timing, modern UI affordances (command palette, slash commands, AI input chips, streaming, attachments), perceived performance (skeleton, optimistic UI, LQIP, staggered reveal), modern dark-mode controls, defaults the model reaches for that already read as dated.
 
 **What this file does NOT own:** any of the topics it links into other references for tactical detail. It's the *index* for "what's missing from the AI default" — not a re-implementation of motion, flows, accessibility, or imagery.
 
 ## When to load this file
 
-- The user names *modern*, *contemporary*, *2026-style*, *fluid*, *container queries*, *AI UI*, *optimistic*, *real-time*, or *presence*.
+- The user names *modern*, *contemporary*, *2026-style*, *fluid*, *container queries*, *AI UI*, *optimistic*, *real-time*, *presence*, *command palette*, *cmd+K*, *slash commands*, *streaming*, or *animation timing*.
 - A design feels generic and you want to introduce a sharper-than-default pattern.
 - Auditing an existing design that reads as "AI default" — glassmorphism, three-card grids, parallax everywhere.
 
@@ -123,6 +123,124 @@ Without an abort, slow-running AI feels broken — users don't know if it's stil
 - Animate AI output character-by-character if the response arrives whole. The fake typewriter is an AI tell.
 - Hide AI generation behind a *"loading…"* with no signal that it's an AI doing work. The model's brand value is that it's an AI; don't disguise it.
 - Wrap AI features in cute personas (*"Hi, I'm Sparky, your AI helper!"*) unless the brand calls for it. Most products are better served by sober AI affordances.
+
+## Animation & motion
+
+Animation is one of the strongest "feels finished" signals in product design and one of the easiest to get wrong. The rules below apply unless the project's [`motion.md`](../assets/design-system/motion.md) overrides them.
+
+**Timing by interaction type.** Different interactions earn different durations:
+
+| Interaction | Duration |
+|-------------|----------|
+| Micro (button press, checkbox toggle, hover) | 100–150ms |
+| State change (modal open, sheet slide-in, panel expand) | 200–300ms |
+| Page transition (route change, full-screen swap) | 300–500ms |
+| Long-form motion (a hero animation, a guided onboarding step) | 600ms–1.2s, only with strong reason |
+
+Anything longer than its category reads sluggish; anything shorter reads jittery. The boundaries aren't strict, but a 300ms button press feels broken and a 100ms page transition feels disorienting.
+
+**GPU-accelerated properties only.** Animate `transform` (translate / scale / rotate) and `opacity`. Never animate `width`, `height`, `top`, `left`, `padding`, `margin`, or any layout property; these trigger reflow on every frame and tank performance, especially on lower-end devices. When you need a "size change" animation, use `transform: scale()` with `transform-origin` set to the right anchor, *not* `width` / `height` interpolation.
+
+**Never `transition: all`.** Always enumerate the specific properties to transition:
+
+```css
+/* Bad: animates every property change, including unintended ones */
+transition: all 200ms ease-out;
+
+/* Good: explicit */
+transition: opacity 200ms ease-out, transform 200ms ease-out;
+```
+
+`transition: all` will animate properties you didn't intend to (a class change shifts a font-weight, the page suddenly animates the weight change), and it forces the browser to track every property for changes. Always list properties explicitly.
+
+**Loading state flicker rule.** When showing a spinner or skeleton, add a `~150–300ms show-delay` and a `~300–500ms minimum-visible-time` so fast responses don't flash a loading state. Pseudocode:
+
+```
+when starting an async operation:
+  schedule "show loading state" in 200ms
+
+when async operation completes:
+  if loading state is visible:
+    hide it after at least 400ms total visible time
+  else:
+    cancel the scheduled show
+    don't show loading state at all
+```
+
+This is the difference between a UI that feels responsive and one that feels twitchy.
+
+**Interruptible.** Starting a new state transition should cancel the current one in progress, not queue behind it. A user that clicks rapidly should see the current UI snap to where they pointed it, not wait for animations to play out in series. Document the expectation in component `context`: *"Interruptible. New state transition cancels in-progress transition."*
+
+**Never autoplay.** Don't loop animations on idle UI elements. A subtly-shimmering CTA, a perpetually-pulsing icon, or a card that gently floats reads as desperate ("look at me!") and exhausts the user's attention. The exception: skeleton-screen shimmer, which is a load-state signal, not an idle decoration.
+
+**Hover micro-pattern.** A subtle `translateY(-2px) scale(1.01)` on cards and interactive tiles communicates affordance without layout shift:
+
+```css
+.card:hover {
+  transform: translateY(-2px) scale(1.01);
+  transition: transform 150ms ease-out;
+}
+```
+
+Avoid layout-shifting hover patterns (`translateY(-8px)`, `scale(1.05)`); they look impressive in isolation and create visual jitter when several cards are visible at once.
+
+**Reduced motion.** Respect `prefers-reduced-motion: reduce` (already covered in [`accessibility.md`](accessibility.md)). When set, transitions > 200ms become instant; loops disable; micro-interactions ≤ 120ms stay (they're imperceptible to most users and provide the affordance signal).
+
+For the project's specific durations, easings, and the skeleton shimmer pattern, see [`assets/design-system/motion.md`](../assets/design-system/motion.md).
+
+## Modern UI affordances
+
+The patterns the model under-uses by default but that ship in essentially every modern productivity surface in 2026.
+
+**Command palette / `⌘+K`.** A keyboard-first command interface, summoned with `⌘+K` (or `Ctrl+K`), that lets the user search across actions, navigate to pages, and execute commands without using the mouse. Now standard in Linear, Notion, GitHub, Vercel, Raycast, Slack, Cursor, and most developer-leaning tools.
+
+Anatomy:
+
+- A modal-style overlay summoned by `⌘+K`.
+- A search input that filters in real time.
+- Grouped results: navigation targets, actions, recent items, search results from your data.
+- Keyboard nav (`↑`/`↓` to move, `Enter` to activate, `Esc` to dismiss).
+- Each result shows a hint of its keyboard shortcut if it has one (`⌘+P` next to "Open project").
+
+When to design one: any product the user opens daily, any product with > 10 navigation destinations, any product with frequent actions the user repeats. Skip if the product is pure-content (a blog, a marketing site).
+
+In Pencil, build the palette as a reusable `CommandPalette` component with slots for `SearchInput`, `Results`, `EmptyState`. Document the keyboard contract in `context`.
+
+**Slash commands.** A text input where typing `/` opens a context menu of commands the user can run inline. Standard in Notion, Slack, GitHub PR comments, Discord. Two patterns:
+
+- *Editor slash:* `/` in a text editor opens block-type picker (heading, list, image, code).
+- *Search slash:* `/` in a search bar opens a filter / scope picker.
+
+Anatomy:
+
+- A `/` keystroke triggers the menu.
+- A filter input narrows the menu options.
+- Arrow keys move; Enter selects; Esc closes; clicking outside closes.
+
+In Pencil, design the menu as a popover component anchored to the input's caret position. Document the trigger and dismissal contract.
+
+**AI input affordances.** When an input accepts AI prompts, the affordance should make this discoverable:
+
+- A subtle `✦` (sparkle) icon in the input or its trailing edge.
+- A placeholder that hints at what's possible: *"Ask anything…"*. Use sparingly; placeholder-as-label is still bad.
+- A `/` slash menu showing AI-specific actions (`/summarise`, `/rephrase`, `/expand`).
+- An attach affordance for files / images the model can consume; usually a paperclip icon adjacent to the input.
+
+**Streaming response patterns.** When an AI response streams in token by token:
+
+- Show a cursor (a thin vertical bar, blinking ~600ms cycle) at the streaming position.
+- The streaming text appears character-by-character as it arrives. *Do not* fake this with a typewriter animation when the response arrives whole; that's an AI tell.
+- A subtle "thinking" indicator before the first token appears (a small `…` or pulsing dot near the cursor).
+- An abort control (`■` square or `✕` icon) renders during streaming, lets the user halt and keep what's already generated.
+
+**Attachment affordances.** For inputs that accept files (chat composers, AI prompts, support forms):
+
+- Drag-and-drop the file onto the input; the input shows a "drop here" overlay during drag-over.
+- A paperclip icon or "attach file" button as a fallback (clicks open the native file picker).
+- Once attached, the file appears as a chip near the input with a thumbnail (for images), filename + size (for documents), and a `✕` to remove.
+- Allow paste-from-clipboard for images (`⌘+V` of an image pastes the image as an attachment).
+
+These affordances are easy to skip and easy to spot when missing. A 2026 product without them reads as a 2022 product.
 
 ## Perceived performance
 
