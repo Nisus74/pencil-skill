@@ -4,7 +4,7 @@ description: Use this skill for any pencil.dev work — designing UI in a .pen f
 license: MIT
 compatibility: Any AI coding tool with the Pencil MCP server configured (Claude Code, Codex, Gemini CLI, Copilot CLI, Cursor)
 metadata:
-  version: "1.7.0"
+  version: "1.8.0"
 permissions:
   mcp:
     - pencil:get_editor_state
@@ -337,6 +337,9 @@ The default workflow assumes a fresh, end-to-end design. Most tasks aren't that.
 - **Designing or extending a reusable component (slots, variants, descendants, component states, library hygiene).** Load `references/composition-patterns.md`. It teaches compound-component design (instead of boolean prop explosion), variant naming, slot anatomy, and the component status workflow (`draft` / `ready` / `stable` / `deprecated`).
 - **The design feels generic; visual hierarchy is unclear; whitespace is wrong; the eye doesn't know where to land.** Load `references/visual-hierarchy.md`. It owns the six levers (size, weight, colour, position, spacing, motion), eye-flow patterns, whitespace as a tool, and density strategy.
 - **Designing a multi-screen project, organising a `.pen` with many flows, deciding whether to split into multiple `.pen` files, or auditing file hygiene.** Load `references/file-architecture.md`. It owns the Cover-frame template, the section-region layout (SourceOfTruth / BuildReady / Exploration / Archive), the hierarchical naming patterns, the multi-`.pen` decision tree, and the per-project-type completeness checklists.
+- **Building a marketing page, dashboard, settings page, list-detail layout, or any structural page archetype.** Load `references/layout-patterns.md`. It owns the named layouts (hero variations, feature-section alternatives to the three-card grid, pricing tables, dashboard layouts, settings patterns, list-detail shapes, empty-page templates) with real-world exemplars for each.
+- **Design feels off: too busy, too sparse, too generic, or doesn't feel premium.** Load `references/iteration-patterns.md`. It owns the failure-mode diagnoses, the rescue recipes for each, the four-question self-critique gate (expanded), the reference-image translation protocol, and the three-iteration limit before stopping to ask the user.
+- **Writing button labels, error messages, empty state text, headlines, or any UI copy that needs to sound like the product rather than the agent.** Load `references/microcopy.md`. It owns the voice and tone framework, action-specific CTA patterns, error message anatomy (what happened + why + what to do), empty-state copy, confirmation copy, system status, loading copy, and localisation considerations.
 
 **Verification cadence.** Screenshots are the most expensive thing this skill does — each one returns a sizeable image payload to the model, costing tokens and consuming context. Do not screenshot "to check progress." Walk the verification ladder (workflow step 6) and stop at the cheapest rung. A typical end-to-end design task should need **one or two screenshots** total: optionally one mid-flight if a structural snapshot reveals something pixel-only can resolve, and one at the end before handing back. Stop when: no rhythm-breaking issues remain, components match the library, contrast OK, the user's stated requirements are covered. Hand back with a one-paragraph summary of what landed.
 
@@ -482,6 +485,9 @@ The Pencil MCP tool names (`get_editor_state`, `batch_design`, etc.) are identic
 - `references/forms.md`: form design discipline. Submit behaviour, label patterns, validation timing, error display, input attributes, submit state, mobile inputs, hit zones, multi-step forms, unsaved-changes warnings
 - `references/interactions.md`: keyboard everywhere, focus management, hit targets (24/44), loading state timing, ellipsis conventions, destructive actions, URL-as-state, optimistic UI, tooltips, toasts, modals, selection, right-click menus
 - `references/visual-hierarchy.md`: the six levers (size/weight/colour/position/spacing/motion), eye-flow patterns (F/Z/gutenberg), whitespace as a tool, composition principles, symmetry vs asymmetry, density strategy
+- `references/layout-patterns.md`: named layout patterns the agent picks from (hero variations, feature sections beyond the three-card grid, pricing tables, testimonials, CTA sections, footers, dashboard layouts, settings patterns, list-detail shapes, empty-page templates) with real-world exemplars
+- `references/iteration-patterns.md`: failure-mode diagnoses (too busy, too sparse, too generic, doesn't feel premium, hierarchy unclear, breakpoints don't hold) with rescue recipes; the expanded four-question self-critique gate; reference-image translation protocol; three-iteration limit
+- `references/microcopy.md`: voice and tone framework, action-specific CTA patterns, error message anatomy, empty-state copy, success copy, confirmation copy, system status, loading copy, localisation considerations
 - `references/pen-schema.md` — full `.pen` data model: every node type, properties, layout/sizing/variables, theme axes, components, slots
 - `references/batch-design-grammar.md` — complete `batch_design` op syntax and chunking rules
 - `references/mcp-tools.md` — cookbook for all 13 Pencil MCP tools, the 8 `get_guidelines` categories, composite recipes (token audit, greenfield bootstrap, library smoke test), and a tool-cost cheatsheet

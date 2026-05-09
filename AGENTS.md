@@ -39,11 +39,11 @@ skill is the capability the AI invokes.
 
 ```
 skills/pencil-design/              # The platform-agnostic core
-  SKILL.md                         # The skill: YAML frontmatter + instructions (v1.7.0)
+  SKILL.md                         # The skill: YAML frontmatter + instructions (v1.8.0)
   references/                      # On-demand references loaded by the skill
     mcp-tools.md                   # Cookbook for all 13 MCP tools + composite recipes
-    states.md                      # Component states + screen-level fault states
-    flows.md                       # Transitions between screens (modal, validation, back-stack)
+    states.md                      # Component states + screen-level fault states + onboarding/settings states
+    flows.md                       # Transitions between screens (modal, validation, back-stack, onboarding, settings, search)
     accessibility.md               # ARIA, focus order, APCA, ARIA live regions, keyboard shortcuts, WCAG 2.2
     modern-patterns.md             # Container queries, fluid type, AI-UI, animation timing, command palette, perceived perf
     pencil-cli.md                  # Full Pencil CLI reference + When CLI vs MCP table
@@ -55,6 +55,9 @@ skills/pencil-design/              # The platform-agnostic core
     forms.md                       # Submit behaviour, validation, error display, autofill, mobile inputs
     interactions.md                # Keyboard, focus, hit targets, loading timing, destructive actions, URL-as-state
     visual-hierarchy.md            # Six levers, eye-flow patterns, whitespace, density strategy
+    layout-patterns.md             # Hero variations, feature sections beyond three-card grid, pricing, dashboards, settings, list-detail, empty pages (cited 2025/2026 exemplars)
+    iteration-patterns.md          # Failure-mode rescues (too busy/sparse/generic/un-premium), self-critique gate, reference-image translation, three-iteration limit
+    microcopy.md                   # Voice/tone framework, action-specific CTAs, error message anatomy, empty/success/confirmation copy, loading copy, localisation
     codex-tools.md                 # OpenAI Codex tool name mappings
     gemini-tools.md                # Google Gemini CLI tool name mappings
     copilot-tools.md               # GitHub Copilot CLI tool name mappings

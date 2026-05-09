@@ -17,11 +17,34 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Cursor's plugin schema doesn't document a `permissions` field. The manifest carries one anyway so `tools/skill-lint.py` can enforce consistency across all three platforms; Cursor ignores the unknown field.
 
+## [1.8.0] - 2026-05-09
+
+### Added
+
+Phase 2 of the world-class overhaul. Three new on-demand reference files filling depth gaps in layout selection, design rescue, and microcopy, plus extensions to states.md and flows.md for onboarding, settings, and search patterns. Every rule cited to authoritative 2025/2026 sources per the source-validation policy.
+
+- **Three new on-demand reference files**:
+  - `references/layout-patterns.md`: named layout patterns the agent picks from for marketing pages, dashboards, settings, list-detail screens, and empty pages. Hero variations (centred / split / asymmetric / full-bleed / minimal / bento), feature-section alternatives to the three-card grid (alternating image-text, bento, comparison table, single hero feature), pricing tables (three-tier / single-tier / usage-based / enterprise), testimonials (avatar grid / single hero / logo wall / video; never auto-rotating carousel), CTA sections, footer architectures, dashboard layouts (sidebar / top nav / three-column / command-driven), settings patterns (tabs / sidebar / search-driven), list-detail shapes (master-detail / three-column / modal / full-page), and empty-page templates. Real-world exemplars cited throughout (Linear, Stripe, Vercel, Notion, Apple, Things, Cron, Raycast, Arc).
+  - `references/iteration-patterns.md`: failure-mode diagnoses and rescue recipes for the six most common iteration failures (too busy, too sparse, too generic / reads as AI, doesn't feel premium, hierarchy unclear, breakpoints don't hold). Each failure mode lists the specific levers to pull, in order of effect. The expanded four-question self-critique gate (with examples and tests for each question), the reference-image translation protocol (six-step process from naming the layout pattern to recreating without copying), and the three-iteration limit before stopping to ask the user.
+  - `references/microcopy.md`: the voice and tone framework (formal-casual, serious-playful, calm-energetic axes), action-specific CTA patterns ('Save changes' beats 'Continue'), error message anatomy (state what happened + hint why + tell the user what to do next, never blame the user), empty state copy that frames the empty state as a beginning rather than a deficit, calibrated success copy (don't over-celebrate routine work), confirmation copy that restates the action ('Delete 12 items' not 'Confirm'), specific system status, named loading copy ('Fetching your projects' not 'Loading...'), and localisation considerations (avoid metaphors that don't travel, leave room for German and Russian, don't bake plurals into single strings).
+- **`references/states.md` extended** with onboarding states (welcome, sample data, coach marks, loaded-with-suggestions), settings states (saved, saving, saved-just-now, dirty, validation, conflict), and a loading-state-timing cross-link to `interactions.md`.
+- **`references/flows.md` extended** with onboarding flows (sign-up → first-action vs sign-up → guided onboarding → first-action; with sample data vs blank slate), settings flows (autosave default vs explicit-save for high-stakes; per-field vs form-level autosave), and search flows (instant vs submit-driven; results vs suggestions; empty results state; URL state).
+- **SKILL.md additions**:
+  - Three new deviation pointers in `Design intelligence: when to deviate` for layout patterns, iteration rescues, and microcopy.
+  - Three new entries in the Reference index for the new files.
+- **Source-validation policy applied** to every rule in the new and extended files. Authoritative 2025/2026 sources cited per file in a Sources section: Refactoring UI, Linear, Stripe, Vercel, Apple HIG, Material 3, WCAG 2.2, APCA, Nielsen Norman Group, Mailchimp Content Style Guide, Shopify Polaris, Atlassian Design System, Stripe Style Guide, Microcopy: The Complete Guide (Yifrah), and others.
+- **Writing-style sweep** applied to all new content. Em-dash count: 0 across the new and extended files. Australian English throughout.
+
+### Changed
+
+- Plugin and skill versions bumped to `1.8.0` (`.claude-plugin/plugin.json`, `.cursor-plugin/plugin.json`, `SKILL.md` frontmatter).
+- The Phase 1 (`1.7.0`) CHANGELOG entry no longer cites third-party skill repositories by name; references for skill design were inputs to the planning conversation, not material that needs to live in the repo.
+
 ## [1.7.0] - 2026-05-09
 
 ### Added
 
-Phase 1 of the world-class overhaul. After reviewing four external skill repositories (`vercel-labs/agent-skills`, `vercel-labs/web-interface-guidelines`, `nextlevelbuilder/ui-ux-pro-max-skill`, `bencium/bencium-marketplace`) plus a comprehensive Figma file-architecture standard, the skill now covers depth across five new domains while keeping `SKILL.md` lean (around 500 lines).
+Phase 1 of the world-class overhaul. The skill now covers depth across five new domains while keeping `SKILL.md` lean (around 500 lines).
 
 - **Five new on-demand reference files** filling major gaps in design craft:
   - `references/forms.md`: submit behaviour (Enter focused-if-single / last-if-many; ⌘+Enter for textarea), label patterns, validation timing (on-blur vs on-submit; never block keystrokes), error display (inline + focus first error + aria-describedby), input attributes (type / inputmode / autocomplete / name / autocapitalise / spellcheck), submit-state choreography (idempotency, password managers, 2FA paste), mobile inputs (16px to defeat iOS zoom, OTP autofill), hit zones, multi-step forms, unsaved-changes warnings, placeholder conventions.
