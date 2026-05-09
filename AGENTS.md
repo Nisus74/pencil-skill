@@ -39,7 +39,7 @@ skill is the capability the AI invokes.
 
 ```
 skills/pencil-design/              # The platform-agnostic core
-  SKILL.md                         # The skill: YAML frontmatter + instructions (v1.9.0)
+  SKILL.md                         # The skill: YAML frontmatter + instructions (v1.10.0)
   references/                      # On-demand references loaded by the skill
     mcp-tools.md                   # Cookbook for all 13 MCP tools + composite recipes
     states.md                      # Component states + screen-level fault states + onboarding/settings states
@@ -70,7 +70,7 @@ skills/pencil-design/              # The platform-agnostic core
     gemini-tools.md                # Google Gemini CLI tool name mappings
     copilot-tools.md               # GitHub Copilot CLI tool name mappings
   assets/
-    design-system/                 # 12 core + 5 optional scaffold templates: copy into any project
+    design-system/                 # 12 core + 13 optional scaffold templates: copy into any project
       README.md                    # Index + how to use
       design-system.md             # Top-level design system doc
       tokens.md                    # Colour, spacing, type tokens
@@ -88,7 +88,15 @@ skills/pencil-design/              # The platform-agnostic core
       brand.md                     # Optional: logo lockups, OG / social imagery
       imagery.md                   # Optional: photo / illustration style, AI-imagery rules
       visual-style.md              # Optional: project's chosen style identity (style + palette + font picks from references catalogues)
-    examples/                      # 7 worked examples with real MCP tool sequences
+      forms.md                     # Optional: project's form conventions (validation timing, error display, save patterns by surface)
+      accessibility.md             # Optional: project's a11y standards (WCAG / APCA target, keyboard shortcuts, screen reader patterns)
+      micro-interactions.md        # Optional: per-interaction motion specs (button press, card hover, modal entrance, sheet drag, toast)
+      empty-states.md              # Optional: per-surface empty state catalogue (first-use / no-results / no-permission / post-action) with copy templates
+      onboarding.md                # Optional: first-run experience (sample-data vs blank slate, sequence, coach marks)
+      navigation.md                # Optional: primary nav (sidebar / top / hamburger / command-driven), workspace switcher, mobile tab bar
+      search.md                    # Optional: search shape (instant / submit / hybrid), suggestions, filters, URL state
+      file-architecture.md         # Optional: project's chosen .pen file structure, naming conventions, status taxonomy
+    examples/                      # 16 worked examples with real MCP tool sequences
       example-login-screen.md      # Greenfield auth screen
       example-import-library.md    # Import .lib.pen library + instantiate components
       example-scaffold-system.md   # Bootstrap a full design-system scaffold
@@ -96,6 +104,15 @@ skills/pencil-design/              # The platform-agnostic core
       example-form-flow.md         # Multi-step signup with email verification
       example-component-deep-dive.md # Full read→understand→instantiate cycle
       example-style-selection.md   # Catalogue (style + palette + fonts) → set_variables MCP → tokens commit → starter components
+      example-settings-page.md     # Settings with sidebar nav, autosave + explicit-save for high-stakes
+      example-dashboard.md         # KPI cards + chart tile + recent-activity table
+      example-marketing-page.md    # Marketing page avoiding three-card grid (asymmetric hero, bento features)
+      example-mobile-app.md        # Mobile app with bottom tab bar, sheet detents, safe areas, haptics
+      example-data-visualization.md # Multi-chart dashboard with colour-blind-safe palettes
+      example-onboarding-flow.md   # Three-step onboarding with progress, skip, sample-data routing
+      example-component-variants.md # Complete Button family with all variants and states
+      example-pricing-table.md     # Three-tier pricing with highlighted recommended tier
+      example-file-cover-and-sections.md # .pen file with Cover frame, section regions, hierarchical naming
 
 # Platform install adapters (required by each platform's installer)
 .claude-plugin/plugin.json         # Claude Code plugin manifest

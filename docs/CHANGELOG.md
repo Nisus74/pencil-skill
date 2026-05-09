@@ -17,6 +17,47 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Cursor's plugin schema doesn't document a `permissions` field. The manifest carries one anyway so `tools/skill-lint.py` can enforce consistency across all three platforms; Cursor ignores the unknown field.
 
+## [1.10.0] - 2026-05-09
+
+### Added
+
+Phase 4 of the world-class overhaul. Eight new design-system templates (project-level commitments the user populates per project) and nine new worked examples. The templates round out the conditionally scaffolded Tier 2 set; the examples teach the agent the catalogue → MCP → tokens → designs flow across the most common surfaces.
+
+- **Eight new design-system templates** (Tier 2, conditionally scaffolded):
+  - `assets/design-system/forms.md` (112 lines): the project's form conventions. Validation timing (on-blur sync + on-submit cross-field/async; never on keystroke). Error display (inline, focus first error on submit, aria-describedby). Submit-state choreography (idempotency key, spinner-plus-label, preserve form values on failure). Save patterns by surface (autosave default; explicit save for billing/security). Mobile inputs (16px font-size to defeat iOS zoom, autocomplete, inputmode). Hit zones, multi-step forms, unsaved-changes warning, placeholder conventions, verification checklist.
+  - `assets/design-system/accessibility.md` (108 lines): the project's a11y standards. WCAG 2.2 AA / APCA Lc 75 hybrid baseline. Focus ring spec, skip links, focus traps. Project-specific keyboard shortcuts table. Screen reader patterns (`role="status"` vs `role="alert"`, `aria-describedby` on form errors). `prefers-reduced-motion` honoured. Dynamic type and RTL commitments. Per-component accessibility table. Six-step verification checklist.
+  - `assets/design-system/micro-interactions.md` (102 lines): per-interaction motion specs. Table of every common interaction with duration, easing, properties, and notes (button press, button hover, card hover, modal open/close, sheet drag-to-dismiss, toast in/out, page transition, tab switch, tooltip, skeleton shimmer, progress bar, focus ring, form field error, optimistic UI commit/rollback). Reduced-motion contract. Animation library commitment. GPU-only properties (transform + opacity). Don't-animate list.
+  - `assets/design-system/empty-states.md` (92 lines): per-surface empty state catalogue. Visual lockup (illustration / title / description / CTA). Tables for each primary surface (Projects list, Inbox, Search, Settings) with all four empty kinds (first-use / no-results / no-permission / post-action). Copy rules. Illustration approach commitment.
+  - `assets/design-system/onboarding.md` (142 lines): first-run experience pattern. Onboarding shape (sign-up to first action, or sign-up to guided onboarding to first action). With sample data vs blank slate routing. Step sequence. Welcome modal vs full-takeover. Coach marks usage. Loaded-with-suggestions. Sample-data realism rules. Skip and exit affordances. Save-progress-on-exit. Re-onboarding for changes. Mobile considerations. Accessibility. Verification checklist.
+  - `assets/design-system/navigation.md` (147 lines): the project's primary navigation. Sidebar / top nav / hamburger / command-driven decision per surface and per breakpoint. Sidebar / top nav structure specs. Breadcrumbs, search placement, notifications, workspace switcher (multi-tenant). Mobile navigation (≤ 5 tabs). Hamburger drawer fallback. Sticky vs scrolling. Active-state visual treatment. Keyboard navigation. URL state. Notification badges. Verification checklist.
+  - `assets/design-system/search.md` (125 lines): search shape (instant / submit / hybrid). Entry point (header search, command palette, dedicated page). Instant search debounce, minimum query length, results panel placement. Submit-driven search URL state. Suggestions vs results. Suggestion categories. Filters. Keyboard shortcuts. URL state. Empty results pattern. Performance. Accessibility.
+  - `assets/design-system/file-architecture.md` (170 lines): the project's chosen `.pen` file structure. File set table (which `.pen` files exist, ownership per file, status). Naming convention. Hierarchical naming for flows (`[Area] / [Flow] / [Step] / [Screen] / [State] / [Breakpoint]`). Section regions per `.pen` (Cover, Source of Truth, Build Ready, UX States, Responsive, Exploration, Archive). Cover frame template. Status taxonomies (file-level + component-level). Source-of-truth designation. Library imports. What NOT to put in a `.pen`. Multi-`.pen` governance. AI-readiness as meta-principle. Completeness checklists by project type.
+- **Nine new worked examples**:
+  - `assets/examples/example-settings-page.md` (200 lines): settings page with sidebar nav, autosave defaults, explicit-save for Billing, validation, dirty state.
+  - `assets/examples/example-dashboard.md` (199 lines): dashboard with KPI cards (top row), chart tile (middle), recent-activity table (bottom). KPI delta colour pairs with arrow shape per colour-blind safety.
+  - `assets/examples/example-marketing-page.md` (226 lines): marketing page avoiding the three-card grid. Asymmetric hero, alternating image-text rows or bento features, three-tier pricing with highlighted Pro tier, avatar-grid testimonials, sitemap footer.
+  - `assets/examples/example-mobile-app.md` (226 lines): mobile app home screen + Compose flow. Bottom tab bar with 4 tabs respecting safe areas. Full sheet for Compose with half/full detents. Keyboard avoidance, haptic feedback.
+  - `assets/examples/example-data-visualization.md` (227 lines): multi-chart dashboard. Chart picked per data shape (line for revenue trend, horizontal bar for conversion by channel, heatmap for cohort, table for top customers). Okabe-Ito for categorical, Viridis for heatmaps. State coding pairs colour with shape.
+  - `assets/examples/example-onboarding-flow.md` (242 lines): three-step onboarding (workspace name, role, sample-data choice). Stepper progress, skip on every step, persist progress on exit. Welcome screen optional.
+  - `assets/examples/example-component-variants.md` (233 lines): complete Button family in `design-system.lib.pen`. Five variants (Primary / Secondary / Destructive / Ghost / IconOnly) × seven states each (Default / Hover / Focus / Pressed / Disabled / Loading / Error). Theme-axis state authoring. Loading-state choreography preserves width. Icon-only `aria-label` documented.
+  - `assets/examples/example-pricing-table.md` (250 lines): three-tier pricing (Free / Pro / Team) with Pro highlighted. Coloured border + badge (the chosen pair; not all four treatments combined). Two-role colour. Layered shadow. Mobile stack puts Pro second.
+  - `assets/examples/example-file-cover-and-sections.md` (312 lines): fresh `.pen` setup with Cover frame at canvas origin, section region anchors (Source of Truth / Build Ready / UX States / Exploration / Archive), hierarchical naming for multi-screen flows (`Customer / Billing / 02 / EnterPayment / Default / Desktop`).
+- **SKILL.md additions**:
+  - 9 new examples added to the Reference index.
+  - `assets/design-system/` template count updated (12 core + 13 optional).
+
+### Changed
+
+- Plugin and skill versions bumped to `1.10.0` (`.claude-plugin/plugin.json`, `.cursor-plugin/plugin.json`, `SKILL.md` frontmatter).
+- AGENTS.md structure listing updated to reflect the 8 new design-system templates and 9 new worked examples (16 total examples now).
+
+### Quality gates
+
+- Em-dash count: 0 across all new files.
+- Australian English throughout new content.
+- No third-party AI skill citations anywhere in the repo.
+- Source-validation policy: examples cite only authoritative 2025/2026 references and real product exemplars; templates point to existing references in the pencil-design skill rather than inventing new claims.
+
 ## [1.9.0] - 2026-05-09
 
 ### Added

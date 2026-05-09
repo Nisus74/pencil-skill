@@ -4,7 +4,7 @@ description: Use this skill for any pencil.dev work — designing UI in a .pen f
 license: MIT
 compatibility: Any AI coding tool with the Pencil MCP server configured (Claude Code, Codex, Gemini CLI, Copilot CLI, Cursor)
 metadata:
-  version: "1.9.0"
+  version: "1.10.0"
 permissions:
   mcp:
     - pencil:get_editor_state
@@ -519,6 +519,15 @@ The Pencil MCP tool names (`get_editor_state`, `batch_design`, etc.) are identic
 - `assets/examples/example-form-flow.md` — worked example: multi-step signup with email verification across three sibling frames
 - `assets/examples/example-component-deep-dive.md` — worked example: full read→understand→instantiate cycle using an existing card component (slot fill, nested path, state variant)
 - `assets/examples/example-style-selection.md`: worked example: catalogue (style + palette + fonts) → `set_variables` MCP → `tokens.md` commit → starter components matching the chosen style
+- `assets/examples/example-settings-page.md`: worked example: settings page with sidebar nav, autosave defaults, explicit-save for high-stakes (Billing), validation, dirty state
+- `assets/examples/example-dashboard.md`: worked example: dashboard with KPI cards, chart tile, recent-activity table, proper hierarchy
+- `assets/examples/example-marketing-page.md`: worked example: marketing page that avoids the three-card grid (asymmetric hero, alternating image-text or bento features, three-tier pricing, avatar-grid testimonials)
+- `assets/examples/example-mobile-app.md`: worked example: mobile app home screen + Compose flow with bottom tab bar, sheet detents, safe areas, haptics, keyboard avoidance
+- `assets/examples/example-data-visualization.md`: worked example: multi-chart dashboard with colour-blind-safe palettes (Okabe-Ito for categorical, Viridis for heatmaps), correct chart per data shape
+- `assets/examples/example-onboarding-flow.md`: worked example: three-step onboarding with progress, skip, sample-data-vs-blank-slate routing, validation, save-progress-on-exit
+- `assets/examples/example-component-variants.md`: worked example: complete Button component family (Primary / Secondary / Destructive / Ghost / IconOnly variants × 7 states each) with theme-axis state authoring
+- `assets/examples/example-pricing-table.md`: worked example: three-tier pricing with highlighted recommended tier (coloured border + badge + layered shadow), two-role colour, mobile stack
+- `assets/examples/example-file-cover-and-sections.md`: worked example: setting up a fresh `.pen` with Cover frame at origin, section regions (Source of Truth / Build Ready / UX States / Exploration / Archive), hierarchical naming for multi-screen flows
 - `references/codex-tools.md`, `references/gemini-tools.md`, `references/copilot-tools.md` — platform tool-name mappings
-- `assets/design-system/`: the 12 core markdown templates copied into user projects on scaffold (`README.md`, `design-system.md`, `tokens.md`, `components.md`, `layout.md`, `motion.md`, `elevation.md`, `iconography.md`, `patterns.md`, `states.md`, `voice.md`, `code-export.md`), plus 5 optional templates scaffolded conditionally (`mobile.md`, `data-viz.md`, `brand.md`, `imagery.md`, `visual-style.md`)
+- `assets/design-system/`: the 12 core markdown templates copied into user projects on scaffold (`README.md`, `design-system.md`, `tokens.md`, `components.md`, `layout.md`, `motion.md`, `elevation.md`, `iconography.md`, `patterns.md`, `states.md`, `voice.md`, `code-export.md`), plus 13 optional templates scaffolded conditionally (`mobile.md`, `data-viz.md`, `brand.md`, `imagery.md`, `visual-style.md`, `forms.md`, `accessibility.md`, `micro-interactions.md`, `empty-states.md`, `onboarding.md`, `navigation.md`, `search.md`, `file-architecture.md`)
 - `assets/examples/` — worked walkthroughs the agent loads on demand (greenfield design, library import, scaffolding, error screens, multi-step form flows)
