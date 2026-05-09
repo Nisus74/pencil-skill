@@ -1,37 +1,13 @@
 ---
 name: pencil-design
-description: Use this skill for any pencil.dev work — designing UI in a .pen file, editing an open Pencil canvas, sketching or mocking screens, instantiating components from a .lib.pen library, scaffolding a project's design-system/ folder, fixing batch_design schema errors, or recovering from Pencil MCP host-not-connected issues. Pick it on any mention of pencil.dev, .pen, .lib.pen, "the Pencil MCP", "the Pencil canvas", or a design-system/ folder in a Pencil context — even when the user phrases it casually, mid-sentence, or doesn't name the tool. This is the canonical skill for all Pencil tasks; reach for it before any general design or frontend skill when Pencil signals are present.
-license: MIT
-compatibility: Any AI coding tool with the Pencil MCP server configured (Claude Code, Cursor, Codex)
-metadata:
-  version: "1.4.0"
-permissions:
-  mcp:
-    - pencil:get_editor_state
-    - pencil:open_document
-    - pencil:get_guidelines
-    - pencil:batch_get
-    - pencil:batch_design
-    - pencil:snapshot_layout
-    - pencil:get_screenshot
-    - pencil:get_variables
-    - pencil:set_variables
-    - pencil:find_empty_space_on_canvas
-    - pencil:search_all_unique_properties
-    - pencil:replace_all_matching_properties
-    - pencil:export_nodes
-  shell: none
-  filesystem: project-only  # reads ./design-system/ and writes scaffolded templates from skill assets
-  network: none
+description: Use this skill for any pencil.dev work — designing UI in a .pen file, editing an open Pencil canvas, sketching or mocking screens, instantiating components from a .lib.pen library, scaffolding a project's design-system/ folder, fixing batch_design schema errors, or recovering from Pencil MCP host-not-connected issues. This is the canonical skill for all Pencil tasks; reach for it before any general design or frontend skill when Pencil signals are present.
+when_to_use: Trigger on any mention of pencil.dev, .pen, .lib.pen, "the Pencil MCP", "the Pencil CLI", "pencil interactive", "the Pencil canvas", or a design-system/ folder in a Pencil context — even when the user phrases it casually, mid-sentence, or doesn't name the tool explicitly.
+paths:
+  - "**/*.pen"
+  - "**/*.lib.pen"
 ---
 
 # Pencil Design Skill
-
-## When this skill applies
-
-Use this skill whenever you are creating, editing, inspecting, or scaffolding a pencil.dev design — anything involving a `.pen` file, a `.lib.pen` library, the Pencil MCP server, or a `design-system/` documentation folder.
-
-Out of scope: writing application code from a design (use a frontend skill once the `.pen` exists), calling any hosted Pencil API, running the Pencil desktop app's GUI for the user.
 
 ## Mental model: what .pen files are
 

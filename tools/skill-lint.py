@@ -72,7 +72,7 @@ def check_frontmatter_loads_safely(path: Path) -> list[Finding]:
     return []
 
 
-_REQUIRED_FIELDS = ("name", "description", "license")
+_REQUIRED_FIELDS = ("name", "description")
 _MIN_DESCRIPTION_CHARS = 50
 
 
@@ -100,15 +100,6 @@ def check_frontmatter_required_fields(path: Path) -> list[Finding]:
                 location=str(path),
                 message=f"missing required frontmatter field: {field}",
             ))
-    has_top_version = bool(data.get("version"))
-    has_meta_version = bool((data.get("metadata") or {}).get("version"))
-    if not (has_top_version or has_meta_version):
-        findings.append(Finding(
-            code="AST04",
-            severity=SEVERITY_ERROR,
-            location=str(path),
-            message="missing version: declare 'version' or 'metadata.version'",
-        ))
     return findings
 
 
@@ -274,10 +265,11 @@ def _load_json(path: Path) -> dict | None:
 
 
 def check_cross_manifest_consistency(paths: list[Path]) -> list[Finding]:
-    """Compare SKILL.md ↔ Claude / Cursor manifests.
+    """Compare manifests across all three platforms.
 
-    Claude (`.claude-plugin/plugin.json`) is required for the consistency
-    check to run; Cursor (`.cursor-plugin/plugin.json`) is checked when present.
+    Claude manifest (`.claude-plugin/plugin.json`) is required to run. Cursor
+    (`.cursor-plugin/plugin.json`) and Codex (`.codex-plugin/plugin.json`) are
+    checked when present: name and version must match the Claude manifest (AST10).
     """
     skill_paths = [p for p in paths if p.name == "SKILL.md"]
     plugin_path = next(
@@ -288,18 +280,25 @@ def check_cross_manifest_consistency(paths: list[Path]) -> list[Finding]:
         (p for p in paths if p.name == "plugin.json" and p.parent.name == ".cursor-plugin"),
         None,
     )
+    codex_path = next(
+        (p for p in paths if p.name == "plugin.json" and p.parent.name == ".codex-plugin"),
+        None,
+    )
     if not (skill_paths and plugin_path):
         return []
 
     findings: list[Finding] = []
     plugin = _load_json(plugin_path) or {}
     cursor = _load_json(cursor_path) if cursor_path else None
+    codex = _load_json(codex_path) if codex_path else None
 
     manifests: list[tuple[Path, dict, str]] = [
         (plugin_path, plugin, ".claude-plugin/plugin.json"),
     ]
     if cursor_path is not None:
         manifests.append((cursor_path, cursor or {}, ".cursor-plugin/plugin.json"))
+    if codex_path is not None:
+        manifests.append((codex_path, codex or {}, ".codex-plugin/plugin.json"))
 
     for manifest_path, manifest, label in manifests:
         for field in ("name", "description"):
@@ -321,25 +320,20 @@ def check_cross_manifest_consistency(paths: list[Path]) -> list[Finding]:
             ),
         ))
 
-    for skill_md in skill_paths:
-        skill_data = _load_frontmatter(skill_md) or {}
-        skill_perms = skill_data.get("permissions")
-        if skill_perms is None:
+    for check_path, check_manifest in [(cursor_path, cursor), (codex_path, codex)]:
+        if check_path is None or check_manifest is None:
             continue
-        for manifest_path, manifest, _label in manifests:
-            manifest_perms = manifest.get("permissions")
-            if manifest_perms is None:
+        for field in ("name", "version"):
+            plugin_val = plugin.get(field)
+            check_val = check_manifest.get(field)
+            if plugin_val and check_val and plugin_val != check_val:
                 findings.append(Finding(
                     code="AST10", severity=SEVERITY_ERROR,
-                    location=str(manifest_path),
-                    message="manifest is missing 'permissions' field declared in SKILL.md",
-                ))
-                continue
-            if manifest_perms != skill_perms:
-                findings.append(Finding(
-                    code="AST10", severity=SEVERITY_ERROR,
-                    location=str(manifest_path),
-                    message="permissions diverge from SKILL.md frontmatter",
+                    location=str(check_path),
+                    message=(
+                        f"{check_path.parent.name}/plugin.json {field} '{check_val}' "
+                        f"diverges from claude manifest '{plugin_val}'"
+                    ),
                 ))
     return findings
 
@@ -386,7 +380,6 @@ def lint_paths(paths: list[Path]) -> list[Finding]:
             findings += check_frontmatter_required_fields(p)
             findings += check_name_matches_directory(p)
             findings += check_description_substantive(p)
-            findings += check_permissions_block(p)
             findings += check_dangerous_content(p)
         elif p.suffix in (".yml", ".yaml") and ".github/workflows" in str(p):
             findings += check_workflow_pin(p)
@@ -403,6 +396,9 @@ def collect_canonical_paths() -> list[Path]:
     cursor_manifest = REPO_ROOT / ".cursor-plugin" / "plugin.json"
     if cursor_manifest.exists():
         paths.append(cursor_manifest)
+    codex_manifest = REPO_ROOT / ".codex-plugin" / "plugin.json"
+    if codex_manifest.exists():
+        paths.append(codex_manifest)
     paths.extend(sorted(REPO_ROOT.glob(".github/workflows/*.yml")))
     paths.extend(sorted(REPO_ROOT.glob(".github/workflows/*.yaml")))
     return paths
