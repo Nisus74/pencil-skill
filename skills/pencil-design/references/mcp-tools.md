@@ -94,7 +94,7 @@ get_guidelines({ category: "Tailwind" })
 
 **Decision shortcuts:**
 
-- *Dashboard task* → `Web App`, `Table` (if data-heavy), `Tailwind` (if stack matches), `Design System`.
+- *Dashboard task* → `Web App`, `Table` (if data-heavy), `Tailwind` (if stack matches), `Design System`. Also load `references/chart-anatomy.md` — it has the exact Pencil node tree, pixel values, and anti-examples for every chart type you will build.
 - *Native iOS app* → `Mobile App`, `Design System`.
 - *Pricing or marketing page* → `Landing Page`, `Design System`.
 - *Building a `.lib.pen` from scratch* → `Design System`, `Code`.

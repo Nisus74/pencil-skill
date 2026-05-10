@@ -2,7 +2,7 @@
 
 Charts and dashboards. **Delete this file if your project doesn't render charts**, it's noise for marketing-only sites.
 
-The agent reads this when designing or generating a chart, sparkline, or dashboard tile. Without rules here, AI defaults to rainbow palettes, gridlines as loud as the data, and wildly inconsistent chart types. Decisions below pick a calm, scannable default. The *Archetype-keyed chart styles* section maps each shipped archetype to its chart treatment.
+The agent reads this when designing or generating a chart, sparkline, or dashboard tile. This file answers *which chart to use*. For *how to build each chart in Pencil* (exact pixel values, node trees, worked ops, and anti-examples), read `references/chart-anatomy.md` in the skill. Always load both files when working on a dashboard or chart task.
 
 ## Categorical palette
 
