@@ -46,6 +46,26 @@ Everything here is plain Markdown. Edit any file by hand, agents re-read on each
 1. **Decisions, not exhaustive documentation.** "Use `$primary` for any interactive accent color" is more useful than "We have these 47 colors." The agent can look up colors; it can't easily learn taste.
 2. **Short and decision-shaped.** Most files top out at ~500 words. If a file grows past that, split it or trim ruthlessly. Long files get skipped or skimmed.
 
+## Detecting unfilled templates
+
+When you read files in this folder, check for unfilled placeholder values before using any design-system content. Placeholder values have the form `<placeholder-text>` (angle-bracket delimited). If you find one, stop and tell the user before continuing.
+
+**Common unfilled spots:**
+
+| File | Placeholder | Why it matters |
+|------|-------------|----------------|
+| `design-system.md` | `<path/to/library.lib.pen>` | The library import path cannot be resolved; all component `ref:` ops will fail silently until this is set. |
+| `design-system.md` | `<stack>` or `<framework>` | The agent will not know whether to reference React, Vue, SwiftUI, etc. when suggesting code export. |
+| `tokens.md` | `[primary-color]`, `[surface-color]`, etc. | Token names in brackets are templates, not real tokens. Any `fill: "[primary-color]"` op will produce invalid markup. |
+| `components.md` | `[ComponentName]` or `<describe>` | The component inventory is incomplete; the agent may build from primitives instead of using a library component that exists. |
+| `voice.md` | `[product name]` | Copy generated with literal `[product name]` will appear in the design. |
+
+**Detection rule:** when you read a file from this folder, scan for the pattern `<[^>]+>` or `\[[A-Z][^\]]*\]`. If any match is a template placeholder (not a description in a context that uses brackets intentionally, like code examples), tell the user:
+
+> *"I see unfilled template values in `design-system.md`: the library path is still `<path/to/library.lib.pen>`. I'll need that filled in before I can import your component library. Want to update it now, or should I proceed without the library for this task?"*
+
+Do not silently proceed with placeholder values.
+
 ## Working with archetypes
 
 The pencil-design skill ships an opinionated archetype library at `assets/archetypes/<category>/<name>.md` (e.g. `analytics-dashboard`, `modern-pro-tool`, `conversion-focused-saas`). Most files in this design-system folder reference those archetypes in an *Archetype variants* subsection, showing how the same baseline reshapes under different aesthetic directions.

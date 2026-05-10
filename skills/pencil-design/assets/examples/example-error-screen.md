@@ -6,17 +6,9 @@ A worked walkthrough of the seven-step workflow for the prompt:
 
 Assume: Pencil desktop running, a `.pen` already open with a populated canvas, repo has a `design-system/` folder with `tokens.md` and a `design/system.lib.pen` library that includes `ButtonPrimary` and `LinkText` but no dedicated `ErrorBlock` component yet.
 
-This example exercises:
-
-- `get_variables` and `set_variables` to confirm and add a missing token.
-- Sibling top-level frames sharing one new `ErrorBlock` reusable.
-- `find_empty_space_on_canvas` to place the new frames without overlapping existing work.
-- `snapshot_layout` for structural verification, one screenshot per page for final sign-off.
-- Cross-references: [`references/states.md`](../../references/states.md) for the screen-level state taxonomy and the lockup; [`assets/design-system/voice.md`](../design-system/voice.md) for copy.
-
 ---
 
-## Step 1 — Detect host
+## Step 1: Detect host
 
 ```
 get_editor_state({ include_schema: false })
@@ -24,17 +16,17 @@ get_editor_state({ include_schema: false })
 
 Result: succeeds. Active document is `./design/screens.pen`. No selection. The canvas already has `LoginPage` and `DashboardPage` as top-level frames.
 
-## Step 2 — Locate context
+## Step 2: Locate context
 
 - `screens.pen` is open.
 - No selection.
 - `design-system/` exists with `README.md`, `tokens.md`, `voice.md`, `components.md`, `patterns.md`, `states.md`.
 
-## Step 3 — Load guidelines + inventory components
+## Step 3: Load guidelines + inventory components
 
 Read `design-system/README.md`, then `design-system/states.md` (the project's state coverage contract), `design-system/voice.md` (for empty-state and error copy templates), and `design-system/patterns.md` (which has an Empty state lockup that 404 / offline can adapt). The skill's own [`references/states.md`](../../references/states.md) is the playbook for screen-level fault states.
 
-Call `get_guidelines()` to confirm the live category list, then load `Web App` for product-error patterns.
+Call `get_guidelines()` to confirm the live category list, then load `Web App`.
 
 Inventory components:
 
@@ -42,21 +34,29 @@ Inventory components:
 batch_get({ filePath: "./design/system.lib.pen", patterns: [{ reusable: true }], readDepth: 2 })
 ```
 
-Library contains `ButtonPrimary`, `ButtonSecondary`, `LinkText`, `Input`, `Card`. **No `ErrorBlock` yet.** That's the right place to put the shared lockup — but build it as a regular frame for now and flag it. Promotion to library is a user-owned decision (per `components.md` § "When the right component doesn't exist").
+Library contains `ButtonPrimary`, `ButtonSecondary`, `LinkText`, `Input`, `Card`. No `ErrorBlock` yet. Build it as a regular frame for now and flag it at the end. Promotion to library is a user-owned decision.
 
-## Step 4 — Plan (told to user)
+## Step 4: Plan
 
-> *"I'll add two sibling top-level frames at desktop breakpoint (1440×900): `Page_404` and `Page_Offline`. Both use the same lockup — a centered icon, title, description, and primary CTA — built as a single frame I'll copy with overrides for each page. The 404 uses `circle-alert`, copy *'This page doesn't exist'* and a CTA back to the dashboard. The offline page uses `cloud-off`, copy *'You're offline'* and a Retry CTA. Both bind colors to your `tokens.md` variables and inherit the `mode` theme axis you already have. I'll add a `$illustration` color token if it isn't already declared so the icon color is centrally controlled."*
+Archetype: inherits from the product's primary archetype (`analytics-dashboard` in this case; the product is a B2B analytics SaaS and these error pages belong to the same product shell).
 
-## Step 4.5 — Verify the token suite
+**Verifiable brief:**
 
-The plan mentioned `$illustration`. Confirm before binding:
+- **What success looks like:** two pages with the same icon-title-description-CTA lockup. The icon is muted grey (`$illustration`), not red and not brand accent. The error code "404" appears small and de-emphasised at the bottom of the block. The pages look calm, not alarming.
+- **Signature element:** `fill: "$illustration"` on the icon (muted grey at low saturation). Not `$danger`. Not `$primary`. Not `$accent`.
+- **Microcopy register:** says "This page doesn't exist." and "Check your connection and try again." Direct and factual. Would never say "Oops, something went wrong!" or "We're sorry for the inconvenience."
+
+> *"I'll add two sibling frames at 1440×900: `Page_404` and `Page_Offline`. Both use the same centred lockup: icon, title, description, CTA, and a small de-emphasised error code. I'll add a `$illustration` colour token if it isn't declared. Archetype: analytics-dashboard. Error icons in muted grey, not danger red; that is the analytics-dashboard register for non-interactive contextual icons."*
+
+## Step 4.5: Verify the token suite
+
+The plan mentions `$illustration`. Confirm before binding:
 
 ```
 get_variables()
 ```
 
-Returns the doc's variables. `$textMuted`, `$danger`, `$primary`, etc. are present. `$illustration` is **not** declared. Add it:
+Returns the doc's variables. `$textMuted`, `$danger`, `$primary` are present. `$illustration` is **not** declared. Add it:
 
 ```
 set_variables({
@@ -70,19 +70,19 @@ set_variables({
 })
 ```
 
-Now the icon color is theme-aware and centrally controllable.
+The icon colour is now theme-aware and centrally controllable.
 
-## Step 4.7 — Place the new frames in empty canvas
+## Step 4.7: Place the new frames in empty canvas
 
-Existing top-level frames occupy part of the canvas. To avoid overlap:
+Existing frames occupy part of the canvas. To avoid overlap:
 
 ```
 find_empty_space_on_canvas({ width: 1440, height: 900, padding: 80, direction: "right" })
 ```
 
-Returns coordinates — call them `(x404, y404)`. Place `Page_404` there. After it lands, find space for `Page_Offline` immediately below or to the right.
+Returns coordinates `(x404, y404)`. Place `Page_404` there. Find space for `Page_Offline` immediately to the right or below.
 
-## Step 5 — First batch_design (404 page + shared lockup)
+## Step 5: First batch_design (404 page + shared lockup)
 
 ```
 page404=I("doc", { type: "frame", name: "Page_404", layout: "vertical", justifyContent: "center", alignItems: "center", x: <x404>, y: <y404>, width: 1440, height: 900, padding: "$space-8", fill: [{ type: "color", color: "$surface" }] })
@@ -94,42 +94,28 @@ cta=I(block, { type: "ref", ref: "ButtonPrimary", descendants: { label: { conten
 code=I(block, { type: "text", name: "ErrorCode", content: "404", fontSize: "$textXs", textAlign: "center", fill: [{ type: "color", color: "$textMuted" }] })
 ```
 
-7 ops — well under 25. Note the `name` and `context` discipline: `Page_404`, `ErrorBlock`, `ErrorIcon`, `Title`, `Description`, `ErrorCode`. No `Frame 1` defaults.
+7 ops.
 
-## Step 6a — Verify structure (404)
+## Step 6a: Screenshot and verify structure (404)
 
 ```
 snapshot_layout({ parentId: "page404", maxDepth: 2 })
-```
-
-Check: `block` is centered (`x` close to `(1440 - 480) / 2 = 480`, `y` close to centered vertical). Gaps between block children match `$space-5` (24px). Title and description render at expected widths. No overflow.
-
-If something's off (often: title or description text grew taller than expected because they're long-strings), it's structural and fixed with a `U` op:
-
-```
-U("desc", { width: 480 })   // explicit width forces wrap
-```
-
-Don't screenshot to confirm structure — `snapshot_layout` is enough.
-
-## Step 7a — Final visual sign-off (404)
-
-```
 get_screenshot({ nodeId: "page404" })
 ```
 
-One screenshot, scoped to the page (not the doc root). Confirm:
+Narrate:
 
-- Icon color reads as `$illustration` against `$surface`.
-- Title contrasts against the background (≥ 4.5:1 — verify in both modes if any of the colors had raw hex; since we used variables, mode parity is guaranteed by the variable system).
-- The button's primary fill is correct.
-- The error code is visible but de-emphasized.
+> *"404 page on canvas. Brief match: centred block with muted grey icon, plain `$surface` background. Archetype signal: the `$illustration` icon colour reads immediately as analytics-dashboard register. It's informational, not alarming. Two non-obvious decisions here. First: the icon is `$illustration` (muted grey), not `$danger` (red). Error pages in `$danger` look like alerts requiring immediate action. This page is a navigational dead end, not an emergency. `$illustration` says 'contextual' not 'urgent'. The generic default would put the icon in `$primary` or `$danger`; both are wrong. Second: the HTTP code '404' is `$textXs` at the bottom, not a large headline. The code is developer metadata. Users don't know what 404 means; what they need is the copy. Showing '404' prominently makes the error number the headline, not the resolution instruction. Drift check: no shadow on the block. Good."*
 
-If clean, move to the offline page.
+If the title or description text grows beyond the block width, fix with an explicit width:
 
-## Step 5b — Second batch_design (Offline page, copying the ErrorBlock)
+```
+U("desc", { width: 480 })   // forces wrap within the block
+```
 
-The lockup is the same. Use `C` (copy) with `descendants` overrides:
+## Step 5b: Second batch_design (offline page, copying the ErrorBlock)
+
+The lockup is identical. Use `C` (copy) with descendants overrides:
 
 ```
 pageOffline=I("doc", { type: "frame", name: "Page_Offline", layout: "vertical", justifyContent: "center", alignItems: "center", x: <xOffline>, y: <yOffline>, width: 1440, height: 900, padding: "$space-8", fill: [{ type: "color", color: "$surface" }] })
@@ -137,73 +123,55 @@ blockCopy=C(block, pageOffline, { descendants: {
   ErrorIcon:    { iconFontName: "cloud-off" },
   Title:        { content: "You're offline." },
   Description:  { content: "We can't reach the server. Check your connection and try again." },
-  ErrorCode:    { content: "" },
-  /* The CTA stays a ButtonPrimary ref, but we override the label */
+  ErrorCode:    { content: "" }
 } })
 ```
 
-Wait — the CTA needs to change from *"Go to dashboard"* to *"Try again"*. The label override goes through the nested `ButtonPrimary` ref's `descendants`. The Pencil schema supports nested descendants paths; the cleaner approach is a follow-up `U` op on the copied CTA's id:
+The CTA label needs changing too. If the copy preserves child ids on copy:
 
 ```
 U(`${blockCopy}/cta`, { descendants: { label: { content: "Try again" } } })
 ```
 
-(The `${blockCopy}/cta` syntax assumes the copy preserves the original child id `cta`; if the schema reassigns ids on copy, fall back to a `batch_get` to resolve, then `U`.)
+If not, resolve via `batch_get` first, then `U`.
 
-Also clear the error-code text since offline isn't an HTTP code:
-
-```
-U(`${blockCopy}/code`, { content: "" })
-```
-
-Or just suppress visibility:
-
-```
-U(`${blockCopy}/code`, { enabled: false })
-```
-
-## Step 6b — Verify structure (offline)
+## Step 6b: Verify structure (offline)
 
 ```
 snapshot_layout({ parentId: "pageOffline", maxDepth: 2 })
-```
-
-Confirm the layout matches the 404 page. Same block dimensions, same internal spacing, same centered block. The copy override didn't shift anything structurally.
-
-## Step 7b — Final visual sign-off (offline)
-
-```
 get_screenshot({ nodeId: "pageOffline" })
 ```
 
-Confirm:
+Narrate:
 
-- The `cloud-off` icon renders correctly.
-- The new copy fits the block width without truncation.
-- The CTA label is *"Try again"*.
-- Error code area is hidden (no leftover ghost).
+> *"Offline page on canvas. Same lockup as 404, different icon (`cloud-off`) and copy. Non-obvious decision: copying the lockup rather than building it fresh. Structurally, 404 and offline are the same communication problem: 'we can't show you what you asked for.' The only differences are the icon and the copy. Separate lockups would diverge over time. Shared lockup means any future refinement (spacing, icon size, CTA placement) applies to both pages at once."*
 
-Two screenshots total across both pages, each scoped to its page.
+Two screenshots total, each scoped to its page.
 
-## Step 8 — Surface the missing component
+## Step 8: Surface the missing component
 
-The lockup is now used twice. Surface it as a `.lib.pen` candidate:
+The lockup is now used on two pages. Surface it:
 
-> *"The two pages share the same lockup — `ErrorBlock` (icon, title, description, CTA, optional error code). It's living inside `Page_404` right now and copied into `Page_Offline`. Want me to promote it to your `design/system.lib.pen` so any future error pages can `ref` it directly?"*
+> *"The two pages share the same lockup: `ErrorBlock` (icon, title, description, CTA, optional error code). It's inside `Page_404` right now and copied into `Page_Offline`. Want me to promote it to your `design/system.lib.pen` so future error pages can reference it directly? A 403, a 500, a maintenance page all use the same shape."*
 
-If yes, mark the `block` node `reusable: true` and the user copies it into the library on their next save (or the agent does it via a `batch_design` `U` op on the `block` node, then re-references both pages with `ref` instead of containing the lockup directly). If no, leave as-is — two-instance duplication is a fair cost for not over-engineering the library.
+If yes: mark the `block` node `reusable: true`. If no: leave as-is. Two-instance duplication is a fair cost; the user decides when the overhead of promoting to library is worth it.
 
 ## Final report to user
 
-> *"Done. Two new pages — `Page_404` and `Page_Offline` — at desktop dimensions, placed in empty canvas to the right of your existing screens. Both use a shared `ErrorBlock` lockup (icon, title, description, CTA, optional error code) bound to your `$illustration`, `$textPrimary`, `$textMuted`, and `$surface` tokens — I added `$illustration` since it wasn't declared. Verified structurally with `snapshot_layout`, then one screenshot per page for sign-off. The `ErrorBlock` is currently embedded — let me know if you want it promoted to your `.lib.pen`."*
+> *"Done. Two new pages (`Page_404` and `Page_Offline`) at desktop dimensions, placed in empty canvas to the right of your existing screens. Both use a shared `ErrorBlock` lockup (icon, title, description, CTA, error code). I added `$illustration` since it wasn't in your token suite: muted grey in light mode, slightly darker in dark. The icon is `$illustration`, not `$danger`; these are navigational dead ends, not alerts. Error code '404' is de-emphasised at `$textXs`. `ErrorBlock` is currently embedded; let me know if you want it promoted to your `.lib.pen`."*
+
+---
 
 ## What this example demonstrates
 
-- **`get_variables` before binding tokens you're not sure exist;** `set_variables` to add the missing one in a single call.
-- **Sibling top-level frames** sharing one lockup, copied with descendants overrides — the canonical pattern for "a family of variants on the same shape" (404, 403, 500, offline all fit the same lockup).
-- **`find_empty_space_on_canvas`** before placing on a populated canvas — avoids invisible overlaps with existing work.
-- **One screenshot per final page**, scoped to the page node, never the doc root.
-- **Surface candidates for the library** but don't promote unilaterally — that's a user-owned decision.
-- **Cross-reference the right files**: `references/states.md` for the screen-state taxonomy, `voice.md` for copy, `tokens.md` for the variables. Don't restate them; link.
+- **`$illustration` for contextual icons, not `$danger`.** Error page icons in danger-red look like alerts requiring immediate action. A 404 page is a navigational dead end, not an emergency. `$illustration` (muted grey) signals "contextual information" rather than "urgent problem." The generic default puts error icons in `$primary` or `$danger`; both import the wrong urgency register into a dead-end page.
 
-For the empty-state taxonomy and the full screen-level error matrix this example draws on, see [`references/states.md`](../../references/states.md). For the copy template (the *"what happened. what to do."* shape), see [`voice.md`](../design-system/voice.md) § Error messages.
+- **Error code de-emphasised, copy primary.** The HTTP code is developer metadata. At `$textXs` with `$textMuted` fill, it's present for debugging purposes without claiming visual priority. The user's primary need is the copy; the developer's secondary need is the code. Both are served by the size and colour hierarchy.
+
+- **Shared lockup for structurally identical problems.** 404 and offline are the same design problem: "we can't show you what you asked for." Separate lockups for each would require double maintenance for what is the same pattern. Copy-with-overrides encodes the insight that these are variants of one thing.
+
+- **`get_variables` before adding tokens.** Checking what exists before adding `$illustration` prevents duplicate tokens with different values. The variable system is the source of truth; don't add to it without reading it first.
+
+- **`find_empty_space_on_canvas` on a populated canvas.** Placing new frames at arbitrary coordinates risks invisible overlaps with existing work. The canvas tool returns safe coordinates; use it every time the canvas already has content.
+
+For the screen-state taxonomy and the full fault-state matrix, see [`references/states.md`](../../references/states.md). For copy templates, see [`assets/design-system/voice.md`](../design-system/voice.md) § Error messages.

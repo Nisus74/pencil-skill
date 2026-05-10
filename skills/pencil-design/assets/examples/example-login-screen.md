@@ -6,8 +6,6 @@ A worked walkthrough for the prompt:
 
 Assume: Pencil desktop app is running, no `.pen` open, repo has a `design-system/` folder and a `design/system.lib.pen` library with `Input`, `ButtonPrimary`, and `LinkText` components.
 
-This example shows the chunked build-screenshot-react loop the SKILL.md `Screenshot loop` section calls for: small ops, a screenshot and narration after each, iteration in response to what the screenshot reveals.
-
 ---
 
 ## Step 1: Detect host
@@ -22,13 +20,13 @@ Succeeds. No active document.
 
 - No `.pen` open.
 - No selection.
-- `design-system/` exists, with `README.md` and `design-system.md`.
+- `design-system/` exists with `README.md`, `design-system.md`, `tokens.md`.
 
 ## Step 3: Load guidelines and inventory
 
-Read `design-system/README.md`. Read `design-system/design-system.md`: confirms library at `./design/system.lib.pen`, stack is React + Tailwind, icon library is Lucide. Read `design-system/tokens.md` for spacing and type tokens.
+Read `design-system/README.md`. Read `design-system/design-system.md`: confirms library at `./design/system.lib.pen`, stack is React + Tailwind, icon library is Lucide. Read `tokens.md` for spacing and type tokens.
 
-Call `get_guidelines()`. Server reports categories `colors`, `typography`, `spacing`. Read `colors` and `typography`.
+Call `get_guidelines()`. Load `Web App`.
 
 Inventory components from the library:
 
@@ -36,17 +34,19 @@ Inventory components from the library:
 batch_get({ filePath: "./design/system.lib.pen", patterns: [{ reusable: true }], readDepth: 2 })
 ```
 
-Component list: `Input`, `ButtonPrimary`, `LinkText`.
-
-Token list (from `tokens.md`): `$surface`, `$surfaceMuted`, `$text`, `$textMuted`, `$border`, `$primary`, `$space-2` through `$space-8`, `$radiusLg`, `$text2xl`, `$textBase`.
-
-Both lists are populated. Step 4 will reference them by id.
+Components: `Input`, `ButtonPrimary`, `LinkText`. Token list from `tokens.md`: `$surface`, `$surfaceMuted`, `$text`, `$textMuted`, `$border`, `$primary`, `$space-2` through `$space-8`, `$radiusLg`, `$text2xl`, `$textBase`.
 
 ## Step 4: Plan
 
-> *"I'll build `LoginPage` at 1440x900: a 360px form card centred on the page with a title, subtitle, email and password inputs (instances of your `Input` component), `ButtonPrimary` for the submit, `LinkText` for 'Forgot password?'. Atmosphere: airy, symmetric, static. Layout shape: centred card on a surface."*
+Archetype: `analytics-dashboard`. This login screen is the auth gate to a B2B analytics product. The design should feel like the product: utility-first, chrome that signals without asserting.
 
-The plan covers all four required parts: top-level frame (`LoginPage`); component ids from the inventory (`Input`, `ButtonPrimary`, `LinkText`); atmosphere stance (airy, symmetric, static); layout shape (centred card on a surface).
+**Verifiable brief:**
+
+- **What success looks like:** a centred 360px form card on a near-white `$surface` page. The card has a 1px `$border` stroke and no shadow. It reads as a contained utility form, not a floating panel. The title is compact functional weight, not a hero heading.
+- **Signature element:** `stroke: { thickness: 1, fill: "$border" }` on the card frame; the `effect` property is absent entirely.
+- **Microcopy register:** says "Sign in", "Forgot password?"; would never say "Welcome back!" or "Enter your credentials to continue your journey."
+
+> *"I'll build `LoginPage` at 1440×900: a 360px form card centred on the page with a title, subtitle, email and password `Input` instances, `ButtonPrimary` for submit, `LinkText` for 'Forgot password?'. Archetype: analytics-dashboard; hairline border on the card, no shadow, compact utility title scale."*
 
 ## Step 4.5: Open document, declare mode axis and imports
 
@@ -54,14 +54,14 @@ The plan covers all four required parts: top-level frame (`LoginPage`); componen
 open_document({ path: "new" })
 ```
 
-The server returns the document root id; call it `doc`. First chunk declares the mode axis and the library import before any frames land:
+The server returns the document root id; call it `doc`. Declare the mode axis and library import before any frames land:
 
 ```
 U(doc, { themes: { mode: ["light", "dark"] } })
 U(doc, { imports: { "ds": "./design/system.lib.pen" } })
 ```
 
-2 ops, no rendered change yet, no screenshot needed.
+2 ops. No rendered change; no screenshot needed.
 
 ## Step 5a: Place the page and the form card
 
@@ -78,17 +78,13 @@ get_screenshot({ nodeId: page })
 
 Narrate:
 
-> *"The 1440x900 page is on the canvas with the 360px form card. The card is sitting too high; the page's `justifyContent: center` cannot take effect because the page is being constrained by the doc root. I'll fix the page height next."*
+> *"The 1440×900 page is on canvas with the 360px form card. Brief match: card is centred, hairline border visible, no shadow present. Archetype signal: stroke-without-shadow reads as analytics-dashboard immediately. The card separates from the page background without claiming elevation. No drift to fix at this stage. The generic default here is adding `effect: [{ type: "drop_shadow", blur: 8, opacity: 0.1 }]` to the card; that is the analytics-dashboard anti-pattern and I have not done it."*
 
-## Step 5b: Fix the page sizing
+If the card sits off-centre, the page height constraint is the culprit:
 
 ```
 U(page, { height: "fill_container(900)" })
 ```
-
-1 op. Screenshot. Narrate:
-
-> *"Page is now 900 tall and the form is centred."*
 
 ## Step 5c: Add the title block
 
@@ -99,7 +95,7 @@ sub=I(form, { type: "text", content: "Welcome back. Enter your details below.", 
 
 2 ops. Screenshot the form. Narrate:
 
-> *"Title and subtitle landed; gap reads right at $space-4 (16px). Both colours resolved through variables, no raw hex."*
+> *"Title and subtitle landed. Non-obvious decision: `$text2xl` / 700, not a display or hero scale. A login screen is a utility action, not a brand moment. At `$text3xl`, the heading would outweigh the form fields and make the page read as a marketing surface. `$text2xl` is compact enough to feel functional. `$space-4` gap between elements reads right at 16px."*
 
 ## Step 5d: Add the inputs
 
@@ -110,7 +106,7 @@ pwd=I(form, { type: "ref", ref: "Input", descendants: { label: { content: "Passw
 
 2 ops. Screenshot the form. Narrate:
 
-> *"Both inputs are instances of your `Input` component; labels and placeholders look right, focus states inherited from the library."*
+> *"Both inputs are library `Input` instances. Non-obvious decision: component refs, not raw frames. The generic default is a frame + text label pair, which bypasses your component's error variant. When the engineer adds email-taken validation, the raw primitive requires a rebuild; the `Input` ref just needs a descendants override on its error child. Labels and focus states inherit from the library."*
 
 ## Step 5e: Add the submit and forgot-password link
 
@@ -121,7 +117,7 @@ forgot=I(form, { type: "ref", ref: "LinkText", descendants: { label: { content: 
 
 2 ops. Screenshot the form. Narrate:
 
-> *"Submit button uses your `$primary` from the library. The 'Forgot password?' link is left-aligned by default, which reads off-centre against the rest of the centred form. I'll centre it next."*
+> *"Submit and link are placed. The link is left-aligned by default, creating a left-pull against the centred card. Fixing before moving on."*
 
 ## Step 5f: Adjust the link alignment
 
@@ -131,7 +127,7 @@ U(forgot, { textAlign: "center" })
 
 1 op. Screenshot. Narrate:
 
-> *"Link is centred now; the form reads as a coherent stack."*
+> *"Link centred. Non-obvious decision: `textAlign: 'center'` on the text node rather than a wrapper frame. The link lives in a vertical-layout form; centring the text property aligns it within its available width without introducing a new layout element. The form now reads as a coherent centred stack."*
 
 ## Step 6: Final pass
 
@@ -144,24 +140,29 @@ Five accessibility checks:
   get_screenshot({ nodeId: page })
   ```
 
-  Narrate: *"Dark mode rendering: title and subtitle remain legible, form card surface picks up the `$surfaceMuted` dark value, primary button keeps its hue, focus styles from the library hold up."*
-- **Hit targets.** Submit button is 44x44 minimum (the library component declares it).
-- **Colour-not-only signal.** No error or success states present yet, nothing to verify.
-- **Semantic names.** `LoginPage`, `Form`, `Title`, `Subtitle` are correct; `email`, `pwd`, `submit`, `forgot` are bindings, not display names. Verify with `batch_get` if any default `Frame` survived.
+  Narrate: *"Dark mode: title and subtitle legible, card surface picks up `$surfaceMuted` dark value, button keeps its hue, focus styles from the library hold. The mode axis declared in step 4.5 means no raw-hex values need updating."*
+
+- **Hit targets.** `ButtonPrimary` declares 44×44 minimum in the library.
+- **Colour-not-only signal.** No error or success states present yet.
+- **Semantic names.** `LoginPage`, `Form` correct; `email`, `pwd`, `submit`, `forgot` are bindings. Verify no default `Frame` names survived.
 - **Focus states.** Inherited from `Input` and `ButtonPrimary`.
 
-Pass. Switch back to light mode for handoff: `U(page, { theme: { mode: "light" } })`.
+Pass. Switch back to light mode: `U(page, { theme: { mode: "light" } })`.
 
 ## Final report to user
 
-> *"Done. `LoginPage` at 1440x900, 360px form card centred with `Input` instances for email and password, `ButtonPrimary` for submit, `LinkText` for the forgot-password link. Atmosphere came through as airy and symmetric. Six visual-build chunks with a screenshot and narration after each, plus one dark-mode screenshot at the final pass. Mode axis declared up-front; every colour resolves through your tokens. Accessibility passes under both modes."*
+> *"Done. `LoginPage` at 1440×900, 360px form card centred with `Input` instances for email and password, `ButtonPrimary` for submit, `LinkText` for the forgot-password link. Analytics-dashboard archetype: hairline border, no shadow, `$text2xl` title scale. Six build chunks with a screenshot after each, plus a dark-mode screenshot at the final pass. Mode axis and library import declared up-front; every colour resolves through your tokens."*
 
 ---
 
 ## What this example demonstrates
 
-- **Mode axis declared first.** Before any frame placement, `themes: { mode: ["light", "dark"] }` and the library import go on the doc root. Every colour reference downstream resolves through a variable.
-- **Small chunks (1-2 ops each), screenshot after each.** Six visual chunks, six screenshots, plus one in dark mode at the final pass.
-- **Narration after each screenshot.** Plain language, specific about what landed and what needs adjusting. The narration is what the user reads to know what the agent is seeing.
-- **Components, not primitives.** `Input`, `ButtonPrimary`, and `LinkText` came from the library; nothing was rebuilt from a frame and a text node.
-- **Tokens everywhere.** Every `fill` and text colour resolves through a `$variableName` from `tokens.md`. No raw hex appears anywhere in the design.
+- **Archetype drives the card spec.** The card has a 1px `$border` stroke and no shadow because the analytics-dashboard archetype rejects elevation chrome. A drop shadow shifts the card into the marketing-page register. One absent property, `effect`, is the difference between the two registers.
+
+- **Form card width is not arbitrary.** 360px is the compact utility width for a login form. 400px and wider reads as a landing-page card. The difference is subtle but present: at 360px, the form reads as a tool; at 480px, it reads as a feature.
+
+- **Title scale signals intent.** `$text2xl` / 700 for a utility screen, not display or hero scale. At `$text3xl`, the heading competes with the form fields and makes the login page read as a marketing surface.
+
+- **Component refs preserve future states.** Using `Input` and `ButtonPrimary` library refs means error states, loading states, and focus rings are already specified at the component level. Raw primitives require rebuilding for every state variant.
+
+- **Mode axis declared first.** Before any frame placement, `themes: { mode: ["light", "dark"] }` and the library import go on the doc root. No raw hex in the design; every colour resolves through a variable.
