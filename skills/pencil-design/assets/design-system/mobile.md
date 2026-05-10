@@ -1,6 +1,6 @@
 # Mobile
 
-Native-mobile patterns. **Delete this file if your project doesn't ship a native or mobile-web app** — it's noise for desktop-only products.
+Native-mobile patterns. **Delete this file if your project doesn't ship a native or mobile-web app**, it's noise for desktop-only products.
 
 The default `layout.md` covers responsive web at a mobile breakpoint (390 × 844). This file covers the patterns that *only* matter when the product is genuinely mobile-first: native iOS, native Android, React Native, Flutter, SwiftUI, or a mobile-web app that should *feel* native.
 
@@ -22,7 +22,7 @@ The default `layout.md` covers responsive web at a mobile breakpoint (390 × 844
 - **Android minimum:** 48 × 48 dp.
 - **Spacing between adjacent targets:** ≥ 8.
 
-Apply even when the visual element is smaller (e.g. a 16 × 16 ✕ icon needs 28pt of padding to hit 44pt). Pencil components for mobile should bake this in — don't reinstate it on every screen.
+Apply even when the visual element is smaller (e.g. a 16 × 16 ✕ icon needs 28pt of padding to hit 44pt). Pencil components for mobile should bake this in, don't reinstate it on every screen.
 
 ## Safe areas
 
@@ -49,7 +49,7 @@ Code-side: `safe-area-inset-top/bottom/left/right` (CSS) or `SafeAreaView` (Reac
 | **Swipe horizontal on row** | Reveal row actions (delete, archive, pin) | List items in inbox-shaped UIs. |
 | **Swipe down on top of screen** | Pull-to-refresh | Lists, feeds. Always pair with a visible loader. |
 | **Swipe down on a sheet** | Dismiss | Bottom sheets, modals where it makes sense. |
-| **Swipe right at left edge** | Back (iOS interactive pop) | Free with native nav stacks; preserve it — don't intercept. |
+| **Swipe right at left edge** | Back (iOS interactive pop) | Free with native nav stacks; preserve it, don't intercept. |
 | **Pinch** | Zoom | Photos, maps. Don't fake it on regular content. |
 
 **Rule:** every gesture must have a non-gesture equivalent. Swipe-to-delete also needs a button-tap path (long-press menu, edit mode). Gesture-only is an accessibility regression.
@@ -59,7 +59,7 @@ Code-side: `safe-area-inset-top/bottom/left/right` (CSS) or `SafeAreaView` (Reac
 - The keyboard appears over content. Scroll the focused field into view; don't let it land behind the keyboard.
 - Dismiss the keyboard on: tapping outside an input (where it makes sense), swipe-down on a scroll view, or a clear "Done" button on the keyboard.
 - Use the right keyboard type per input: `numeric` for numbers, `email` for emails, `tel` for phones, `url` for links, `decimal-pad` for currency.
-- Autocomplete tokens: `username`, `email`, `current-password`, `new-password`, `one-time-code`, `street-address`, etc. These let password managers and autofill work — skipping them is hostile.
+- Autocomplete tokens: `username`, `email`, `current-password`, `new-password`, `one-time-code`, `street-address`, etc. These let password managers and autofill work, skipping them is hostile.
 
 ## Haptics
 
@@ -98,9 +98,21 @@ Mobile makes performance gaps visceral. A few rules:
 - **Animations at 60fps.** If a transition janks, simplify it (cut filter blurs, large shadows, layout-triggering properties).
 - **Avoid full-page loaders for partial updates.** A spinner that blocks the whole screen for a list refresh is worse than the old data + a top-bar progress indicator.
 
+## Archetype variants
+
+The mobile/ archetypes in `assets/archetypes/mobile/` carry the full bundles. At a glance:
+
+- **`mobile/ios-native-utility`** (Apple stock apps, Things): native-feel chrome, large titles, sheet-driven, gesture-rich.
+- **`mobile/ios-native-social`** (Instagram, TikTok): image-first, full-bleed, chrome-light. Tab bar minimal, content edge-to-edge.
+- **`mobile/android-material`** (Google apps, Material 3): bold colour, FAB pattern, expressive type, motion-led.
+- **`mobile/cross-platform-modern`** (Notion mobile, Linear mobile): cross-platform but designed-once, refined typography, restrained colour, tab bar where useful.
+
+When the brief is silent on platform, default to `mobile/cross-platform-modern`. The patterns above are platform-neutral baselines; the archetypes layer the platform-specific moves on top.
+
 ## What this file doesn't cover
 
 - Push notifications (system / OS concern).
 - Deep linking (router/runtime concern).
-- App Store / Play Store screenshots (those are marketing assets — see `imagery.md` if present).
-- Specific cross-platform framework idioms — see your code-export.md.
+- App Store / Play Store screenshots (those are marketing assets, see `imagery.md` if present).
+- Specific cross-platform framework idioms, see your code-export.md.
+- Full per-archetype mobile bundles, see `assets/archetypes/mobile/` in the skill.

@@ -1,6 +1,6 @@
 # Imagery
 
-Photos, illustrations, and AI-generated visuals. **Delete this file if your project is mostly chrome and data** (internal SaaS, dashboards) — imagery decisions matter most for marketing surfaces, content products, and content-heavy app states.
+Photos, illustrations, and AI-generated visuals. **Delete this file if your project is mostly chrome and data** (internal SaaS, dashboards), imagery decisions matter most for marketing surfaces, content products, and content-heavy app states.
 
 The agent reads this when adding a hero image, an empty-state illustration, an avatar fallback, or any visual that isn't a chart or icon.
 
@@ -14,9 +14,10 @@ Pick one of these and stay there. Mixing styles in one product is the strongest 
 | **Product photography** | Clean, controlled, often on a neutral background. | Hardware, physical-good brands. |
 | **Abstract photography** | Macro, textures, gradients in real materials. | Brand-forward, less explicit narrative. |
 | **Line illustration** | Single-weight, flat, mode-agnostic. | Empty states, docs, calm SaaS marketing. |
-| **Filled illustration** | Shapes + color, brand palette. | Marketing heroes, onboarding, story-driven. |
+| **Filled illustration** | Shapes + colour, brand palette. | Marketing heroes, onboarding, story-driven. |
 | **Isometric illustration** | 3D-ish, technical-feeling. | Developer tools, infrastructure products. |
 | **3D / render** | Heavy lift, hard to maintain at scale. | Use only if you have a dedicated artist. |
+| **Product screenshots as imagery** | The actual UI of the product, rendered in marketing surfaces. | Modern dev tools, AI products, software-led brands. |
 
 **Rule:** declare your project's primary style here in one sentence and an example URL or path.
 
@@ -39,16 +40,16 @@ Use standard ratios. Variables let consumers swap implementations.
 A unified treatment is what separates "a brand" from "a Pinterest board."
 
 - **Corner radius:** `$radiusLg` (12px) by default for in-product imagery; full-bleed for marketing hero.
-- **Color overlay:** if you tint images for contrast (text-on-image), use `$surface` (light: white at 40%, dark: black at 50%) as the overlay. Don't use a brand-color overlay — it makes every image look like it's the same image.
+- **Colour overlay:** if you tint images for contrast (text-on-image), use `$surface` (light: white at 40%, dark: black at 50%) as the overlay. Don't use a brand-colour overlay, it makes every image look like it's the same image.
 - **Drop shadow on images:** by default, **none.** Float images on the page; let surrounding layout carry depth.
 - **Borders:** none on photography (corner radius does the framing). 1px `$border` on illustration when it sits directly on a card.
 - **Filters / saturation shifts:** none. Apply at the source if needed; don't filter in CSS.
 
-## Accessibility & alt text
+## Accessibility and alt text
 
-- Every meaningful image gets descriptive alt text. *"Two engineers reviewing code at a whiteboard"* > *"team"* > *"image"*.
+- Every meaningful image gets descriptive alt text. *"Two engineers reviewing code at a whiteboard"* beats *"team"* beats *"image"*.
 - **Decorative-only images** (texture under a hero) get `alt=""` (empty), not omitted.
-- Alt text describes the image, not its function — the function is the surrounding text. *"A chart showing weekly active users rising 15%"* belongs in a `<figcaption>` or the body, not in `alt`.
+- Alt text describes the image, not its function, the function is the surrounding text. *"A chart showing weekly active users rising 15%"* belongs in a `<figcaption>` or the body, not in `alt`.
 
 ## AI-generated imagery
 
@@ -61,16 +62,16 @@ Where AI-generated art is OK in this project:
 Where it's not:
 
 - ❌ **Hero shots on marketing pages.** They tend to read as generic; the brand needs to feel real.
-- ❌ **Photos of people**, especially testimonials, "team" pages, and "real customer" imagery — these read as fraudulent and the cost when discovered is higher than the cost of a stock photo.
-- ❌ **Images that imply specific facts** (a screenshot of "your dashboard" — make a real one; a fake city skyline labeled with a city name — find or skip).
+- ❌ **Photos of people**, especially testimonials, "team" pages, and "real customer" imagery. These read as fraudulent and the cost when discovered is higher than the cost of a stock photo.
+- ❌ **Images that imply specific facts** (a screenshot of "your dashboard", make a real one; a fake city skyline labeled with a city name, find or skip).
 
 In Pencil, prefer `G(node, "ai", "<prompt>")` for AI-generated art and `G(node, "unsplash", "<query>")` for stock photography. Stock photography is rarely the right answer either; better to use real product imagery whenever possible.
 
 ## Avatars
 
 - Default size: 32 × 32 in lists, 40 × 40 in headers, 64 × 64 in profile views.
-- **Fallback when there's no image:** colored circle with initials. Pick the background color from the user's id hash, not random per-render. Initials on top in `$onPrimary` color (or whatever contrasts).
-- Always circular for personal avatars; square (with `$radiusSm` rounding) for organization / brand avatars. The shape language helps users distinguish "person" from "team."
+- **Fallback when there's no image:** coloured circle with initials. Pick the background colour from the user's id hash, not random per-render. Initials on top in `$onPrimary` colour (or whatever contrasts).
+- Always circular for personal avatars; square (with `$radiusSm` rounding) for organisation / brand avatars. The shape language helps users distinguish "person" from "team."
 - Don't use `John Doe` placeholder names + a generic silhouette in shipped designs. Use a list of plausible names and varied initials when illustrating.
 
 ## Hero imagery
@@ -84,12 +85,23 @@ For a marketing hero:
 
 ## Social / OG imagery
 
-Per-page open-graph imagery extends the brand template in `brand.md`. For pages without a custom OG image (most blog posts, deep app pages), generate one programmatically: brand surface, page title in display type, optional accent shape — not the page's screenshot.
+Per-page open-graph imagery extends the brand template in `brand.md`. For pages without a custom OG image (most blog posts, deep app pages), generate one programmatically: brand surface, page title in display type, optional accent shape, not the page's screenshot.
 
 ## Where images live in code
 
 - **Public marketing imagery:** `<public/images/>` or your CDN. Use Next.js `<Image>` (or framework equivalent) for responsive sizing.
 - **In-product illustrations:** SVG inline via component, or imported from `<src/illustrations/>`.
-- **Avatars:** served from your auth provider, with the colored-circle fallback above.
+- **Avatars:** served from your auth provider, with the coloured-circle fallback above.
 
 (Mirror this from `code-export.md` if you want one canonical answer.)
+
+## Archetype-keyed imagery direction
+
+Imagery decisions reshape meaningfully under different archetypes:
+
+- **`saas-apps/b2b/analytics-dashboard`**: minimal imagery. Empty states use a single muted icon (no illustration scenes). Avatars in user tables use the coloured-circle fallback with initials. No hero imagery.
+- **`saas-apps/b2b/modern-pro-tool`** (Linear-style): also minimal. Empty states use 2x4 abstract icon clusters (decorative-but-restrained, not illustrated mascots). Avatars use coloured-circle fallback. No marketing-style imagery inside the app.
+- **`marketing-websites/conversion-focused-saas`** (Linear marketing-style): **product screenshots as the primary visual treatment**, not stock photography or illustration. Carousels of UI variants per feature section (8–9 image variants per feature suggesting rotating screenshots). The actual UI of the product appears in feature sections.
+- **`marketing-websites/editorial-storytelling`**: visuals are *editorial moments*, not decorative spacers. Cinematic flavour: full-bleed product imagery alternating with text sections. Manifesto flavour: minimal or no images, type-led.
+
+**What generic looks like (don't ship this):** stock photography of diverse smiling office workers in every section, generic isometric illustrations of clouds-and-arrows under each feature, AI-generated illustrations of "abstract concepts" (AI brain, a network of connected nodes), illustrated mascot characters in empty states.

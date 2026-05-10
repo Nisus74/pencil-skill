@@ -17,6 +17,29 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Cursor's plugin schema doesn't document a `permissions` field. The manifest carries one anyway so `tools/skill-lint.py` can enforce consistency across all three platforms; Cursor ignores the unknown field.
 
+## [2.1.0] - 2026-05-10
+
+Minor release: **opinionated design-system scaffolds**. The 16 markdown templates that get copied into user projects (`assets/design-system/*.md`) are no longer generic placeholders. Each file now leads with concrete decisions, references the shipped archetype library, and includes "what generic looks like" anti-examples to short-circuit AI defaults.
+
+### Changed
+
+- **`assets/design-system/patterns.md`** restructured. Each page-level pattern (marketing landing, pricing, settings, dashboard, list+detail, auth, onboarding, empty state) gains an *Archetype variants* subsection citing populated archetypes plus a *What generic looks like* anti-example. The rewrite shape was approved before applying it across the rest of the folder.
+- **`assets/design-system/voice.md`** rewritten. Each section (tone, case, buttons, errors, empty states, numbers/dates) gains archetype-keyed variants and explicit anti-patterns. The forbidden-words table extended with severity-2 AI clichés (leverage, robust, foster, holistic, transformative, streamline-without-specifics).
+- **`assets/design-system/components.md`** rewritten. Adds a "Component variants by archetype" section showing how Button, Card, Sidebar, Empty state, Status pill, Avatar reshape under each populated archetype.
+- **`assets/design-system/tokens.md`** rewritten. Each section (colour, spacing, typography, border radius) carries an *Archetype-keyed bundles* subsection with concrete values per archetype, replacing the generic `<#hex>` placeholders for the projects that match a shipped archetype.
+- **`assets/design-system/motion.md`** rewritten. Adds a "Motion personality by archetype" table mapping archetypes (analytics-dashboard, modern-pro-tool, conversion-focused-saas, editorial-storytelling) to motion strategies.
+- **`assets/design-system/states.md`** rewritten. Adds archetype-keyed visual recipes; notes that Linear-style optimistic updates rarely show loading states; cleans up table cells (the `not-applicable` glyph is now an empty cell rather than an em dash).
+- **`assets/design-system/brand.md`** rewritten. Brand voice and product voice section extended with how brand shows up in each archetype.
+- **`assets/design-system/data-viz.md`** rewritten. Adds an "Archetype-keyed chart styles" section. analytics-dashboard is the canonical chart archetype; modern-pro-tool keeps charts inline and small; marketing archetypes show data as editorial moments.
+- **`assets/design-system/imagery.md`** rewritten. Adds archetype-keyed imagery direction. Linear-style marketing uses product screenshots as the primary visual treatment; analytics-dashboard uses minimal imagery.
+- **Tier 3 (`README.md`, `design-system.md`, `layout.md`, `elevation.md`, `iconography.md`, `mobile.md`, `code-export.md`)** received targeted updates: archetype-keyed variant subsections where applicable, cross-references to the archetype library, em-dash sweep applied. `design-system.md` gains a new *Chosen archetype* field for projects that have committed to one. `README.md` gains a *Working with archetypes* section explaining the precedence rule.
+- **Plugin manifests bumped to `2.1.0`** across all three platforms.
+
+### Migration notes
+
+- These files are scaffold templates copied into user projects on first scaffold. Existing projects that already have a `design-system/` folder won't see automatic updates; users can re-scaffold individual files or pull the new content selectively.
+- The structure of each file is preserved so existing edits remain meaningful. The new content lives in additional sections (*Archetype variants*, *What generic looks like*) rather than replacing existing sections.
+
 ## [2.0.0] - 2026-05-10
 
 Major release: **taste-first rework**. The skill no longer outsources aesthetic direction to the user's instinct. It now leads with explicit aesthetic commitment, ships an opinionated archetype library to use as defaults when the user is silent, and runs a single distinctiveness pass after compose to catch generic output before declaring done.

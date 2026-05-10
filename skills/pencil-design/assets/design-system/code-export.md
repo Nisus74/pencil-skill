@@ -4,7 +4,7 @@ How designs in `.pen` files map to code in this project. The agent reads this wh
 
 ## Stack reminders
 
-(These mirror `design-system.md` — kept here for self-contained reading when the agent only loads this file.)
+(These mirror `design-system.md`, kept here for self-contained reading when the agent only loads this file.)
 
 - **Framework:** `<React | Vue | SwiftUI | Flutter | Other>`
 - **Styling:** `<Tailwind | CSS Modules | styled-components | other>`
@@ -16,7 +16,7 @@ How designs in `.pen` files map to code in this project. The agent reads this wh
 |----------------|------------------|
 | `frame` with `layout: "vertical"` | A flex column container. (`<div className="flex flex-col gap-4">` in Tailwind, `VStack` in SwiftUI, `Column` in Flutter.) |
 | `frame` with `layout: "horizontal"` | A flex row container. |
-| `frame` with `layout: "none"` | An absolutely-positioned container — but check first; absolute layout in code is usually a sign the design should have used auto-layout. |
+| `frame` with `layout: "none"` | An absolutely-positioned container, but check first; absolute layout in code is usually a sign the design should have used auto-layout. |
 | `text` with `$textBase` | A semantic element appropriate to context (`<p>`, `<span>`, `<label>`, `<h2>`). The variable picks size; the surrounding role picks the tag. |
 | `icon_font` | Import from the configured icon library, e.g. `import { LogIn } from 'lucide-react'`. |
 | `ref` to a `reusable` component | An import of the matching code-side component, e.g. `<Button variant="primary">`. The component's name matches the library's `id`. |

@@ -1,6 +1,6 @@
 # Elevation
 
-How depth is communicated. The agent reads this when adding cards, modals, popovers, dropdowns, or anything that should feel "above" the page. Without rules here, AI defaults to `0 4px 24px rgba(0,0,0,0.15)` everywhere — Bootstrap-era, immediately dated.
+How depth is communicated. The agent reads this when adding cards, modals, popovers, dropdowns, or anything that should feel "above" the page. Without rules here, AI defaults to `0 4px 24px rgba(0,0,0,0.15)` everywhere, Bootstrap-era, immediately dated.
 
 ## The scale
 
@@ -18,11 +18,11 @@ Five levels. Most surfaces sit at level 0; reach for higher levels only when a s
 
 ## Why dark mode is different
 
-Drop shadows mostly fail in dark mode. A 6%-opacity black shadow on a `#0F0F12` background is invisible. Don't paper over this by darkening the shadow further — that creates an opaque "dirt smudge" effect.
+Drop shadows mostly fail in dark mode. A 6%-opacity black shadow on a `#0F0F12` background is invisible. Don't paper over this by darkening the shadow further, that creates an opaque "dirt smudge" effect.
 
 Instead, in dark mode, depth comes from **light borders** (a 1px hairline at 6–10% white opacity), **subtle inner glow**, or **lightening the surface itself** (a card on a `#0F0F12` page might be `#16161A`). Reserve actual shadows for level 3+ where the surface contrast is large enough to support them.
 
-This is why the Light/Dark columns in the table above aren't symmetric — they shouldn't be.
+This is why the Light/Dark columns in the table above aren't symmetric, they shouldn't be.
 
 ## What sits where (defaults)
 
@@ -32,7 +32,7 @@ This is why the Light/Dark columns in the table above aren't symmetric — they 
 | Card | `$elevation1` | Raised hairline. Most cards stay here. |
 | Card on hover (clickable card) | `$elevation2` | Lift on hover; transition is the `$durationFast` color/transform recipe. |
 | Sticky header / footer | `$elevation1` | Hairline shadow appears only when content scrolls beneath (use `box-shadow` only when `scrollTop > 0`). |
-| Sidebar (desktop) | `$elevation0` | Sidebars don't elevate — they sit on the same plane as the page, separated by a 1px `$border`. |
+| Sidebar (desktop) | `$elevation0` | Sidebars don't elevate, they sit on the same plane as the page, separated by a 1px `$border`. |
 | Dropdown / Select menu | `$elevation2` | |
 | Popover | `$elevation2` | |
 | Tooltip | `$elevation2` | |
@@ -44,7 +44,7 @@ This is why the Light/Dark columns in the table above aren't symmetric — they 
 
 - **Shadow as the only visual signal.** Pair every elevation > 0 with at least one other affordance (border, lighter surface color, padding). Shadow alone is invisible to color-blind users in some palettes and gone entirely in dark mode.
 - **Glow shadows on light mode** (`box-shadow: 0 0 24px rgba(120, 80, 255, 0.4)`). Reads as 2014-era "neon." Reserve glow effects for explicit brand moments declared in this file.
-- **Stacked drop shadows.** Two `box-shadow` values to "make it pop." If level 1 isn't enough, you want level 2 — not level 1 + level 1.
+- **Stacked drop shadows.** Two `box-shadow` values to "make it pop." If level 1 isn't enough, you want level 2, not level 1 + level 1.
 - **Animated elevation on first render.** Cards lifting into place when the page loads is loading-shimmer-adjacent and reads AI-generated. Animate elevation only on user interaction (hover, focus, drag).
 - **Inset shadows on inputs in dark mode.** Almost always invisible. Use a 1px border instead.
 
@@ -67,6 +67,17 @@ Higher-elevation surfaces use larger radii:
 
 Sharp corners (`$radiusSm` or 0) on a high-elevation surface read as cheap. Pair `$radiusXl` with at least `$elevation2`.
 
+## Archetype variants
+
+How elevation reads under different archetypes:
+
+- **`saas-apps/b2b/analytics-dashboard`**: hairline borders, NO shadows on cards or tables. `$elevation0` for everything except popovers, dropdowns, and tooltips (`$elevation2`). Shadows on cards are an anti-cue here.
+- **`saas-apps/b2b/modern-pro-tool`** (Linear): same, hairline borders, no shadows on the work surfaces. The only places shadows appear: floating menus, command palettes, dropdowns, tooltips. Even there, soft and restrained.
+- **`marketing-websites/conversion-focused-saas`**: dark-mode default for marketing. Soft shadows on cards in dark mode show up as faint glows around the upper edge. Restrained in light mode.
+- **`marketing-websites/editorial-storytelling`**: no card metaphor; content sits directly on the page background. Elevation is essentially absent.
+
+**What generic looks like (don't ship this):** medium soft shadow on every card regardless of archetype, hover state lifts each card with a stronger shadow, modals and popovers carry similarly-weighted shadows so the user can't tell what's "above" what.
+
 ## Adding new elevation tokens
 
-If you need a depth that doesn't fit, add a new `$elevationN` row here with **both** light and dark treatments before referencing it. Don't ship a one-off `box-shadow` value in a single component — it'll metastasize.
+If you need a depth that doesn't fit, add a new `$elevationN` row here with **both** light and dark treatments before referencing it. Don't ship a one-off `box-shadow` value in a single component, it'll metastasize.

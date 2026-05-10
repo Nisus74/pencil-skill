@@ -6,9 +6,9 @@ This folder is read by AI coding tools (Claude Code, Cursor, Codex, and any othe
 
 When you ask an agent to design or build something, it loads files in this order:
 
-1. **`README.md` (this file)** — to find the entry points
-2. **`design-system.md`** — to find the `.lib.pen` library and tech stack
-3. **The other files only when the task needs them** — e.g. `tokens.md` when picking a color, `components.md` when choosing what to instantiate, `voice.md` when writing copy
+1. **`README.md` (this file)**, to find the entry points
+2. **`design-system.md`**, to find the `.lib.pen` library and tech stack
+3. **The other files only when the task needs them**, e.g. `tokens.md` when picking a color, `components.md` when choosing what to instantiate, `voice.md` when writing copy
 
 This progressive loading keeps the agent's context small while still giving it the right information at the right time.
 
@@ -23,11 +23,11 @@ This progressive loading keeps the agent's context small while still giving it t
 | `components.md` | Deciding which component to use for a job (Button vs IconButton, Card vs Modal, etc.). |
 | `layout.md` | Setting auto-layout, choosing sizing behavior (`fill_container` vs `fit_content`), or laying out a page grid. |
 | `motion.md` | Adding any transition, hover effect, modal entrance, or animated state. |
-| `elevation.md` | Choosing shadows / depth — cards, modals, popovers, dropdowns. |
+| `elevation.md` | Choosing shadows / depth, cards, modals, popovers, dropdowns. |
 | `iconography.md` | Picking an icon size, deciding icon-only vs paired-with-label, applying icon color. |
-| `patterns.md` | Laying out a whole page — marketing landing, settings, dashboard shell, list+detail, auth, onboarding. |
+| `patterns.md` | Laying out a whole page, marketing landing, settings, dashboard shell, list+detail, auth, onboarding. |
 | `states.md` | Deciding which states a component needs (hover, focus, error, loading, skeleton…) or which fault states a page needs (404, 500, offline, empty). |
-| `voice.md` | Writing user-facing copy — labels, error messages, empty states, CTAs. |
+| `voice.md` | Writing user-facing copy, labels, error messages, empty states, CTAs. |
 | `code-export.md` | Translating a design into code (React component, SwiftUI view, etc.). |
 
 ### Optional (present only if your project ships these surfaces)
@@ -41,15 +41,28 @@ This progressive loading keeps the agent's context small while still giving it t
 
 ## Editing this folder
 
-Everything here is plain Markdown. Edit any file by hand — agents re-read on each task. Two principles for keeping it useful:
+Everything here is plain Markdown. Edit any file by hand, agents re-read on each task. Two principles for keeping it useful:
 
 1. **Decisions, not exhaustive documentation.** "Use `$primary` for any interactive accent color" is more useful than "We have these 47 colors." The agent can look up colors; it can't easily learn taste.
 2. **Short and decision-shaped.** Most files top out at ~500 words. If a file grows past that, split it or trim ruthlessly. Long files get skipped or skimmed.
 
+## Working with archetypes
+
+The pencil-design skill ships an opinionated archetype library at `assets/archetypes/<category>/<name>.md` (e.g. `analytics-dashboard`, `modern-pro-tool`, `conversion-focused-saas`). Most files in this design-system folder reference those archetypes in an *Archetype variants* subsection, showing how the same baseline reshapes under different aesthetic directions.
+
+Precedence when the agent is making a decision:
+
+1. The user's direction (a screenshot, a brand name, a description) wins.
+2. This `design-system/` folder wins next.
+3. The shipped archetype (when no user direction or specific design-system rule covers it).
+4. The skill's negative-space defaults.
+
+If your project has committed to a specific archetype, note it in `design-system.md` so the agent loads the right archetype file before any work.
+
 ## Where this came from
 
-This folder was scaffolded by the [pencil-design skill](https://github.com/Nisus74/pencil-skill). You can keep, edit, rename, or remove any of these files — none of them are required for the skill to work, but they make the agent's output dramatically more consistent.
+This folder was scaffolded by the [pencil-design skill](https://github.com/Nisus74/pencil-skill). You can keep, edit, rename, or remove any of these files, none of them are required for the skill to work, but they make the agent's output dramatically more consistent.
 
 ## Not using pencil.dev?
 
-That's fine — this folder is tool-agnostic markdown. A frontend coding agent benefits just as much from `tokens.md` and `components.md` as a design agent does. Keep the folder; ignore the `.lib.pen` references in `design-system.md`.
+That's fine, this folder is tool-agnostic markdown. A frontend coding agent benefits just as much from `tokens.md` and `components.md` as a design agent does. Keep the folder; ignore the `.lib.pen` references in `design-system.md`.
