@@ -4,7 +4,7 @@ A worked walkthrough of the seven-step workflow for the prompt:
 
 > *"Design a signup flow with email + password, then email verification, then a welcome confirmation page."*
 
-Assume: Pencil desktop running, no `.pen` open, repo has a `design-system/` folder with `tokens.md`, `voice.md`, `patterns.md`, `states.md`, and a `design/system.lib.pen` library that includes `Input`, `ButtonPrimary`, `LinkText`.
+Assume: Pencil desktop running, no `.pen` open, the project has a `design/system.lib.pen` library that includes `Input`, `ButtonPrimary`, `LinkText`, `Checkbox`.
 
 ---
 
@@ -16,23 +16,15 @@ get_editor_state({ include_schema: false })
 
 Result: succeeds. No active document.
 
-## Step 2: Locate context
+## Step 2: Understand aesthetic direction
 
-- No `.pen` open.
-- No selection.
-- `design-system/` exists with the relevant files.
+No explicit direction given. This is a signup conversion flow, so the design should feel like a utility auth screen, not a marketing page. Load `references/flows.md` before planning — it owns validation timing, back-stack model, and multi-step confirmation anatomy.
+
+Announced direction: *"utility auth card: centred form, hairline border, no shadow, dot stepper (not numbered), specific CTAs. The welcome page breaks the card pattern to signal completion."*
 
 ## Step 3: Load guidelines + inventory components
 
-Read `design-system/README.md`, then:
-
-- `design-system/patterns.md`: § Auth flow gives the centred-card shape; § Onboarding flow gives the wizard shape with progress indicator (the welcome step rhymes with the onboarding-confirmation page).
-- `design-system/voice.md`: § Error messages (the *what happened. what to do.* shape) and § Buttons & CTAs (specific verbs).
-- `design-system/states.md`: confirms `Input` requires error and loading variants.
-
-The skill's [`references/flows.md`](../../references/flows.md) is the playbook for validation timing, back-stack across the three screens, and confirmation-step anatomy. [`references/states.md`](../../references/states.md) covers the focus-with-error edge case on the password field.
-
-Call `get_guidelines()` to confirm the live category list, then load `Web App`.
+Call `get_guidelines()`, then load `Web App`.
 
 Inventory the library:
 
@@ -40,19 +32,11 @@ Inventory the library:
 batch_get({ filePath: "./design/system.lib.pen", patterns: [{ reusable: true }], readDepth: 2 })
 ```
 
-Components: `Input`, `ButtonPrimary`, `ButtonSecondary`, `LinkText`. The `Input` component declares `default`, `hover`, `focus`, `error`, and `success` variants.
+Components: `Input`, `ButtonPrimary`, `ButtonSecondary`, `LinkText`, `Checkbox`. The `Input` component declares `default`, `hover`, `focus`, `error`, and `success` variants.
 
 ## Step 4: Plan
 
-Archetype: `conversion-focused-saas`. This is an onboarding signup funnel; the three-step flow is the product's primary conversion path.
-
-**Verifiable brief:**
-
-- **What success looks like:** three frames side by side. Pages 1 and 2 look like auth cards: centred card with a stepper at the top. Page 3 breaks the card shape completely, showing just a centred vertical block with an oversized icon and a single CTA. The break in structure at page 3 makes the completion moment legible at a glance.
-- **Signature element:** `WelcomeBlock` on page 3 has no card frame. It is a bare vertical layout with `fill: "transparent"`, no `stroke`, no `cornerRadius`. Nothing wrapped around the content.
-- **Microcopy register:** says "Continue", "Verify email", "You're in.", "Go to dashboard"; would never say "Submit", "OK", "Congratulations! Your account is ready."
-
-> *"I'll create three sibling top-level frames at 1440×900: `Signup_Step1_Email`, `Signup_Step2_Verify`, `Signup_Step3_Welcome`. Step 1 is the auth-card shape from patterns.md with email + password fields, a dot stepper showing 1-of-3, and the email field in error state on the canvas. Step 2 is a slimmer card with a 6-digit code input. Step 3 breaks the card shape: icon, title, single CTA, no card wrapper. Components: `Input`, `ButtonPrimary`, `LinkText`. Archetype: conversion-focused-saas."*
+> *"I'll create three sibling top-level frames at 1440×900: `Signup_Step1_Email`, `Signup_Step2_Verify`, `Signup_Step3_Welcome`. Step 1 is a centred auth card with email + password fields, a dot stepper showing 1-of-3, and the email field in error state on the canvas. Step 2 is a slimmer card with a 6-digit code input. Step 3 breaks the card shape entirely: icon, title, single CTA, no card wrapper. Direction: utility auth register — hairline borders, no shadows, dot steppers not numbered."*
 
 ## Step 4.5: Open document
 
@@ -109,9 +93,9 @@ get_screenshot({ nodeId: "page1" })
 
 Narrate:
 
-> *"Step 1 is on canvas. Brief match: centred auth card with stepper above. Archetype signal: the dot stepper, not a numbered stepper. Non-obvious decision: dots, not numbers. Numbers suggest a menu the user can jump between; dots read as a one-way tunnel. On a signup flow, users don't navigate backwards by choice. The generic default here is a numbered pill stepper (1, 2, 3 with circles) which reads as a wizard menu. The dot-plus-bar shape reads as progress. Drift check: the email field is showing its error state correctly with the inline message visible. Good. Card uses hairline border, no shadow."*
+> *"Step 1 is on canvas. Direction match: centred auth card with dot stepper above, hairline border visible, no shadow. Non-obvious decision: dots, not numbers. Numbers suggest a menu the user can jump between; dots read as a one-way tunnel. On a signup flow, users don't navigate backwards by choice. The generic default is a numbered pill stepper (1, 2, 3 with circles), which reads as a wizard menu. The dot-plus-bar shape reads as progress. The email field is showing error state correctly with inline message. No AI-default drift to fix."*
 
-If the stepper is off-centre (common: the parent's `justifyContent` only applies to the main axis), fix structurally:
+If the stepper is off-centre, fix structurally:
 
 ```
 U("stepper", { alignSelf: "center" })
@@ -149,7 +133,7 @@ get_screenshot({ nodeId: "page2" })
 
 Narrate:
 
-> *"Step 2 on canvas. The email address ('alex@startup.io') appears in the subtitle, making the verification step concrete and personal. Non-obvious decision: including the user's specific email in the subtitle, not the generic 'Check your inbox'. Users who check multiple accounts on the same device need to know which inbox to look at. The code cells are 48×56px, taller than wide, so they read as digit slots not general inputs."*
+> *"Step 2 on canvas. The email address ('alex@startup.io') appears in the subtitle, making the verification step concrete and personal. Non-obvious decision: the user's specific email in the subtitle, not the generic 'Check your inbox'. Users who check multiple accounts on the same device need to know which inbox to look at. The code cells are 48×56px, taller than wide, so they read as digit slots not general inputs."*
 
 ## Step 5c: Third batch_design (Step 3: welcome)
 
@@ -172,11 +156,11 @@ get_screenshot({ nodeId: "page3" })
 
 Narrate:
 
-> *"Step 3 on canvas. Three non-obvious decisions here. First: no card wrapper on the WelcomeBlock. A card shape would make this read as another form step. The bare vertical layout says the form is over; this is resolution, not continuation. Second: the icon is `$success` (green), not `$primary` (brand colour). `$primary` is an interactive affordance colour; using it on a static confirmation icon makes it read like a button. `$success` marks achieved state. Third: the title is `$text3xl` not `$text2xl`. The welcome moment earns a larger heading because this is the completion of a conversion funnel. Form steps use utility scale; the resolution moment uses a slightly larger scale."*
+> *"Step 3 on canvas. Three non-obvious decisions. First: no card wrapper on WelcomeBlock. A card shape would make this read as another form step; the bare vertical layout says the form is over. Second: the icon is `$success` (green), not `$primary` (brand colour). `$primary` is an interactive affordance colour; using it on a static confirmation icon makes it read like a button. `$success` marks achieved state. Third: title is `$text3xl` not `$text2xl`. The welcome moment earns a larger heading — form steps use utility scale, the resolution moment uses slightly more."*
 
 ## Step 7: Final visual sign-off
 
-Three pages, three screenshots, each scoped to its page:
+Three pages, three screenshots:
 
 ```
 get_screenshot({ nodeId: "page1" })
@@ -186,20 +170,20 @@ get_screenshot({ nodeId: "page3" })
 
 Verify per page:
 
-- **Page 1.** Dot stepper renders with 1-of-3 highlighted. Email field shows error-state styling with the inline message "That email is already registered. Try signing in instead." Password field has helper text. Continue button correct. ToS checkbox legible.
-- **Page 2.** Stepper shows 2-of-3 complete. Email address visible in subtitle. Six code cells render with consistent borders at 48×56px.
-- **Page 3.** No card frame visible. Just icon-title-subtitle-CTA centred on a plain surface. Check icon in `$success`. Title at `$text3xl`. Single CTA "Go to dashboard".
+- **Page 1.** Dot stepper renders with 1-of-3 highlighted. Email field shows error-state styling with inline message. Password field has helper text. Continue button correct. ToS checkbox legible.
+- **Page 2.** Stepper shows 2-of-3 complete. Email address visible in subtitle. Six code cells at 48×56px with consistent borders.
+- **Page 3.** No card frame visible. Icon-title-subtitle-CTA centred on plain surface. Check icon in `$success`. Title at `$text3xl`. Single CTA "Go to dashboard".
 
 ## Step 8: Surface candidates and notes
 
 Two notes for the user:
 
-1. **`CodeInput` is a library candidate.** The six-digit code row is six manual frames. It is likely to appear again in 2FA and any other verification flows. Surface it: *"The 6-digit code input on Step 2 is currently built from primitives. Want me to promote it to your `.lib.pen` as `CodeInput` so other flows can reference it?"*
-2. **Validation timing belongs in `flows.md`.** Document the email field's intended async behaviour in the node's `context` property: *"Unique-email check fires on blur with 400ms debounce. Error decays when user re-edits the field."* The engineer reads this and ships matching behaviour.
+1. **`CodeInput` is a library candidate.** The six-digit code row is six manual frames. It will appear again in 2FA and other verification flows. Surface it: *"The 6-digit code input on Step 2 is currently built from primitives. Want me to promote it to your `.lib.pen` as `CodeInput`?"*
+2. **Validation timing belongs in context.** Document the email field's intended async behaviour in the node's `context` property: *"Unique-email check fires on blur with 400ms debounce. Error decays when user re-edits the field."* The engineer reads this and ships matching behaviour.
 
 ## Final report to user
 
-> *"Done. Three sibling pages at 1440×900 placed side by side. Step 1 is an auth card with email in error state, password, ToS checkbox, Continue CTA, and a dot stepper showing 1-of-3. Step 2 is a verification card with 6 code cells and a Resend link. Step 3 breaks the card pattern: icon, 'You're in.', subtitle, single CTA. No card wrapper on Step 3; that break in structure signals completion. All bound to your `tokens.md` variables and mode axis. `CodeInput` and the validation timing are flagged for follow-up."*
+> *"Done. Three sibling pages at 1440×900 placed side by side. Step 1 is an auth card with email in error state, password, ToS checkbox, Continue CTA, and a dot stepper showing 1-of-3. Step 2 is a verification card with 6 code cells and a Resend link. Step 3 breaks the card pattern: icon, 'You're in.', subtitle, single CTA. No card wrapper on Step 3; that structural break signals completion. All bound to token variables and mode axis. `CodeInput` and validation timing are flagged for follow-up."*
 
 ---
 
@@ -209,10 +193,8 @@ Two notes for the user:
 
 - **Dot stepper, not a numbered stepper.** Numbers suggest a choosable menu; dots read as a one-way sequence. On a signup flow, the user isn't navigating, they're progressing. The dot-plus-bar shape encodes that distinction.
 
-- **Error state on the canvas, not the default state.** Showing the email field's error state on page 1 forces the design to answer: what does error handling look like? A default-only design leaves that question for the engineer to answer. See `references/states.md` for the "screenshot the worst state" rule.
+- **Error state on the canvas, not the default state.** Showing the email field's error state on page 1 forces the design to answer: what does error handling look like? A default-only design leaves that question for the engineer. See `references/states.md` for the "screenshot the worst state" rule.
 
 - **Icon colour: `$success` not `$primary`.** On the welcome page, `$primary` is an interactive affordance colour. Using it on a static confirmation icon makes it read as a button. `$success` marks achieved state without claiming interactivity.
 
 - **Specific verbs everywhere.** "Continue", "Verify email", "Resend code", "Go to dashboard"; never "Submit", "OK", "Confirm". Each verb names what happens next.
-
-For the back-stack model across the three steps, see [`references/flows.md`](../../references/flows.md) § Back-stack and navigation model. For the auth-card layout shape, see [`assets/design-system/patterns.md`](../design-system/patterns.md) § Auth flow. For copy patterns, see [`assets/design-system/voice.md`](../design-system/voice.md).

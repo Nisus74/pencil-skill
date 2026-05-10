@@ -45,8 +45,8 @@ DashboardPage (frame, 1440 x 900, layout: none)
 |---------|-------|--------|-------|
 | Sidebar | 220 | fill_container | Never wider than 240. Narrower (180) for dense tools. |
 | Topbar | fill_container | 56 | 48 for compact. Never below 44 (touch target). |
-| Content padding | 24 on all sides | | 16 for dense archetypes. |
-| Card gap | 16 | | 24 for spacious archetypes. |
+| Content padding | 24 on all sides | | 16 for dense products (data tables, developer consoles). |
+| Card gap | 16 | | 24 for spacious layouts (marketing, consumer apps). |
 | KPI card | fill_container | fit_content | Equal width across the row via fill_container + gap. |
 | Chart card | fill_container | 280–360 | Height depends on chart type; declare explicitly. |
 
@@ -215,7 +215,7 @@ barFill=I(..., { cornerRadius: 8 })  // bars become pills
 // Makes the chart look like a solid rectangle
 ```
 
-For `analytics-dashboard` archetype: the most recent bar gets `fill: "$chart-1"` at full opacity. Prior bars get `opacity: 0.5`. This is the "highlight latest period" move — not all bars the same colour.
+**Highlight-latest move:** the most recent bar gets `fill: "$chart-1"` at full opacity. Prior bars get `opacity: 0.5`. This signals "this is the current period" without a separate legend — not all bars the same colour.
 
 ---
 
@@ -333,7 +333,7 @@ xLabels=I(canvas, {
 // WRONG: legend in a box on the right — label lines directly at their endpoints
 ```
 
-For `analytics-dashboard` archetype: lines are thinner (1.5 px), filled area optional (5–10% opacity), colour from `$chart-1` only unless a second series is genuinely needed. No point markers.
+**For data-dense product surfaces:** lines are thinner (1.5 px), filled area optional (5–10% opacity), colour from `$chart-1` only unless a second series is genuinely needed. No point markers — they add visual noise at small sizes.
 
 ---
 
@@ -623,7 +623,7 @@ These are the differences between "technically correct" and "looks finished".
 | Detail | Wrong | Right |
 |--------|-------|-------|
 | Card edge | No border, floating | `stroke: { color: "$border", thickness: 1 }` |
-| Card corner | `cornerRadius: 0` or `cornerRadius: 16` | `cornerRadius: 8` (most archetypes) |
+| Card corner | `cornerRadius: 0` or `cornerRadius: 16` | `cornerRadius: 8` (default for data cards) |
 | Chart title weight | `fontWeight: 400` (same as body) | `fontWeight: 600` |
 | Y-axis labels | Missing entirely | Present, right-aligned, `$textXs`, `$textMuted` |
 | X-axis labels | Rotated 45° | Horizontal; reduce count if they overlap |

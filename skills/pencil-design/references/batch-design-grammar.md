@@ -184,7 +184,7 @@ bar10=I(sparklineArea, { type: "frame", name: "Bar10", width: 3, height: 32, fil
 
 Key rules:
 - Parent: `layout: "horizontal"`, `alignItems: "flex_end"` (bars grow upward from the bottom), `gap: 2`, explicit `width`/`height` in px.
-- Each bar: explicit `width: 3` (never `fill_container`), explicit height in px representing relative magnitude, `fill: "$accent"` (no gradients unless archetype calls for it), `cornerRadius: 1`.
+- Each bar: explicit `width: 3` (never `fill_container`), explicit height in px representing relative magnitude, `fill: "$accent"` (no gradients unless the user's direction explicitly calls for them), `cornerRadius: 1`.
 - Vary heights across bars to show trend shape. Do not use equal heights — that's a loading bar.
 
 ### KPI metric card
@@ -207,7 +207,7 @@ delta=I(valueRow, { type: "text", name: "DeltaBadge", content: "+18%", fontSize:
 spark=I(kpiCard, { type: "frame", name: "Sparkline", layout: "horizontal", alignItems: "flex_end", gap: 2, width: 60, height: 24 })
 ```
 
-For `analytics-dashboard` archetype: no shadow on the card. Use `stroke: { color: "$border", thickness: 1 }`. Remove any `effect: [{ type: "drop_shadow", ... }]` if present. The hairline border is the elevation signal.
+For data-dense product surfaces: no shadow on the card. Use `stroke: { color: "$border", thickness: 1 }`. Remove any `effect: [{ type: "drop_shadow", ... }]` if present. The hairline border is the elevation signal; a shadow claims hierarchy the data card doesn't need.
 
 ## A complete small example
 

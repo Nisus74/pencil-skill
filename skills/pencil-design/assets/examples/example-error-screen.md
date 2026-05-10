@@ -4,7 +4,7 @@ A worked walkthrough of the seven-step workflow for the prompt:
 
 > *"Design a 404 page and an offline screen for our web app."*
 
-Assume: Pencil desktop running, a `.pen` already open with a populated canvas, repo has a `design-system/` folder with `tokens.md` and a `design/system.lib.pen` library that includes `ButtonPrimary` and `LinkText` but no dedicated `ErrorBlock` component yet.
+Assume: Pencil desktop running, a `.pen` already open with a populated canvas, and a `design/system.lib.pen` library that includes `ButtonPrimary` and `LinkText` but no dedicated `ErrorBlock` component yet.
 
 ---
 
@@ -16,15 +16,15 @@ get_editor_state({ include_schema: false })
 
 Result: succeeds. Active document is `./design/screens.pen`. No selection. The canvas already has `LoginPage` and `DashboardPage` as top-level frames.
 
-## Step 2: Locate context
+## Step 2: Understand aesthetic direction
 
-- `screens.pen` is open.
-- No selection.
-- `design-system/` exists with `README.md`, `tokens.md`, `voice.md`, `components.md`, `patterns.md`, `states.md`.
+Existing screens (`LoginPage`, `DashboardPage`) already on the canvas. The error pages belong to the same product shell. Load `references/states.md` — it owns the screen-level fault state taxonomy and the empty-state taxonomy, which 404 and offline both need.
+
+Announced direction: *"match the existing product shell — plain `$surface` background, muted grey icon (not danger red), de-emphasised error code, calm copy."*
 
 ## Step 3: Load guidelines + inventory components
 
-Read `design-system/README.md`, then `design-system/states.md` (the project's state coverage contract), `design-system/voice.md` (for empty-state and error copy templates), and `design-system/patterns.md` (which has an Empty state lockup that 404 / offline can adapt). The skill's own [`references/states.md`](../../references/states.md) is the playbook for screen-level fault states.
+Call `get_guidelines()`, then load `Web App`. The skill's own [`references/states.md`](../../references/states.md) is the playbook for screen-level fault states.
 
 Call `get_guidelines()` to confirm the live category list, then load `Web App`.
 
@@ -38,15 +38,7 @@ Library contains `ButtonPrimary`, `ButtonSecondary`, `LinkText`, `Input`, `Card`
 
 ## Step 4: Plan
 
-Archetype: inherits from the product's primary archetype (`analytics-dashboard` in this case; the product is a B2B analytics SaaS and these error pages belong to the same product shell).
-
-**Verifiable brief:**
-
-- **What success looks like:** two pages with the same icon-title-description-CTA lockup. The icon is muted grey (`$illustration`), not red and not brand accent. The error code "404" appears small and de-emphasised at the bottom of the block. The pages look calm, not alarming.
-- **Signature element:** `fill: "$illustration"` on the icon (muted grey at low saturation). Not `$danger`. Not `$primary`. Not `$accent`.
-- **Microcopy register:** says "This page doesn't exist." and "Check your connection and try again." Direct and factual. Would never say "Oops, something went wrong!" or "We're sorry for the inconvenience."
-
-> *"I'll add two sibling frames at 1440×900: `Page_404` and `Page_Offline`. Both use the same centred lockup: icon, title, description, CTA, and a small de-emphasised error code. I'll add a `$illustration` colour token if it isn't declared. Archetype: analytics-dashboard. Error icons in muted grey, not danger red; that is the analytics-dashboard register for non-interactive contextual icons."*
+> *"I'll add two sibling frames at 1440×900: `Page_404` and `Page_Offline`. Both use the same centred lockup: icon, title, description, CTA, and a small de-emphasised error code. I'll add a `$illustration` colour token if it isn't declared. Direction: error icons in muted grey, not danger red — these are navigational dead ends, not emergencies."*
 
 ## Step 4.5: Verify the token suite
 
@@ -105,7 +97,7 @@ get_screenshot({ nodeId: "page404" })
 
 Narrate:
 
-> *"404 page on canvas. Brief match: centred block with muted grey icon, plain `$surface` background. Archetype signal: the `$illustration` icon colour reads immediately as analytics-dashboard register. It's informational, not alarming. Two non-obvious decisions here. First: the icon is `$illustration` (muted grey), not `$danger` (red). Error pages in `$danger` look like alerts requiring immediate action. This page is a navigational dead end, not an emergency. `$illustration` says 'contextual' not 'urgent'. The generic default would put the icon in `$primary` or `$danger`; both are wrong. Second: the HTTP code '404' is `$textXs` at the bottom, not a large headline. The code is developer metadata. Users don't know what 404 means; what they need is the copy. Showing '404' prominently makes the error number the headline, not the resolution instruction. Drift check: no shadow on the block. Good."*
+> *"404 page on canvas. Direction match: centred block with muted grey icon, plain `$surface` background — calm, not alarming. Two non-obvious decisions. First: the icon is `$illustration` (muted grey), not `$danger` (red). Error pages in `$danger` look like alerts requiring immediate action. This page is a navigational dead end, not an emergency. `$illustration` says 'contextual' not 'urgent'. The generic default puts the icon in `$primary` or `$danger`; both are wrong. Second: the HTTP code '404' is `$textXs` at the bottom, not a large headline. The code is developer metadata. Users don't know what 404 means; what they need is the copy. Showing '404' prominently makes the error number the headline, not the resolution instruction. Drift signal: no shadow on the block. Good."*
 
 If the title or description text grows beyond the block width, fix with an explicit width:
 
@@ -174,4 +166,4 @@ If yes: mark the `block` node `reusable: true`. If no: leave as-is. Two-instance
 
 - **`find_empty_space_on_canvas` on a populated canvas.** Placing new frames at arbitrary coordinates risks invisible overlaps with existing work. The canvas tool returns safe coordinates; use it every time the canvas already has content.
 
-For the screen-state taxonomy and the full fault-state matrix, see [`references/states.md`](../../references/states.md). For copy templates, see [`assets/design-system/voice.md`](../design-system/voice.md) § Error messages.
+For the screen-state taxonomy and the full fault-state matrix, see [`references/states.md`](../../references/states.md).

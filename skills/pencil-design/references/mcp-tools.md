@@ -84,7 +84,7 @@ get_guidelines({ category: "Tailwind" })
 | Category | Load when… |
 |----------|-----------|
 | `Code` | Generating code from a `.pen`, scaffolding a `.lib.pen`, or working on the design-to-code boundary. |
-| `Design System` | Building or editing reusable components, scaffolding a `design-system/` folder, or auditing token usage. |
+| `Design System` | Building or editing reusable components or auditing token usage. |
 | `Landing Page` | Marketing surfaces, hero sections, pricing pages, signup flows targeting conversion. |
 | `Mobile App` | Native iOS / Android / React Native / Flutter / SwiftUI work. Mobile-web that should *feel* native. |
 | `Slides` | Presentation decks, slide layouts, talk visuals. |
@@ -103,17 +103,17 @@ get_guidelines({ category: "Tailwind" })
 
 **Pitfalls.** Loading three or four categories at once burns context for limited gain. Pick the one or two most relevant; reach for more only if the first pass leaves an obvious blind spot.
 
-**Guidelines carry generic defaults. The archetype overrides them.** The built-in guidelines teach schema syntax and accessibility constraints — both worth following. Their *stylistic* defaults (chart types, surface colours, shadow use) are generic and will produce AI-slop output if applied without filtering. After reading guidelines, consult the chosen archetype and override any stylistic default that conflicts.
+**Guidelines carry generic defaults. Filter them against the stated aesthetic direction.** The built-in guidelines teach schema syntax and accessibility constraints — both worth following. Their *stylistic* defaults (chart types, surface colours, shadow use) are generic and will produce AI-slop output if applied without filtering. Read the guidelines for schema rules, then apply only the stylistic defaults that match the direction stated in step 2.
 
-The most common overrides:
+The most common stylistic overrides:
 
 | What the guideline says | When to override | What to use instead |
 |-------------------------|------------------|---------------------|
 | "Prefer bar charts for data" | Always on sparklines inside KPI cards | Sparkline bars: explicit `width: 3`, `height: <N>`, `gap: 2`, parent `alignItems: "flex_end"`. Never `fill_container` on bar width. See `batch-design-grammar.md` for the exact anatomy. |
-| Blue/purple gradient fills on charts | When archetype is `analytics-dashboard` or `modern-pro-tool` | Flat `fill: "$accent"`. No gradients on data bars. |
-| Card drop shadows everywhere | `analytics-dashboard` archetype | Hairline `stroke: { color: "$border", thickness: 1 }`, no shadow at all. |
-| Inter as UI font | Unless archetype explicitly opts in (e.g., `modern-pro-tool`) | `Geist` for UI text, `Geist Mono` for numerals and data. |
-| Dark sidebar + white body as default shell | Unless user direction or archetype calls for it | `analytics-dashboard` defaults to an all-light layout. Dark sidebar is not a neutral default. |
+| Blue/purple gradient fills on charts | For data-dense product surfaces | Flat `fill: "$accent"`. No gradients on data bars. |
+| Card drop shadows everywhere | For utility/data surfaces (not marketing or consumer surfaces) | Hairline `stroke: { color: "$border", thickness: 1 }`, no shadow at all. |
+| Inter as UI font | When direction doesn't call for it | `Geist` for UI text, `Geist Mono` for numerals and data. |
+| Dark sidebar + white body as default shell | For data products where the direction calls for all-light layout | Don't default to a dark sidebar. It's not a neutral choice. |
 
 ## Read / inspect
 

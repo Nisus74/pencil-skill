@@ -4,7 +4,7 @@ How to design every state a real product needs. Most AI-generated UIs ship the d
 
 **What this file owns:** the *vocabulary* and *visual recipes* for component-level interaction states (hover, focus, pressed, disabled, loading, error, empty, skeleton, success) and screen-level fault states (404, 403, 500, 503, 408, 429, offline, partial-failure). Plus the empty-state taxonomy.
 
-**What this file does NOT own:** the page lockup that *contains* the state — that's [`assets/design-system/patterns.md`](../assets/design-system/patterns.md) (e.g. § Empty state, § Settings page). The copy that fills it — that's [`assets/design-system/voice.md`](../assets/design-system/voice.md). The motion timing of state transitions — that's [`assets/design-system/motion.md`](../assets/design-system/motion.md).
+**What this file does NOT own:** the page *layout* that contains the state (e.g. the Settings page shell). The *copy* that fills it — follow the project's voice guidelines or the copy patterns in this file's empty-state section. The *motion timing* of state transitions — define durations in your token suite (`$durationFast`, `$durationBase`, etc.).
 
 ## When to load this file
 
@@ -17,7 +17,7 @@ If you're laying out a new dashboard or marketing page from scratch, you don't n
 
 ## Component states — the matrix
 
-Every reusable component must declare these states before it's library-ready. The first seven are summarized in [`components.md`](../assets/design-system/components.md) § Required state coverage; this file extends the matrix with the three states that file undersells (skeleton, in-component empty, partial-failure).
+Every reusable component must declare these states before it's library-ready. This file covers the full matrix, with particular depth on the three states most commonly omitted: skeleton, in-component empty, and partial-failure.
 
 | State | Required for | Visual recipe (defaults; let `tokens.md` override) |
 |-------|--------------|----------------------------------------------------|
@@ -85,7 +85,7 @@ There isn't one "empty state" — there are four. Each takes different copy, dif
 | **No-permission** | The user doesn't have rights to see content that exists. | Honest: *"You don't have access to this workspace."* | A path forward: *"Request access"* / *"Contact admin"*. |
 | **Post-action** | The user *did* the thing — inbox cleared, task list completed. | Acknowledging: *"You've reviewed all comments."* | Optional secondary action *or* nothing. Don't push for more work. |
 
-Visual lockup (the same across all four — see [`patterns.md`](../assets/design-system/patterns.md) § Empty state for the structural template):
+Visual lockup (the same structure across all four):
 
 ```
 EmptyState (centered in the empty container)
@@ -97,7 +97,7 @@ EmptyState (centered in the empty container)
 
 Don't stack multiple CTAs ("Import", "Create", "Explore demo"). Pick one. The exception: first-use empty states for products with a strong import path can pair `Create` with a secondary `Import` link below.
 
-For copy specifics — voice, tense, length — see [`voice.md`](../assets/design-system/voice.md) § Empty states.
+Copy rule for empty states: present tense, no exclamation marks, named action verb on the CTA. "No projects yet. Create your first one." not "Wow, it's empty here! Click below to get started."
 
 ## Loading taxonomy
 
@@ -194,9 +194,5 @@ These read as state-blind designs and should be fixed in passing whenever you se
 
 ## See also
 
-- [`components.md`](../assets/design-system/components.md) § Required state coverage — per-component state checklist (canonical reference).
-- [`patterns.md`](../assets/design-system/patterns.md) § Empty state — the visual lockup this file's empty taxonomy fills in.
-- [`voice.md`](../assets/design-system/voice.md) § Error messages, § Empty states — copy templates.
-- [`motion.md`](../assets/design-system/motion.md) § Looping animations — skeleton shimmer recipe.
 - [`accessibility.md`](accessibility.md) — focus states, disabled-contrast minimums, error-not-color-alone rule.
 - [`assets/examples/example-error-screen.md`](../assets/examples/example-error-screen.md) — worked walkthrough of a 404 + offline pair.

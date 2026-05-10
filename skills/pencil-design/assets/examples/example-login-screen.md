@@ -4,7 +4,7 @@ A worked walkthrough for the prompt:
 
 > *"Design a login screen in pencil"*
 
-Assume: Pencil desktop app is running, no `.pen` open, repo has a `design-system/` folder and a `design/system.lib.pen` library with `Input`, `ButtonPrimary`, and `LinkText` components.
+Assume: Pencil desktop app is running, no `.pen` open, the project has a `design/system.lib.pen` library with `Input`, `ButtonPrimary`, and `LinkText` components.
 
 ---
 
@@ -16,15 +16,13 @@ get_editor_state({ include_schema: false })
 
 Succeeds. No active document.
 
-## Step 2: Locate context
+## Step 2: Understand aesthetic direction
 
-- No `.pen` open.
-- No selection.
-- `design-system/` exists with `README.md`, `design-system.md`, `tokens.md`.
+The user hasn't given a screenshot or brand reference. Infer from context: this is a B2B data product's auth gate. The design should feel like the product itself — utility-first, no marketing register.
+
+Announced direction: *"utility login for a data product: compact title scale, centred form card with hairline border and no shadow, no hero language."*
 
 ## Step 3: Load guidelines and inventory
-
-Read `design-system/README.md`. Read `design-system/design-system.md`: confirms library at `./design/system.lib.pen`, stack is React + Tailwind, icon library is Lucide. Read `tokens.md` for spacing and type tokens.
 
 Call `get_guidelines()`. Load `Web App`.
 
@@ -34,19 +32,11 @@ Inventory components from the library:
 batch_get({ filePath: "./design/system.lib.pen", patterns: [{ reusable: true }], readDepth: 2 })
 ```
 
-Components: `Input`, `ButtonPrimary`, `LinkText`. Token list from `tokens.md`: `$surface`, `$surfaceMuted`, `$text`, `$textMuted`, `$border`, `$primary`, `$space-2` through `$space-8`, `$radiusLg`, `$text2xl`, `$textBase`.
+Components: `Input`, `ButtonPrimary`, `LinkText`. Token list includes: `$surface`, `$surfaceMuted`, `$text`, `$textMuted`, `$border`, `$primary`, `$space-2` through `$space-8`, `$radiusLg`, `$text2xl`, `$textBase`.
 
 ## Step 4: Plan
 
-Archetype: `analytics-dashboard`. This login screen is the auth gate to a B2B analytics product. The design should feel like the product: utility-first, chrome that signals without asserting.
-
-**Verifiable brief:**
-
-- **What success looks like:** a centred 360px form card on a near-white `$surface` page. The card has a 1px `$border` stroke and no shadow. It reads as a contained utility form, not a floating panel. The title is compact functional weight, not a hero heading.
-- **Signature element:** `stroke: { thickness: 1, fill: "$border" }` on the card frame; the `effect` property is absent entirely.
-- **Microcopy register:** says "Sign in", "Forgot password?"; would never say "Welcome back!" or "Enter your credentials to continue your journey."
-
-> *"I'll build `LoginPage` at 1440×900: a 360px form card centred on the page with a title, subtitle, email and password `Input` instances, `ButtonPrimary` for submit, `LinkText` for 'Forgot password?'. Archetype: analytics-dashboard; hairline border on the card, no shadow, compact utility title scale."*
+> *"I'll build `LoginPage` at 1440×900: a 360px form card centred on the page with a title, subtitle, email and password `Input` instances, `ButtonPrimary` for submit, `LinkText` for 'Forgot password?'. Direction: utility scale — hairline border on the card, no shadow, `$text2xl` title, not a hero heading."*
 
 ## Step 4.5: Open document, declare mode axis and imports
 
@@ -78,7 +68,7 @@ get_screenshot({ nodeId: page })
 
 Narrate:
 
-> *"The 1440×900 page is on canvas with the 360px form card. Brief match: card is centred, hairline border visible, no shadow present. Archetype signal: stroke-without-shadow reads as analytics-dashboard immediately. The card separates from the page background without claiming elevation. No drift to fix at this stage. The generic default here is adding `effect: [{ type: "drop_shadow", blur: 8, opacity: 0.1 }]` to the card; that is the analytics-dashboard anti-pattern and I have not done it."*
+> *"The 1440×900 page is on canvas with the 360px form card centred. Direction match: hairline border visible, no shadow — the card separates from the background without claiming elevation. No AI-default drift to fix: the generic trap here is adding `effect: [{ type: 'drop_shadow', blur: 8, opacity: 0.1 }]` to the card, which I have not done."*
 
 If the card sits off-centre, the page height constraint is the culprit:
 
@@ -95,7 +85,7 @@ sub=I(form, { type: "text", content: "Welcome back. Enter your details below.", 
 
 2 ops. Screenshot the form. Narrate:
 
-> *"Title and subtitle landed. Non-obvious decision: `$text2xl` / 700, not a display or hero scale. A login screen is a utility action, not a brand moment. At `$text3xl`, the heading would outweigh the form fields and make the page read as a marketing surface. `$text2xl` is compact enough to feel functional. `$space-4` gap between elements reads right at 16px."*
+> *"Title and subtitle landed. Non-obvious decision: `$text2xl` / 700, not a display or hero scale. At `$text3xl`, the heading would outweigh the form fields and make the page read as a marketing surface. `$text2xl` is compact enough to feel functional. `$space-4` gap reads right at 16px."*
 
 ## Step 5d: Add the inputs
 
@@ -106,7 +96,7 @@ pwd=I(form, { type: "ref", ref: "Input", descendants: { label: { content: "Passw
 
 2 ops. Screenshot the form. Narrate:
 
-> *"Both inputs are library `Input` instances. Non-obvious decision: component refs, not raw frames. The generic default is a frame + text label pair, which bypasses your component's error variant. When the engineer adds email-taken validation, the raw primitive requires a rebuild; the `Input` ref just needs a descendants override on its error child. Labels and focus states inherit from the library."*
+> *"Both inputs are library `Input` instances. Non-obvious decision: component refs, not raw frames. The generic default is a frame + text label pair, which bypasses your component's error variant. When the engineer adds email-taken validation, the raw primitive requires a rebuild; the `Input` ref just needs a descendants override on its error child."*
 
 ## Step 5e: Add the submit and forgot-password link
 
@@ -127,7 +117,7 @@ U(forgot, { textAlign: "center" })
 
 1 op. Screenshot. Narrate:
 
-> *"Link centred. Non-obvious decision: `textAlign: 'center'` on the text node rather than a wrapper frame. The link lives in a vertical-layout form; centring the text property aligns it within its available width without introducing a new layout element. The form now reads as a coherent centred stack."*
+> *"Link centred. Non-obvious decision: `textAlign: 'center'` on the text node rather than a wrapper frame. The link lives in a vertical-layout form; centring the text property aligns it within its available width without introducing a new layout element."*
 
 ## Step 6: Final pass
 
@@ -151,15 +141,15 @@ Pass. Switch back to light mode: `U(page, { theme: { mode: "light" } })`.
 
 ## Final report to user
 
-> *"Done. `LoginPage` at 1440×900, 360px form card centred with `Input` instances for email and password, `ButtonPrimary` for submit, `LinkText` for the forgot-password link. Analytics-dashboard archetype: hairline border, no shadow, `$text2xl` title scale. Six build chunks with a screenshot after each, plus a dark-mode screenshot at the final pass. Mode axis and library import declared up-front; every colour resolves through your tokens."*
+> *"Done. `LoginPage` at 1440×900, 360px form card centred with `Input` instances for email and password, `ButtonPrimary` for submit, `LinkText` for the forgot-password link. Hairline border, no shadow, `$text2xl` title scale. Six build chunks with a screenshot after each, plus a dark-mode screenshot at the final pass. Mode axis and library import declared up-front; every colour resolves through your tokens."*
 
 ---
 
 ## What this example demonstrates
 
-- **Archetype drives the card spec.** The card has a 1px `$border` stroke and no shadow because the analytics-dashboard archetype rejects elevation chrome. A drop shadow shifts the card into the marketing-page register. One absent property, `effect`, is the difference between the two registers.
+- **Direction drives the card spec.** The card has a 1px `$border` stroke and no shadow because the stated direction was utility-first, no elevation chrome. A drop shadow shifts the card into the marketing-page register. One absent property, `effect`, is the difference between the two registers.
 
-- **Form card width is not arbitrary.** 360px is the compact utility width for a login form. 400px and wider reads as a landing-page card. The difference is subtle but present: at 360px, the form reads as a tool; at 480px, it reads as a feature.
+- **Form card width is not arbitrary.** 360px is the compact utility width for a login form. 400px and wider reads as a landing-page card. The difference is subtle: at 360px, the form reads as a tool; at 480px, it reads as a feature.
 
 - **Title scale signals intent.** `$text2xl` / 700 for a utility screen, not display or hero scale. At `$text3xl`, the heading competes with the form fields and makes the login page read as a marketing surface.
 

@@ -4,7 +4,7 @@ SKILL.md § Accessibility names five non-negotiable checks (contrast, hit target
 
 **What this file owns:** ARIA semantics, focus order, keyboard navigation, screen-reader content, the deeper-cut contrast cases (gradients, text on photos), the `prefers-*` media queries, dynamic type, RTL & internationalization, color-blindness, motor accessibility.
 
-**What this file does NOT own:** the SKILL.md baseline (already enforced). Reduced-motion timing — that's [`motion.md`](../assets/design-system/motion.md). Token-level contrast values — that's [`tokens.md`](../assets/design-system/tokens.md). Hit-target sizes for native — that's [`mobile.md`](../assets/design-system/mobile.md). Color-blind chart palettes — that's [`data-viz.md`](../assets/design-system/data-viz.md). Decorative-vs-meaningful icons — that's [`iconography.md`](../assets/design-system/iconography.md). This file links rather than duplicates.
+**What this file does NOT own:** the SKILL.md baseline (already enforced). Reduced-motion timing (define durations in your token suite). Token-level contrast values (document in your project's tokens). Hit-target sizes for native (document per platform guidelines). Color-blind chart palettes (document in your project's data-viz guidelines).
 
 ## When to load this file
 
@@ -117,7 +117,7 @@ The SKILL.md baseline (4.5:1 body, 3:1 large/UI components) and `tokens.md`'s pe
 
 Modern operating systems expose user preferences to the browser. Designs that respect them are accessible to a much wider audience.
 
-**`prefers-reduced-motion`.** Already covered in [`motion.md`](../assets/design-system/motion.md). Restating the rule: when the user prefers reduced motion, transitions > 200ms become instant; loops (except skeleton shimmer) disable; micro-interactions ≤ 120ms stay.
+**`prefers-reduced-motion`.** When the user prefers reduced motion, transitions > 200ms become instant; loops (except skeleton shimmer) disable; micro-interactions ≤ 120ms stay.
 
 **`prefers-contrast`.** Two values matter: `more` (boost contrast) and `less` (rare; reduce contrast). When `more` is set:
 
@@ -205,7 +205,7 @@ Right-to-left languages (Arabic, Hebrew, Persian, Urdu) flip the reading axis. D
 
 Design buttons, labels, and section headers with **30% extra width** beyond the English text — or use `"fit_content"` and let the layout adapt. Hard-coded button widths break in localization.
 
-**Locale-specific formatting.** Numbers, dates, currency, plurals all change. Don't hard-code formatting in mockups — use placeholder shapes (`1,234` → `{N} users`, `$1,234 USD` → `{currency}{amount}`) and let the engineer apply the localization library. See [`voice.md`](../assets/design-system/voice.md) § Numbers, dates, currency for the project's choice of locale formatting.
+**Locale-specific formatting.** Numbers, dates, currency, plurals all change. Don't hard-code formatting in mockups — use placeholder shapes (`1,234` → `{N} users`, `$1,234 USD` → `{currency}{amount}`) and let the engineer apply the localization library.
 
 **Pseudo-localization.** A test pass where the engineer replaces every translatable string with an inflated placeholder (`Hello` → `[Ḣéĺĺöö Ŵõŕĺď ţéšţ ťéśţ]`). Reveals every string that's not actually localizable, every layout that breaks under 30% expansion. Worth requesting for any product that ships internationally.
 
@@ -218,7 +218,7 @@ SKILL.md says "color is never the only signal." Restated for state design:
 - **Warnings:** amber + alert-triangle icon.
 - **Status pills:** color + text label, never color + nothing.
 
-For chart palettes specifically (sequential, diverging, categorical), see [`data-viz.md`](../assets/design-system/data-viz.md). Quick rules:
+For chart palettes specifically (sequential, diverging, categorical):
 
 - **Categorical palettes** must work for the most common color-blindness types (deuteranopia, protanopia). Avoid red/green-only distinctions; pair with shape or pattern.
 - **Sequential palettes** are color-blind-safe by default if they vary lightness, not just hue (a viridis-style ramp).
@@ -226,7 +226,7 @@ For chart palettes specifically (sequential, diverging, categorical), see [`data
 
 ## Touch & motor accessibility
 
-Mentioned in [`mobile.md`](../assets/design-system/mobile.md) for native; for web:
+For web:
 
 - **Hit targets ≥ 44×44.** Already in SKILL.md. Restate for web: even on desktop, a 24×24 close-button is hostile to users with motor impairment.
 - **Spacing between adjacent targets ≥ 8.** Two buttons one pixel apart force precise targeting. Always pad.
@@ -253,11 +253,4 @@ Fix what fails before reporting done. Don't note a11y failures as "TODOs" — th
 ## See also
 
 - SKILL.md § Accessibility — the 5-point baseline (always-on).
-- [`components.md`](../assets/design-system/components.md) § Required state coverage — focus state required on every interactive component.
-- [`tokens.md`](../assets/design-system/tokens.md) § Color, § Contrast — the per-token contrast contract.
-- [`motion.md`](../assets/design-system/motion.md) § `prefers-reduced-motion` — the motion side of accessibility.
-- [`mobile.md`](../assets/design-system/mobile.md) § Touch targets — native hit-target rules.
-- [`data-viz.md`](../assets/design-system/data-viz.md) — color-blind chart palettes.
-- [`iconography.md`](../assets/design-system/iconography.md) — decorative-vs-meaningful icon distinction.
-- [`voice.md`](../assets/design-system/voice.md) § Numbers, dates, currency — locale formatting.
 - [`states.md`](states.md) — focus-with-error edge case, disabled contrast, error-not-color-alone.

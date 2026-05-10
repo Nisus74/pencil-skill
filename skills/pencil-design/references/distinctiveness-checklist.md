@@ -6,14 +6,14 @@ This isn't a polish loop. It runs **at most once**, with an explicit kill switch
 
 ## When this runs
 
-- Step 5 of the SKILL.md default workflow, after compose and the section-end screenshot.
+- Step 6 of the SKILL.md default workflow, after compose and the section-end screenshot.
 - Skips entirely if the user said *"go fast"*, *"ship it"*, *"don't polish"*, or otherwise signalled they want the design committed as-is.
 - Runs once per design task. After one revision round, the loop exits regardless of remaining items.
 
 ## How to run it
 
 1. Take the final screenshot of the design (whole page, not a subtree).
-2. Walk the 8 questions below in order. For each, answer aloud: *yes (passes)*, *no (fails, propose one fix)*, or *not applicable (this archetype doesn't care)*.
+2. Walk the 8 questions below in order. For each, answer aloud: *yes (passes)*, *no (fails, propose one fix)*, or *not applicable (skip this one for this task)*.
 3. If any item fails, propose ONE concrete fix per failed item, not a list, one fix that addresses the root issue. Apply the fixes in a single follow-up `batch_design` chunk.
 4. Take a final post-revision screenshot. Stop. Hand back.
 
@@ -21,12 +21,12 @@ If 0 items fail: the design passed. Hand back without changes.
 
 ## The 8 questions
 
-### 1. Aesthetic commitment named in the spec
+### 1. Aesthetic direction named in the plan
 
-Did you name the chosen archetype (or synthesised ephemeral) in your plan, before you started building? If the spec just says *"a SaaS dashboard"* with no archetype reference, the design is operating without aesthetic direction and will read as generic.
+Did you state a specific aesthetic direction before building? If the plan says only "a SaaS dashboard" with no specific direction — no typography call, no density register, no surface treatment decision — the design is operating without intent and will default to the generic.
 
-**Fail mode:** the spec is silent on aesthetic direction; the design defaults to violet-on-white SaaS shell.
-**Fix:** name the archetype now (post-hoc), and if the design has drifted from it, propose the specific revisions to bring it in line.
+**Fail mode:** the plan is silent on aesthetic direction; the design landed in violet-on-white balanced-SaaS shell.
+**Fix:** name the direction now (post-hoc): *"dense data product, hairline borders, no shadows, mono numerals."* Check if the design already contradicts it and propose the specific revisions.
 
 ### 2. Accent used in a non-obvious place
 
@@ -37,45 +37,45 @@ Is the accent applied somewhere that isn't *every primary CTA, every active stat
 
 ### 3. Typography shows personality, not just hierarchy
 
-Beyond size and weight, is there a typographic *choice* that's visible? Type pairing, mono numerals where they help, small caps on a label, a serif accent in a heading, deliberate tracking?
+Beyond size and weight, is there a typographic *choice* that's visible? Type pairing, mono numerals where they help, small caps on a label, deliberate tracking?
 
-**Fail mode:** Geist-everywhere with H1/H2/Body/Small as the only differentiation. Nothing the eye remembers.
-**Fix:** introduce one typographic move. Mono numerals on data, small caps on section labels, or a single serif heading where the brand allows.
+**Fail mode:** the same font everywhere with H1/H2/Body/Small as the only differentiation. Nothing the eye remembers.
+**Fix:** introduce one typographic move. Mono numerals on data, small caps on section labels, or a deliberate weight contrast that goes beyond the obvious.
 
 ### 4. At least one density choice is deliberate
 
 Did you make a density call (airy, balanced, dense) and apply it consistently in one region? Or did the whole design land in default-balanced because no decision was made?
 
 **Fail mode:** every region uses the same 16/24/32 spacing rhythm; nothing reads as denser-than-default or airier-than-default.
-**Fix:** pick one region and shift it. Tighten the table to mono-utility-dense (8/12 row padding) or open up the hero (96+ vertical padding). Density variance signals intent.
+**Fix:** pick one region and shift it. Tighten the table to dense (8/12 row padding) or open up the hero (96+ vertical padding). Density variance signals intent.
 
 ### 5. The page has a signature moment
 
-Is there one moment on the page that wouldn't survive being deleted? A signature element, an inline data viz, a custom empty state, a microinteraction, a deliberate type pairing on a hero, that gives the page memorable identity.
+Is there one moment on the page that wouldn't survive being deleted? A custom data visualisation, a specific type move on a hero, a deliberate empty state, an element that gives the page identity beyond competent layout.
 
 **Fail mode:** every region is competently generic; nothing on the page would be missed.
-**Fix:** invest in one element. Make the chart custom, give the empty state a real character (without illustrated mascots), redesign one card to do something the others don't.
+**Fix:** invest in one element. Make the chart specific, give the empty state real character, redesign one card to do something the others don't.
 
-### 6. Anti-cues from the chosen archetype are absent
+### 6. AI-default tells are absent
 
-Each archetype lists anti-cues, moves that break it. Walk them and confirm none appear in the design.
+Does the design have any of the anti-patterns from the Aesthetic foundation section — pure white/black, Inter with no direction, pill badges defaulted to `cornerRadius: 999`, full-opacity accent everywhere, soft shadows where the direction called for hairline borders?
 
-**Fail mode:** building in `analytics-dashboard` but the cards have shadows; building in `modern-pro-tool` but the active sidebar item is a coloured pill; building in `editorial-storytelling` but you added a comparison table.
-**Fix:** remove the anti-cue. The archetype tells you the right replacement.
+**Fail mode:** the design reads as AI-generated at a glance — not because of any single flaw, but because nothing signals deliberate intent.
+**Fix:** name the specific tell and override it. "Cards have soft shadows but the direction called for flat surfaces. `U(cardId, { effect: [] })`."
 
-### 7. Microcopy carries the archetype's voice
+### 7. Microcopy feels specific to this product
 
-Does the copy match the archetype's voice? Empty states, error messages, button labels, loading states, these are easy to leave as defaults and surprisingly powerful when shaped to the archetype.
+Does the copy feel like it belongs to this product, or is it generic SaaS placeholder text?
 
-**Fail mode:** *"Oh no! Something went wrong."* in a `modern-pro-tool` design (which calls for terse *"Couldn't load. Retry"*). Or *"Welcome to your dashboard! 🎉"* in an `analytics-dashboard` (which calls for confident, present-tense data framing).
-**Fix:** rewrite 1–3 microcopy strings to match the archetype's voice section.
+**Fail mode:** *"How your product performed over the last 7 days."* *"Something went wrong. Please try again."* *"No items found."* All interchangeable with any other SaaS product.
+**Fix:** rewrite 1–3 microcopy strings to be specific to the product's domain. "API calls this week" not "Activity over the last 7 days." "Connection lost — retry now" not "Something went wrong."
 
-### 8. Surface treatment matches the archetype
+### 8. Surface treatment matches the stated direction
 
-Borders vs shadows, corner radii, surface hierarchy, dark vs light mode, does the design's chrome match what the archetype calls for? AI defaults often drift toward soft shadows + medium radius + medium hierarchy regardless of archetype.
+Does the chrome (borders vs shadows, corner radii, surface hierarchy, light vs dark mode) match the aesthetic direction stated in the plan? AI defaults drift toward soft shadows + medium radius + medium hierarchy regardless of what was asked for.
 
-**Fail mode:** building in `analytics-dashboard` (hairline borders, no shadows) but every card has a soft shadow. Building in `modern-pro-tool` (light mode canonical) but the design defaulted to dark.
-**Fix:** swap the chrome to match. Borders for shadows, sharper radii, correct mode default.
+**Fail mode:** direction called for a dense data product with hairline borders, but every card has a soft shadow and `cornerRadius: 12`.
+**Fix:** swap the chrome to match the direction. Remove shadows where the direction didn't call for them. Tighten radii for utilitarian surfaces.
 
 ## Kill switch
 
@@ -92,23 +92,23 @@ When the kill switch fires, hand back the design as-is. Do not present remaining
 - Not an accessibility check (those run in step 6 of SKILL.md and are non-negotiable).
 - Not a polish loop (one round, then stop).
 - Not a critique of the user's brief (if the user wanted violet-on-white, that's their call; the checklist asks whether the *agent* defaulted there without intent).
-- Not a substitute for live iteration (the screenshot loop in step 4 is the main quality mechanism; this checklist catches what the loop missed because the agent was deciding while building).
+- Not a substitute for live iteration (the screenshot loop in step 5 is the main quality mechanism; this checklist catches what the loop missed because the agent was deciding while building).
 
-## Worked example: applying the checklist to today's `pencil-new.pen`
+## Worked example
 
-The SaaS analytics dashboard built earlier in the session, scored against the checklist:
+A SaaS analytics dashboard built without stating an aesthetic direction:
 
 | # | Question | Result |
 |---|---|---|
-| 1 | Archetype named in spec? | **Fail.** The spec said "SaaS analytics dashboard"; no archetype named. The design defaulted. |
-| 2 | Accent in non-obvious place? | **Fail.** Violet appears in 7+ places (CTA, sidebar active, KPI deltas, sparklines, brand mark, link, "View all"). |
-| 3 | Typography shows personality? | **Fail.** Inter throughout (which is also banned by SKILL.md), no mono on data, no small caps, no serif. |
-| 4 | Deliberate density choice? | **Pass-ish.** Balanced throughout; no region intentionally denser or airier than default. |
-| 5 | Signature moment? | **Fail.** Nothing on the page would be missed if removed. The mini-bar sparklines are the closest, but they're decorative, not functional. |
-| 6 | Anti-cues absent? | **N/A.** No archetype was chosen. |
-| 7 | Microcopy archetype-voiced? | **Fail.** Generic *"How your product performed over the last 7 days"* subhead; default to defaults. |
-| 8 | Surface treatment matches archetype? | **N/A.** No archetype was chosen. |
+| 1 | Aesthetic direction named? | **Fail.** The plan said "SaaS analytics dashboard"; no direction stated. The design defaulted. |
+| 2 | Accent in non-obvious place? | **Fail.** Violet appears in 7+ places — CTA, sidebar active, KPI deltas, sparklines, brand mark, links, badges. |
+| 3 | Typography shows personality? | **Fail.** Same proportional font throughout, no mono on data, no deliberate typographic move. |
+| 4 | Deliberate density choice? | **N/A.** Balanced throughout; no region intentionally denser or airier. |
+| 5 | Signature moment? | **Fail.** Nothing on the page would be missed if removed. |
+| 6 | AI-default tells absent? | **Fail.** Soft shadows on every card. Pill badges. Blue default primary. |
+| 7 | Microcopy product-specific? | **Fail.** *"How your product performed over the last 7 days"* — interchangeable with any SaaS. |
+| 8 | Surface treatment matches direction? | **N/A.** No direction was stated. |
 
-Fail count: 5. The design is competent but undirected. Loading `analytics-dashboard` and re-running steps 4–5 of SKILL.md against that archetype would address all 5 fails.
+Fail count: 5. The design is competent but undirected. Stating a direction in step 2 — *"dense data product: hairline borders, no shadows, mono on all numerals"* — and re-running the build against it would address all 5 fails.
 
 This is exactly the gap this checklist is designed to catch.
