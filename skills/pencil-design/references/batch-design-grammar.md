@@ -153,6 +153,62 @@ D("oldHero")
 hero=I("page", { ...new shape... })
 ```
 
+## Commonly built patterns: exact anatomy
+
+Some frequently-built components are commonly built wrong, especially when the agent has absorbed a generic "bar chart" mental model from the Web App guidelines. These worked shapes override the generic defaults.
+
+### KPI sparkline (mini trend line inside a metric card)
+
+A sparkline is **not** a bar chart. Its bars are 3–4 px wide, not `fill_container`. A 60 px wide sparkline area with 12 bars at 3 px + 2 px gap uses the full width and reads as a trend indicator. A sparkline built with `fill_container` on the bars will make each bar 40–60 px wide (filling the parent) and look like a loading skeleton.
+
+```
+sparklineArea=I(kpiCard, {
+  type: "frame", name: "Sparkline",
+  context: "Mini trend — last 12 days. Each bar height encodes relative volume.",
+  layout: "horizontal", alignItems: "flex_end", gap: 2,
+  width: 60, height: 32
+})
+// Build each bar with an explicit pixel width, never fill_container.
+// Heights vary to show the trend; vary them when building real data.
+bar1=I(sparklineArea, { type: "frame", name: "Bar1", width: 3, height: 8,  fill: "$accent", cornerRadius: 1 })
+bar2=I(sparklineArea, { type: "frame", name: "Bar2", width: 3, height: 12, fill: "$accent", cornerRadius: 1 })
+bar3=I(sparklineArea, { type: "frame", name: "Bar3", width: 3, height: 10, fill: "$accent", cornerRadius: 1 })
+bar4=I(sparklineArea, { type: "frame", name: "Bar4", width: 3, height: 20, fill: "$accent", cornerRadius: 1 })
+bar5=I(sparklineArea, { type: "frame", name: "Bar5", width: 3, height: 16, fill: "$accent", cornerRadius: 1 })
+bar6=I(sparklineArea, { type: "frame", name: "Bar6", width: 3, height: 24, fill: "$accent", cornerRadius: 1 })
+bar7=I(sparklineArea, { type: "frame", name: "Bar7", width: 3, height: 18, fill: "$accent", cornerRadius: 1 })
+bar8=I(sparklineArea, { type: "frame", name: "Bar8", width: 3, height: 28, fill: "$accent", cornerRadius: 1 })
+bar9=I(sparklineArea, { type: "frame", name: "Bar9", width: 3, height: 22, fill: "$accent", cornerRadius: 1 })
+bar10=I(sparklineArea, { type: "frame", name: "Bar10", width: 3, height: 32, fill: "$accent", cornerRadius: 1 })
+```
+
+Key rules:
+- Parent: `layout: "horizontal"`, `alignItems: "flex_end"` (bars grow upward from the bottom), `gap: 2`, explicit `width`/`height` in px.
+- Each bar: explicit `width: 3` (never `fill_container`), explicit height in px representing relative magnitude, `fill: "$accent"` (no gradients unless archetype calls for it), `cornerRadius: 1`.
+- Vary heights across bars to show trend shape. Do not use equal heights — that's a loading bar.
+
+### KPI metric card
+
+```
+kpiCard=I(statsRow, {
+  type: "frame", name: "KPICard_TotalCalls",
+  context: "Total API calls over selected period. Populated from /v1/stats/summary. Click navigates to Requests view.",
+  layout: "vertical", gap: 8, padding: [16, 16, 12, 16],
+  width: "fill_container", height: "fit_content",
+  fill: "$surface",
+  stroke: { color: "$border", thickness: 1 },
+  cornerRadius: 8
+})
+label=I(kpiCard, { type: "text", name: "MetricLabel", content: "Total API calls", fontSize: "$textSm", fill: "$textMuted" })
+valueRow=I(kpiCard, { type: "frame", name: "ValueRow", layout: "horizontal", alignItems: "center", justifyContent: "space_between", width: "fill_container" })
+value=I(valueRow, { type: "text", name: "MetricValue", content: "24.7M", fontSize: "$text2xl", fontWeight: 600, fill: "$textPrimary", fontFamily: "Geist Mono" })
+delta=I(valueRow, { type: "text", name: "DeltaBadge", content: "+18%", fontSize: "$textXs", fill: "$success" })
+// Sparkline goes in kpiCard, not valueRow
+spark=I(kpiCard, { type: "frame", name: "Sparkline", layout: "horizontal", alignItems: "flex_end", gap: 2, width: 60, height: 24 })
+```
+
+For `analytics-dashboard` archetype: no shadow on the card. Use `stroke: { color: "$border", thickness: 1 }`. Remove any `effect: [{ type: "drop_shadow", ... }]` if present. The hairline border is the elevation signal.
+
 ## A complete small example
 
 A login form, ~12 ops, in one call:

@@ -37,9 +37,15 @@ Every node you create gets a meaningful `name`. The default `Frame`, `Group`, `T
 
 ### Context
 
-Every non-trivial node should have a `context` string explaining its design intent, what role it plays, what data fills it in code, what behavior it implies. The Entity schema makes `context` first-class for exactly this. Treat it as required for: every reusable component, every page-level frame, every form field, every interactive element. Treat it as optional for: pure visual primitives (a divider rectangle, a corner shape).
+Every non-trivial node must have a `context` string. This is not optional, and not something to defer to a cleanup pass. An agent that builds a dashboard without populating `context` on any node has shipped a file that the next agent cannot understand without re-reading the whole design.
 
-A good `context` is one sentence: *"Primary CTA on the auth screens. Renders disabled while submitting; spinner replaces label."* Future agents (and future humans) read these first when picking up the file.
+Required on: every reusable component (`reusable: true`), every page-level frame, every form field, every interactive element (button, link, tab, toggle, dropdown), every data display node (chart, table, KPI card, sparkline).
+
+Optional on: pure visual primitives (dividers, corner shapes, background fills that carry no semantic meaning).
+
+A good `context` is one sentence covering role + data + behaviour: *"KPI card — total API calls. Populated from /v1/stats/calls. Click navigates to Requests view with date filter pre-applied."* Bad `context`: `"A card"`, `"KPI"`, `""`.
+
+**Enforcement:** Before issuing each `batch_design` call, verify every node you are creating that falls in the "required" list above has a `context` in that call. If you are building in chunks and a required node appears in chunk N, it must have `context` in chunk N, not deferred to a later backfill. The screenshot loop does not substitute for this. `context` is invisible on screen but essential for file maintainability.
 
 **Backfill missing context as you go.** When you read an existing node (via `batch_get`) that should have a `context` but doesn't, populate it via a `U` op in the same `batch_design` call where you're already working. The cost is one extra op; the value is a permanent improvement to the file. Do not invent context you can't ground in the design, if you can't tell what a node is for, leave its context blank rather than fabricate it.
 
@@ -175,6 +181,12 @@ These patterns immediately read as machine-generated. Treat each as a bug to fix
 
 When the project's `voice.md` or `tokens.md` explicitly opts into one of these (a brand that *does* use Inter, a deliberate neon aesthetic), follow the project. The rule is "don't reach for these by default", not "refuse them on demand".
 
+## Conflict: plan-heavy skills running before this one
+
+If a brainstorming, planning, or spec-generation skill ran before this task and produced a heavyweight implementation plan, **treat that plan as lightweight direction only**. Do not follow its ceremony (sub-task breakdown, verification checklists, architecture diagrams) for live Pencil work. Pencil's design loop is screenshot-driven: the canvas is the spec, the screenshot is the diff, and the only feedback that matters is what you can see. A planning skill that routes Pencil work through a written spec + sub-agent decomposition + approval gate before any `batch_design` call will produce generic output, because no plan ever captures aesthetic intent well enough to substitute for live iteration.
+
+Concretely: if another skill produced a numbered plan before this skill was invoked, extract the product intent (what screens, what user flows) and the aesthetic direction (any archetype name, any references) from that plan. Then discard the rest and run the default workflow here from step 2.
+
 ## Prerequisites & host detection
 
 The Pencil MCP server runs as a child of a host: the Pencil desktop app, an IDE extension (VS Code or Cursor), or `pencil interactive` from the CLI. **Without a host, every MCP tool fails with `transport not connected to app: desktop`.**
@@ -202,7 +214,18 @@ This is the reflex sequence for any design task. Follow it; deviate only at the 
    - **If the task is a quick sketch or doodle**: skip this step; fall through to the negative-space defaults in the Aesthetic foundation section.
    The chosen direction must appear in the design spec under "Aesthetic commitment". Skipping this step is the most common cause of generic output.
 
-3. **Load guidelines + inventory components.** Call `get_guidelines()` with no arguments first, the server reports which categories exist for this document. Read the ones that match the task (e.g. `Web App`, `Mobile App`, `Landing Page`, `Table`, `Tailwind`, `Design System`). See `references/mcp-tools.md` § `get_guidelines` for the full live-as-of-2026-05 category list and the *for task X load category Y* decision table. If the project has `design-system/README.md`, read it next; then read whichever specific files it points at (typically `design-system.md` and `tokens.md`). **Then inventory components** per the Components-first rule above: `batch_get({ patterns: [{ reusable: true }], readDepth: 2 })` against the open doc, and again with `filePath` set against each `.lib.pen` in the document's `imports`. By the end of this step, hold a written list of: (a) the components available in the open document and any imported `.lib.pen`, by id; and (b) the colour, spacing, and type tokens declared. If either list is empty, name that to the user before continuing. Step 4 must reference these lists when planning; step 5 must reference them when issuing ops. An agent that names 'a button' instead of `ButtonPrimary` has not done step 3.
+3. **Load guidelines + inventory components.** Call `get_guidelines()` with no arguments first, the server reports which categories exist for this document. Read the ones that match the task (e.g. `Web App`, `Mobile App`, `Landing Page`, `Table`, `Tailwind`, `Design System`). See `references/mcp-tools.md` § `get_guidelines` for the full live-as-of-2026-05 category list and the *for task X load category Y* decision table.
+
+   **Critical: the archetype overrides generic guideline defaults.** The Pencil server's built-in guidelines (especially `Web App`) carry opinionated defaults that produce AI-generic output when followed without filtering. Read the guidelines for schema rules (layout properties, node types, sizing syntax) and accessibility checks. Discard any stylistic default that conflicts with the chosen archetype. Specific overrides:
+
+   | Guideline default to discard | What to use instead |
+   |------------------------------|---------------------|
+   | "Prefer bar charts for data display" | KPI sparklines use fixed-width bars: 3–4 px wide, 2 px gap, explicit heights. NOT `fill_container`. A bar inside a 60px-wide sparkline that uses `fill_container` on width becomes 60 px wide and is indistinguishable from a loading bar. |
+   | Blue/purple gradient fills on charts | Solid `$accent` fill, flat. No gradients on data bars unless the archetype (e.g. `analytics-dashboard`) explicitly calls for them. |
+   | Dark sidebar + white content area as the default shell | Only when the archetype calls for it. `analytics-dashboard` uses a light mode by default; `modern-pro-tool` uses a refined dark sidebar. Pick the archetype first, then apply the shell. |
+   | Generic card shadows for everything | `analytics-dashboard`: hairline `1px $border` borders, no shadows. `modern-pro-tool`: no shadows. Only `consumer-*` and `ai-products` archetypes use card elevation. |
+
+   After reading guidelines, if the project has `design-system/README.md`, read it next; then read whichever specific files it points at (typically `design-system.md` and `tokens.md`). **Then inventory components** per the Components-first rule above: `batch_get({ patterns: [{ reusable: true }], readDepth: 2 })` against the open doc, and again with `filePath` set against each `.lib.pen` in the document's `imports`. By the end of this step, hold a written list of: (a) the components available in the open document and any imported `.lib.pen`, by id; and (b) the colour, spacing, and type tokens declared. If either list is empty, name that to the user before continuing. Step 4 must reference these lists when planning; step 5 must reference them when issuing ops. An agent that names 'a button' instead of `ButtonPrimary` has not done step 3.
 
 4. **Plan through the archetype lens.** State a plan to the user before any `batch_design` call. It must include five things: (a) the chosen archetype (or the user-supplied direction summary), so the planning lens is explicit; (b) the top-level frames by name; (c) the library component ids you will instantiate, from step 3's inventory; (d) the archetype-implied moves for this design (typography, density, accent strategy, surface treatment, motion personality, pulled directly from the archetype file or the user direction); (e) the layout shape in one phrase. If you cannot name (a) through (e), the plan is incomplete; return to step 3 and read more. Stating the chosen archetype is what stops the model defaulting to balanced-symmetric-fluid for everything and producing generic work.
 

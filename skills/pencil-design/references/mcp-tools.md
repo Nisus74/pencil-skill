@@ -103,6 +103,18 @@ get_guidelines({ category: "Tailwind" })
 
 **Pitfalls.** Loading three or four categories at once burns context for limited gain. Pick the one or two most relevant; reach for more only if the first pass leaves an obvious blind spot.
 
+**Guidelines carry generic defaults. The archetype overrides them.** The built-in guidelines teach schema syntax and accessibility constraints — both worth following. Their *stylistic* defaults (chart types, surface colours, shadow use) are generic and will produce AI-slop output if applied without filtering. After reading guidelines, consult the chosen archetype and override any stylistic default that conflicts.
+
+The most common overrides:
+
+| What the guideline says | When to override | What to use instead |
+|-------------------------|------------------|---------------------|
+| "Prefer bar charts for data" | Always on sparklines inside KPI cards | Sparkline bars: explicit `width: 3`, `height: <N>`, `gap: 2`, parent `alignItems: "flex_end"`. Never `fill_container` on bar width. See `batch-design-grammar.md` for the exact anatomy. |
+| Blue/purple gradient fills on charts | When archetype is `analytics-dashboard` or `modern-pro-tool` | Flat `fill: "$accent"`. No gradients on data bars. |
+| Card drop shadows everywhere | `analytics-dashboard` archetype | Hairline `stroke: { color: "$border", thickness: 1 }`, no shadow at all. |
+| Inter as UI font | Unless archetype explicitly opts in (e.g., `modern-pro-tool`) | `Geist` for UI text, `Geist Mono` for numerals and data. |
+| Dark sidebar + white body as default shell | Unless user direction or archetype calls for it | `analytics-dashboard` defaults to an all-light layout. Dark sidebar is not a neutral default. |
+
 ## Read / inspect
 
 ### `batch_get`
