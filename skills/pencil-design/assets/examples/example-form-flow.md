@@ -82,22 +82,22 @@ Returns `(x1, y1)`. The other two frames will be at `(x1 + 1520, y1)` and `(x1 +
 ## Step 5a — First batch_design (Step 1: Email + Password)
 
 ```
-page1=I("doc", { type: "frame", name: "Signup_Step1_Email", layout: "vertical", justifyContent: "center", alignItems: "center", x: <x1>, y: <y1>, width: 1440, height: 900, padding: "$space-8", fill: [{ type: "solid_color", color: "$surface" }] })
+page1=I("doc", { type: "frame", name: "Signup_Step1_Email", layout: "vertical", justifyContent: "center", alignItems: "center", x: <x1>, y: <y1>, width: 1440, height: 900, padding: "$space-8", fill: [{ type: "color", color: "$surface" }] })
 stepper=I(page1, { type: "frame", name: "Stepper", layout: "horizontal", gap: "$space-2", padding: "$space-4", alignItems: "center" })
-step1Dot=I(stepper, { type: "ellipse", name: "Step1Dot", width: 8, height: 8, fill: [{ type: "solid_color", color: "$primary" }] })
-step1Bar=I(stepper, { type: "rectangle", name: "Step1Bar", width: 32, height: 2, fill: [{ type: "solid_color", color: "$primary" }] })
-step2Dot=I(stepper, { type: "ellipse", name: "Step2Dot", width: 8, height: 8, fill: [{ type: "solid_color", color: "$border" }] })
-step2Bar=I(stepper, { type: "rectangle", name: "Step2Bar", width: 32, height: 2, fill: [{ type: "solid_color", color: "$border" }] })
-step3Dot=I(stepper, { type: "ellipse", name: "Step3Dot", width: 8, height: 8, fill: [{ type: "solid_color", color: "$border" }] })
-card=I(page1, { type: "frame", name: "AuthCard", layout: "vertical", gap: "$space-4", padding: "$space-8", width: 400, cornerRadius: "$radiusLg", fill: [{ type: "solid_color", color: "$surfaceMuted" }], stroke: { thickness: 1, fill: "$border" } })
-title=I(card, { type: "text", name: "Title", text: "Create your account", fontSize: "$text2xl", fontWeight: 700 })
-sub=I(card, { type: "text", name: "Subtitle", text: "Step 1 of 3 — your details.", fontSize: "$textBase", fill: [{ type: "solid_color", color: "$textMuted" }] })
-email=I(card, { type: "ref", ref: "Input", descendants: { label: { text: "Email" }, input: { placeholder: "you@example.com", value: "alex@startup.io" }, error: { text: "That email is already registered. Try signing in instead." } }, theme: { state: "error" } })
-pwd=I(card, { type: "ref", ref: "Input", descendants: { label: { text: "Password" }, input: { type: "password", placeholder: "8+ characters" }, helperText: { text: "Mix letters, numbers, and a symbol." } } })
+step1Dot=I(stepper, { type: "ellipse", name: "Step1Dot", width: 8, height: 8, fill: [{ type: "color", color: "$primary" }] })
+step1Bar=I(stepper, { type: "rectangle", name: "Step1Bar", width: 32, height: 2, fill: [{ type: "color", color: "$primary" }] })
+step2Dot=I(stepper, { type: "ellipse", name: "Step2Dot", width: 8, height: 8, fill: [{ type: "color", color: "$border" }] })
+step2Bar=I(stepper, { type: "rectangle", name: "Step2Bar", width: 32, height: 2, fill: [{ type: "color", color: "$border" }] })
+step3Dot=I(stepper, { type: "ellipse", name: "Step3Dot", width: 8, height: 8, fill: [{ type: "color", color: "$border" }] })
+card=I(page1, { type: "frame", name: "AuthCard", layout: "vertical", gap: "$space-4", padding: "$space-8", width: 400, cornerRadius: "$radiusLg", fill: [{ type: "color", color: "$surfaceMuted" }], stroke: { thickness: 1, fill: "$border" } })
+title=I(card, { type: "text", name: "Title", content: "Create your account", fontSize: "$text2xl", fontWeight: 700 })
+sub=I(card, { type: "text", name: "Subtitle", content: "Step 1 of 3 — your details.", fontSize: "$textBase", fill: [{ type: "color", color: "$textMuted" }] })
+email=I(card, { type: "ref", ref: "Input", descendants: { label: { content: "Email" }, input: { placeholder: "you@example.com", value: "alex@startup.io" }, error: { content: "That email is already registered. Try signing in instead." } }, theme: { state: "error" } })
+pwd=I(card, { type: "ref", ref: "Input", descendants: { label: { content: "Password" }, input: { type: "password", placeholder: "8+ characters" }, helperText: { content: "Mix letters, numbers, and a symbol." } } })
 tos=I(card, { type: "frame", name: "ToS", layout: "horizontal", gap: "$space-2", alignItems: "start" })
-tosCheckbox=I(tos, { type: "ref", ref: "Checkbox", descendants: { label: { text: "I agree to the Terms and Privacy Policy." } } })
-continue=I(card, { type: "ref", ref: "ButtonPrimary", descendants: { label: { text: "Continue" } } })
-signinLink=I(card, { type: "ref", ref: "LinkText", descendants: { label: { text: "Already have an account? Sign in" } } })
+tosCheckbox=I(tos, { type: "ref", ref: "Checkbox", descendants: { label: { content: "I agree to the Terms and Privacy Policy." } } })
+continue=I(card, { type: "ref", ref: "ButtonPrimary", descendants: { label: { content: "Continue" } } })
+signinLink=I(card, { type: "ref", ref: "LinkText", descendants: { label: { content: "Already have an account? Sign in" } } })
 ```
 
 15 ops. Note:
@@ -124,16 +124,16 @@ U("stepper", { width: "fit_content" })   // stepper hugs its content; parent's a
 ## Step 5b — Second batch_design (Step 2: Verify code)
 
 ```
-page2=I("doc", { type: "frame", name: "Signup_Step2_Verify", layout: "vertical", justifyContent: "center", alignItems: "center", x: <x1 + 1520>, y: <y1>, width: 1440, height: 900, padding: "$space-8", fill: [{ type: "solid_color", color: "$surface" }] })
+page2=I("doc", { type: "frame", name: "Signup_Step2_Verify", layout: "vertical", justifyContent: "center", alignItems: "center", x: <x1 + 1520>, y: <y1>, width: 1440, height: 900, padding: "$space-8", fill: [{ type: "color", color: "$surface" }] })
 stepper2=I(page2, { type: "frame", name: "Stepper", layout: "horizontal", gap: "$space-2", padding: "$space-4", alignItems: "center", width: "fit_content" })
-s2dot1=I(stepper2, { type: "ellipse", name: "Step1Dot", width: 8, height: 8, fill: [{ type: "solid_color", color: "$primary" }] })
-s2bar1=I(stepper2, { type: "rectangle", name: "Step1Bar", width: 32, height: 2, fill: [{ type: "solid_color", color: "$primary" }] })
-s2dot2=I(stepper2, { type: "ellipse", name: "Step2Dot", width: 8, height: 8, fill: [{ type: "solid_color", color: "$primary" }] })
-s2bar2=I(stepper2, { type: "rectangle", name: "Step2Bar", width: 32, height: 2, fill: [{ type: "solid_color", color: "$border" }] })
-s2dot3=I(stepper2, { type: "ellipse", name: "Step3Dot", width: 8, height: 8, fill: [{ type: "solid_color", color: "$border" }] })
-card2=I(page2, { type: "frame", name: "AuthCard", layout: "vertical", gap: "$space-4", padding: "$space-8", width: 400, cornerRadius: "$radiusLg", fill: [{ type: "solid_color", color: "$surfaceMuted" }], stroke: { thickness: 1, fill: "$border" } })
-title2=I(card2, { type: "text", name: "Title", text: "Check your email", fontSize: "$text2xl", fontWeight: 700 })
-sub2=I(card2, { type: "text", name: "Subtitle", text: "We sent a 6-digit code to alex@startup.io.", fontSize: "$textBase", fill: [{ type: "solid_color", color: "$textMuted" }] })
+s2dot1=I(stepper2, { type: "ellipse", name: "Step1Dot", width: 8, height: 8, fill: [{ type: "color", color: "$primary" }] })
+s2bar1=I(stepper2, { type: "rectangle", name: "Step1Bar", width: 32, height: 2, fill: [{ type: "color", color: "$primary" }] })
+s2dot2=I(stepper2, { type: "ellipse", name: "Step2Dot", width: 8, height: 8, fill: [{ type: "color", color: "$primary" }] })
+s2bar2=I(stepper2, { type: "rectangle", name: "Step2Bar", width: 32, height: 2, fill: [{ type: "color", color: "$border" }] })
+s2dot3=I(stepper2, { type: "ellipse", name: "Step3Dot", width: 8, height: 8, fill: [{ type: "color", color: "$border" }] })
+card2=I(page2, { type: "frame", name: "AuthCard", layout: "vertical", gap: "$space-4", padding: "$space-8", width: 400, cornerRadius: "$radiusLg", fill: [{ type: "color", color: "$surfaceMuted" }], stroke: { thickness: 1, fill: "$border" } })
+title2=I(card2, { type: "text", name: "Title", content: "Check your email", fontSize: "$text2xl", fontWeight: 700 })
+sub2=I(card2, { type: "text", name: "Subtitle", content: "We sent a 6-digit code to alex@startup.io.", fontSize: "$textBase", fill: [{ type: "color", color: "$textMuted" }] })
 codeRow=I(card2, { type: "frame", name: "CodeRow", layout: "horizontal", gap: "$space-2", justifyContent: "center" })
 d1=I(codeRow, { type: "frame", name: "Digit1", width: 48, height: 56, cornerRadius: "$radiusMd", stroke: { thickness: 1, fill: "$border" } })
 d2=I(codeRow, { type: "frame", name: "Digit2", width: 48, height: 56, cornerRadius: "$radiusMd", stroke: { thickness: 1, fill: "$border" } })
@@ -141,8 +141,8 @@ d3=I(codeRow, { type: "frame", name: "Digit3", width: 48, height: 56, cornerRadi
 d4=I(codeRow, { type: "frame", name: "Digit4", width: 48, height: 56, cornerRadius: "$radiusMd", stroke: { thickness: 1, fill: "$border" } })
 d5=I(codeRow, { type: "frame", name: "Digit5", width: 48, height: 56, cornerRadius: "$radiusMd", stroke: { thickness: 1, fill: "$border" } })
 d6=I(codeRow, { type: "frame", name: "Digit6", width: 48, height: 56, cornerRadius: "$radiusMd", stroke: { thickness: 1, fill: "$border" } })
-verify=I(card2, { type: "ref", ref: "ButtonPrimary", descendants: { label: { text: "Verify email" } } })
-resend=I(card2, { type: "ref", ref: "LinkText", descendants: { label: { text: "Resend code" } } })
+verify=I(card2, { type: "ref", ref: "ButtonPrimary", descendants: { label: { content: "Verify email" } } })
+resend=I(card2, { type: "ref", ref: "LinkText", descendants: { label: { content: "Resend code" } } })
 ```
 
 19 ops. The 6-digit code input is custom — six small frames in a horizontal row. The component library doesn't have a `CodeInput` yet; this is a candidate to surface for the library at the end of the task.
@@ -160,12 +160,12 @@ Check: code row is centered, six 48×56 cells with 8px gaps total ~56px height +
 The confirmation page is structurally different. Larger icon, no stepper indicator (or a fully-completed stepper for visual closure), single primary action.
 
 ```
-page3=I("doc", { type: "frame", name: "Signup_Step3_Welcome", layout: "vertical", justifyContent: "center", alignItems: "center", x: <x1 + 3040>, y: <y1>, width: 1440, height: 900, padding: "$space-8", fill: [{ type: "solid_color", color: "$surface" }] })
+page3=I("doc", { type: "frame", name: "Signup_Step3_Welcome", layout: "vertical", justifyContent: "center", alignItems: "center", x: <x1 + 3040>, y: <y1>, width: 1440, height: 900, padding: "$space-8", fill: [{ type: "color", color: "$surface" }] })
 welcomeBlock=I(page3, { type: "frame", name: "WelcomeBlock", layout: "vertical", justifyContent: "center", alignItems: "center", gap: "$space-5", padding: "$space-8", width: 480 })
-checkIcon=I(welcomeBlock, { type: "icon_font", name: "CheckIcon", iconName: "check-circle", iconLibrary: "lucide", fontSize: 64, fill: [{ type: "solid_color", color: "$success" }] })
-welcomeTitle=I(welcomeBlock, { type: "text", name: "Title", text: "You're in.", fontSize: "$text3xl", fontWeight: 700, textAlign: "center" })
-welcomeSub=I(welcomeBlock, { type: "text", name: "Subtitle", text: "We've set up your workspace. Head over and create your first project.", fontSize: "$textBase", textAlign: "center", fill: [{ type: "solid_color", color: "$textMuted" }] })
-goCta=I(welcomeBlock, { type: "ref", ref: "ButtonPrimary", descendants: { label: { text: "Go to dashboard" } } })
+checkIcon=I(welcomeBlock, { type: "icon_font", name: "CheckIcon", iconFontName: "circle-check", iconFontFamily: "lucide", width: 64, height: 64, fill: [{ type: "color", color: "$success" }] })
+welcomeTitle=I(welcomeBlock, { type: "text", name: "Title", content: "You're in.", fontSize: "$text3xl", fontWeight: 700, textAlign: "center" })
+welcomeSub=I(welcomeBlock, { type: "text", name: "Subtitle", content: "We've set up your workspace. Head over and create your first project.", fontSize: "$textBase", textAlign: "center", fill: [{ type: "color", color: "$textMuted" }] })
+goCta=I(welcomeBlock, { type: "ref", ref: "ButtonPrimary", descendants: { label: { content: "Go to dashboard" } } })
 ```
 
 6 ops. Confirmation copy is concise — *"You're in."* is the lead, the subtitle is one sentence, the CTA is a specific verb (*"Go to dashboard"*). No filler hero copy, no fabricated metrics, no AI clichés.
@@ -190,9 +190,9 @@ get_screenshot({ nodeId: "page3" })
 
 Verify per page:
 
-- **Page 1.** Stepper renders (1-of-3 highlighted). Email field shows error-state styling — red border, alert-circle icon, the error message *"That email is already registered. Try signing in instead."* below the input. Password field renders cleanly with helper text. Continue button uses `$primary`. ToS checkbox legible. Sign-in link at bottom.
+- **Page 1.** Stepper renders (1-of-3 highlighted). Email field shows error-state styling — red border, circle-alert icon, the error message *"That email is already registered. Try signing in instead."* below the input. Password field renders cleanly with helper text. Continue button uses `$primary`. ToS checkbox legible. Sign-in link at bottom.
 - **Page 2.** Stepper shows 2-of-3. Email reference (*"alex@startup.io"*) is visible in the subtitle. Six code-input cells render with consistent borders. Verify button uses `$primary`. Resend link is present.
-- **Page 3.** Different lockup — larger icon (`check-circle` in `$success`), `$text3xl` headline, single subtitle, single primary CTA. Reads as completion, not as another form step.
+- **Page 3.** Different lockup — larger icon (`circle-check` in `$success`), `$text3xl` headline, single subtitle, single primary CTA. Reads as completion, not as another form step.
 
 Three screenshots total — one per page.
 

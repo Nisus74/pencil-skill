@@ -47,11 +47,11 @@ U("doc", { imports: { "ds": "./design/system.lib.pen" } })
 ## Step 6 — Build the form
 
 ```
-form=I("doc", { type: "frame", name: "LoginForm", layout: "vertical", gap: "$space-4", padding: "$space-6", width: 360, cornerRadius: 12, fill: [{ type: "solid_color", color: "$surface" }] })
-title=I(form, { type: "text", text: "Sign in", fontSize: "$text2xl", fontWeight: 700 })
-email=I(form, { type: "ref", ref: "Input", descendants: { label: { text: "Email" }, input: { placeholder: "you@example.com" } } })
-pwd=I(form, { type: "ref", ref: "Input", descendants: { label: { text: "Password" }, input: { type: "password" } } })
-submit=I(form, { type: "ref", ref: "ButtonPrimary", descendants: { label: { text: "Sign in" } } })
+form=I("doc", { type: "frame", name: "LoginForm", layout: "vertical", gap: "$space-4", padding: "$space-6", width: 360, cornerRadius: 12, fill: [{ type: "color", color: "$surface" }] })
+title=I(form, { type: "text", content: "Sign in", fontSize: "$text2xl", fontWeight: 700 })
+email=I(form, { type: "ref", ref: "Input", descendants: { label: { content: "Email" }, input: { placeholder: "you@example.com" } } })
+pwd=I(form, { type: "ref", ref: "Input", descendants: { label: { content: "Password" }, input: { type: "password" } } })
+submit=I(form, { type: "ref", ref: "ButtonPrimary", descendants: { label: { content: "Sign in" } } })
 ```
 
 Five ops.

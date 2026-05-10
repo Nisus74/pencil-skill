@@ -46,7 +46,7 @@ Library contains `ButtonPrimary`, `ButtonSecondary`, `LinkText`, `Input`, `Card`
 
 ## Step 4 — Plan (told to user)
 
-> *"I'll add two sibling top-level frames at desktop breakpoint (1440×900): `Page_404` and `Page_Offline`. Both use the same lockup — a centered icon, title, description, and primary CTA — built as a single frame I'll copy with overrides for each page. The 404 uses `alert-circle`, copy *'This page doesn't exist'* and a CTA back to the dashboard. The offline page uses `cloud-off`, copy *'You're offline'* and a Retry CTA. Both bind colors to your `tokens.md` variables and inherit the `mode` theme axis you already have. I'll add a `$illustration` color token if it isn't already declared so the icon color is centrally controlled."*
+> *"I'll add two sibling top-level frames at desktop breakpoint (1440×900): `Page_404` and `Page_Offline`. Both use the same lockup — a centered icon, title, description, and primary CTA — built as a single frame I'll copy with overrides for each page. The 404 uses `circle-alert`, copy *'This page doesn't exist'* and a CTA back to the dashboard. The offline page uses `cloud-off`, copy *'You're offline'* and a Retry CTA. Both bind colors to your `tokens.md` variables and inherit the `mode` theme axis you already have. I'll add a `$illustration` color token if it isn't already declared so the icon color is centrally controlled."*
 
 ## Step 4.5 — Verify the token suite
 
@@ -85,13 +85,13 @@ Returns coordinates — call them `(x404, y404)`. Place `Page_404` there. After 
 ## Step 5 — First batch_design (404 page + shared lockup)
 
 ```
-page404=I("doc", { type: "frame", name: "Page_404", layout: "vertical", justifyContent: "center", alignItems: "center", x: <x404>, y: <y404>, width: 1440, height: 900, padding: "$space-8", fill: [{ type: "solid_color", color: "$surface" }] })
+page404=I("doc", { type: "frame", name: "Page_404", layout: "vertical", justifyContent: "center", alignItems: "center", x: <x404>, y: <y404>, width: 1440, height: 900, padding: "$space-8", fill: [{ type: "color", color: "$surface" }] })
 block=I(page404, { type: "frame", name: "ErrorBlock", layout: "vertical", justifyContent: "center", alignItems: "center", gap: "$space-5", padding: "$space-8", width: 480 })
-icon=I(block, { type: "icon_font", name: "ErrorIcon", iconName: "alert-circle", iconLibrary: "lucide", fontSize: 64, fill: [{ type: "solid_color", color: "$illustration" }] })
-title=I(block, { type: "text", name: "Title", text: "This page doesn't exist.", fontSize: "$text2xl", fontWeight: 700, textAlign: "center", fill: [{ type: "solid_color", color: "$textPrimary" }] })
-desc=I(block, { type: "text", name: "Description", text: "The link may be broken, or the page may have moved. Head back to the dashboard.", fontSize: "$textBase", textAlign: "center", fill: [{ type: "solid_color", color: "$textMuted" }] })
-cta=I(block, { type: "ref", ref: "ButtonPrimary", descendants: { label: { text: "Go to dashboard" } } })
-code=I(block, { type: "text", name: "ErrorCode", text: "404", fontSize: "$textXs", textAlign: "center", fill: [{ type: "solid_color", color: "$textMuted" }] })
+icon=I(block, { type: "icon_font", name: "ErrorIcon", iconFontName: "circle-alert", iconFontFamily: "lucide", width: 64, height: 64, fill: [{ type: "color", color: "$illustration" }] })
+title=I(block, { type: "text", name: "Title", content: "This page doesn't exist.", fontSize: "$text2xl", fontWeight: 700, textAlign: "center", fill: [{ type: "color", color: "$textPrimary" }] })
+desc=I(block, { type: "text", name: "Description", content: "The link may be broken, or the page may have moved. Head back to the dashboard.", fontSize: "$textBase", textAlign: "center", fill: [{ type: "color", color: "$textMuted" }] })
+cta=I(block, { type: "ref", ref: "ButtonPrimary", descendants: { label: { content: "Go to dashboard" } } })
+code=I(block, { type: "text", name: "ErrorCode", content: "404", fontSize: "$textXs", textAlign: "center", fill: [{ type: "color", color: "$textMuted" }] })
 ```
 
 7 ops — well under 25. Note the `name` and `context` discipline: `Page_404`, `ErrorBlock`, `ErrorIcon`, `Title`, `Description`, `ErrorCode`. No `Frame 1` defaults.
@@ -132,12 +132,12 @@ If clean, move to the offline page.
 The lockup is the same. Use `C` (copy) with `descendants` overrides:
 
 ```
-pageOffline=I("doc", { type: "frame", name: "Page_Offline", layout: "vertical", justifyContent: "center", alignItems: "center", x: <xOffline>, y: <yOffline>, width: 1440, height: 900, padding: "$space-8", fill: [{ type: "solid_color", color: "$surface" }] })
+pageOffline=I("doc", { type: "frame", name: "Page_Offline", layout: "vertical", justifyContent: "center", alignItems: "center", x: <xOffline>, y: <yOffline>, width: 1440, height: 900, padding: "$space-8", fill: [{ type: "color", color: "$surface" }] })
 blockCopy=C(block, pageOffline, { descendants: {
-  ErrorIcon:    { iconName: "cloud-off" },
-  Title:        { text: "You're offline." },
-  Description:  { text: "We can't reach the server. Check your connection and try again." },
-  ErrorCode:    { text: "" },
+  ErrorIcon:    { iconFontName: "cloud-off" },
+  Title:        { content: "You're offline." },
+  Description:  { content: "We can't reach the server. Check your connection and try again." },
+  ErrorCode:    { content: "" },
   /* The CTA stays a ButtonPrimary ref, but we override the label */
 } })
 ```
@@ -145,7 +145,7 @@ blockCopy=C(block, pageOffline, { descendants: {
 Wait — the CTA needs to change from *"Go to dashboard"* to *"Try again"*. The label override goes through the nested `ButtonPrimary` ref's `descendants`. The Pencil schema supports nested descendants paths; the cleaner approach is a follow-up `U` op on the copied CTA's id:
 
 ```
-U(`${blockCopy}/cta`, { descendants: { label: { text: "Try again" } } })
+U(`${blockCopy}/cta`, { descendants: { label: { content: "Try again" } } })
 ```
 
 (The `${blockCopy}/cta` syntax assumes the copy preserves the original child id `cta`; if the schema reassigns ids on copy, fall back to a `batch_get` to resolve, then `U`.)
@@ -153,7 +153,7 @@ U(`${blockCopy}/cta`, { descendants: { label: { text: "Try again" } } })
 Also clear the error-code text since offline isn't an HTTP code:
 
 ```
-U(`${blockCopy}/code`, { text: "" })
+U(`${blockCopy}/code`, { content: "" })
 ```
 
 Or just suppress visibility:

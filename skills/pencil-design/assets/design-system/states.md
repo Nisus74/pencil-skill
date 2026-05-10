@@ -41,8 +41,8 @@ Project-specific renderings of the states whose visual language differs from the
 | **Hover** | Shift fill toward `$primaryMuted`; no `translateY`. We don't lift on hover anywhere. |
 | **Pressed** | Instant `transform: scale(0.98)`; release on `$durationFast`. |
 | **Disabled** | `opacity: 0.5`, `cursor: not-allowed`. Foreground stays readable (≥ 3:1). |
-| **Error** | Border `$danger` (2px when paired with `:focus`), `alert-circle` icon (16px) at the end of the field, helper text in `$danger` below. |
-| **Success** | Border `$success`, `check-circle` icon, helper text in `$success`. Decay to default after 2s for transient confirmation. |
+| **Error** | Border `$danger` (2px when paired with `:focus`), `circle-alert` icon (16px) at the end of the field, helper text in `$danger` below. |
+| **Success** | Border `$success`, `circle-check` icon, helper text in `$success`. Decay to default after 2s for transient confirmation. |
 | **Loading (button)** | Replace label with a 16px spinner in the button's foreground color. Preserve width. |
 | **Skeleton** | `$surfaceMuted` fill, 1.4s shimmer per `motion.md`. Match loaded-content dimensions. |
 
