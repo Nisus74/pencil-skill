@@ -23,6 +23,11 @@ Most design systems sit on a 4pt or 8pt base. Spacing values are multiples (4, 8
 
 The discipline is in *picking* a base and *staying* in it. Mixing 4pt and 8pt across the same surface is the most common subtle layout error.
 
+### Semantic spacing tokens
+Name spacing tokens by their relationship, not their literal value. `$spaceSm`, `$spaceMd`, `$spaceLg` survive a scale change; `$spacing8`, `$spacing16`, `$spacing24` lock the values in and require renames when the system shifts. The same logic applies to font sizes (`$textSm` over `$text14`), radii (`$radiusMd` over `$radius8`), and elevation (`$shadowLg` over `$shadow24`).
+
+For sibling spacing, prefer `gap` on the parent's auto-layout over per-child `margin`. Pencil's `gap` eliminates the margin-collapse and double-spacing failures that surface when adjacent elements both claim their own margins.
+
 ## Spatial rhythm
 
 Spacing is half of layout. The same components arranged with different spacing read as different designs.
@@ -43,6 +48,20 @@ Decide a rhythm in step 2 (aesthetic direction) and apply it; don't let *"reason
 Squint at the layout. The eye should land on a deliberate first focal point, then move through the surface in a clear order. If squinting reveals an even field of grey rectangles with no obvious entry point, the layout has no hierarchy.
 
 If the squint test fails, the fix is rarely *"more colour"* or *"a bigger heading."* It's usually *"more spacing variance"* and *"more weight contrast."* See [typography.md](typography.md) on weight contrast and [cognitive-load.md](cognitive-load.md) on hierarchy as a cognitive scaffolding move.
+
+### Hierarchy through multiple dimensions
+
+When the squint test fails, the fix is usually layered. Strong hierarchy combines two or three of these dimensions on the same element; weak hierarchy relies on one of them alone.
+
+| Dimension | Strong hierarchy | Weak hierarchy |
+|---|---|---|
+| Size | 3:1 ratio or more | Less than 2:1 ratio |
+| Weight | Bold versus Regular (900 paired with 300) | Medium versus Regular (500 paired with 400) |
+| Colour | High-contrast accent against neutrals | Two similar tones |
+| Position | Top-left or geometric focal point | Bottom-right or buried mid-page |
+| Space | Generous whitespace around the element | Tight padding everywhere |
+
+A heading that's larger, bolder, AND has more space above it carries unambiguous hierarchy. A heading that's only larger reads as *"the design got the type ratio right"*, which isn't the same as *"this is the thing to look at first."* Pick two or three dimensions per focal point; the others stay quiet.
 
 ## Register-specific spatial strategy
 
@@ -101,6 +120,19 @@ Split-screen guidance:
 ### The bento grid
 Mixed-size cards arranged in a grid (popularised by Apple, now over-saturated). Refuse as the default product page (per [brand.md](brand.md)); use intentionally when the content actually varies in importance and shape.
 
+### Cards as a layout choice
+Cards are overused. Spacing, alignment, and typography create visual grouping naturally; reaching for cards every time a group needs to be distinct produces the *"identical card grid"* aesthetic that reads as templated.
+
+Cards earn their place in three situations:
+
+- The content is genuinely distinct and actionable; each card is a tappable target.
+- Items need direct visual comparison in a grid; pricing tiers, plan options, dashboard metrics with shared shape.
+- The content needs a clear interaction boundary; a drag-and-drop target, a hoverable preview surface.
+
+When none of those apply, render the group as a list with stronger typography or as separated sections with rhythm. Cards-by-reflex is a fast way to make a brand page feel like a generic product page.
+
+**Never nest cards inside cards.** The SKILL.md ban exists because the layout pattern is unsalvageable; if you find yourself reaching for a nested card, the outer card probably shouldn't have been a card to begin with. Use spacing, typography, and subtle dividers for hierarchy within a card instead.
+
 ## Working with breakpoints
 
 The SKILL.md responsive table covers the canonical breakpoints (Mobile 390, Tablet 768, Desktop 1440). Layout decisions per breakpoint:
@@ -128,6 +160,40 @@ For very wide viewports (1920+), the design should NOT keep stretching. Either:
 - Cap content at 1200 (or whatever max-width the brand uses) and let the wings breathe.
 - Add a third column of supporting content (right-rail navigation, related content).
 - Increase font size and line spacing rather than line length; long lines harm reading.
+
+## Touch targets
+
+Mouse pointers have pixel precision; fingers don't. A 24px button works on desktop and reads as broken on mobile. The 44x44px floor from [accessibility.md](accessibility.md) applies wherever touch is plausible.
+
+The Pencil pattern: keep the visual icon at its natural size and expand the tap target via a sibling frame with `fill: "transparent"`:
+
+```
+U("<iconButton>", { width: 24, height: 24 })
+T1=I("iconButton", { type: "frame", x: -10, y: -10, width: 44, height: 44, fill: "transparent", role: "button" })
+```
+
+Apply at minimum to:
+
+- Icon-only buttons in toolbars and toasts
+- Chevrons on expandable rows
+- Toggle switches and small checkboxes
+- Close buttons on modals and banners
+- Tab targets in dense navigation
+
+The visual element stays small; the tap target gets enough surface area to land. Inconsistent tap targets (some elements 44, some 24) read as bugs on mobile.
+
+Touch-target adherence on desktop is also worth aiming for. Mouse users with low-precision pointing (older users, users with motor difficulties, users on a touchpad) benefit from the extra surface area too.
+
+## Optical adjustments
+
+The pixel grid is precise; the eye isn't. A handful of common adjustments compensate:
+
+- **Icon centring.** Geometric centring of triangles, arrows, and other asymmetric glyphs reads off-centre. A play-triangle shifts right by 1–2px; an arrow shifts toward its direction by 1–2px; a chevron centres on its visual midpoint, not its bounding box.
+- **Text optical alignment at container edges.** Body text starting at `x: 0` looks indented because letterform whitespace pushes the visual edge inward. For display-sized text against a container edge, apply a negative offset (roughly -0.05em in pixel terms; for a 64px headline that's about -3px).
+- **Vertical text centring in buttons.** Button labels are usually optically centred slightly higher than the geometric centre because of the baseline. If a button looks bottom-heavy, nudge the label up by 1px.
+- **Hanging punctuation.** Quote marks, dashes, and similar punctuation pulled into the margin for pull-quotes and editorial layouts. Reserve for editorial; not for product UI.
+
+These adjustments are small per element and visible in aggregate. The surface ends up reading as *"someone cared"* rather than as *"the grid was followed."*
 
 ## Layout anti-patterns
 
