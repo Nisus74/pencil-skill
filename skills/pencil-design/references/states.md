@@ -54,13 +54,7 @@ ButtonPrimary (reusable: true)
 
 The instance picks a sibling by `descendants` override or by `theme: { state: "hover" }` if you've added a `state` axis.
 
-**`state` theme axis.** Declare a `state` axis at the document level:
-
-```
-U("doc", { themes: { state: ["default", "hover", "focus", "pressed", "disabled"] } })
-```
-
-Then bind state-conditional values on the component:
+**`state` theme axis.** The `state` axis registers automatically once you declare state-conditional variable values via `set_variables`. No explicit axis-declaration step is needed. Bind state-conditional values on the component:
 
 ```
 fill: [

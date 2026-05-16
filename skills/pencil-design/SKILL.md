@@ -78,7 +78,7 @@ If a component exists but its name doesn't quite match what the user said (`Prim
 
 Every new document declares a `mode` theme axis with `light` and `dark` values. Every color variable carries both. No exceptions for "we'll add dark mode later", the variables are nearly free to declare upfront, and retrofitting a colorscape after the design exists is brutal.
 
-**Setting themes and variables:** `U("document", ...)` is not supported by `batch_design`, the `document` binding is insert-only. Use `set_variables` (the dedicated MCP tool) to write design tokens, or set them directly in the document JSON. To activate a theme on a frame (e.g. render in dark mode), use `U("frameId", { theme: { mode: "dark" } })`.
+**Setting themes and variables:** declare tokens with `set_variables`; the server auto-registers any theme axis it sees in your variable values. No separate "declare the axis first" step is needed. `U("document", ...)` is not supported by `batch_design`, the `document` binding is insert-only, and there is no other root-node id exposed to `U`. The two correct paths: `set_variables` for design tokens (themed values use an array of `{ value, theme }` entries; the axis appears automatically); and `U("frameId", { theme: { mode: "dark" } })` to activate a theme on a specific frame. The frame `theme` (singular, object) is different from the variable themed-value array (plural, list of entries), see `references/mcp-tools.md` § `set_variables`.
 
 Test under both modes by updating the page frame's `theme` property before declaring the design done.
 
@@ -131,7 +131,7 @@ Where the discipline rules govern *correctness*, this section governs *taste*. T
 
 ### Precedence (the most important rule on this page)
 
-1. **User direction wins.** If the user has supplied a screenshot, named a brand or product, pasted a URL, or described an aesthetic in prose, follow that direction. Synthesise the aesthetic properties from the input — typography, density, accent strategy, surface treatment — and apply them for the session.
+1. **User direction wins.** If the user has supplied a screenshot, named a brand or product, pasted a URL, or described an aesthetic in prose, follow that direction. Synthesise the aesthetic properties from the input, typography, density, accent strategy, surface treatment, and apply them for the session.
 2. **Negative-space defaults** (below) apply when no direction was given.
 
 When in doubt, the user's direction is the answer.
@@ -202,26 +202,90 @@ If it succeeds, note: which `.pen` file is open (if any), what is selected, what
 
 This is the reflex sequence for any design task. Follow it; deviate only at the branch points listed in the next section. The flow is **taste-first**: aesthetic direction leads, the build executes against it, and a single distinctiveness pass catches "this is still generic" before declaring done.
 
-1. **Detect host + locate context.** `get_editor_state({ include_schema: false })`. Failure → stop and instruct the user (see Failure modes §1). On success, determine: is a `.pen` file open? What's selected? These facts shape everything that follows.
+1. **Detect host + locate context.** First call of every conversation: `get_editor_state({ include_schema: true })`, the server requires the schema be loaded once per conversation before any read or write. Subsequent calls in the same conversation can pass `include_schema: false` to skip re-loading. Failure → stop and instruct the user (see Failure modes §1). On success, determine: is a `.pen` file open? What's selected? These facts shape everything that follows.
 
-2. **Understand aesthetic direction.** Before any planning, determine what the design will look like. Read any direction the user has given: a screenshot, a brand name, a URL, a prose description, or an existing design file. If direction was given, synthesise the key aesthetic properties from it — typography pairing, density, accent strategy, surface treatment, motion personality — and announce what you understood. Name the direction out loud: *"this reads as a dense data-product: monospace figures, hairline borders, no shadows"* — so the user can correct course early. If no direction was given, fall through to the negative-space defaults in the Aesthetic foundation. Skip this step for quick sketches and throwaway mocks.
+2. **Understand aesthetic direction.** Before any planning, determine what the design will look like. Read any direction the user has given: a screenshot, a brand name, a URL, a prose description, or an existing design file. If direction was given, synthesise the key aesthetic properties from it, typography pairing, density, accent strategy, surface treatment, motion personality, and announce what you understood. Name the direction out loud: *"this reads as a dense data-product: monospace figures, hairline borders, no shadows"*, so the user can correct course early. If no direction was given, fall through to the negative-space defaults in the Aesthetic foundation. Skip this step for quick sketches and throwaway mocks.
 
-3. **Load guidelines + inventory components.** Call `get_guidelines()` with no arguments first — the server reports which categories exist for this document. Read the ones that match the task (e.g. `Web App`, `Mobile App`, `Landing Page`, `Table`, `Tailwind`, `Design System`). See `references/mcp-tools.md` § `get_guidelines` for the full live-as-of-2026-05 category list and the *for task X load category Y* decision table. Read the guidelines for **schema rules** (layout properties, node types, sizing syntax) and accessibility checks. Treat stylistic defaults in the guidelines critically — filter any that conflict with the user's stated aesthetic direction.
+3. **Load guidelines + inventory components.** Call `get_guidelines()` with no arguments first, the server lists two top-level categories: **Guides** (task-oriented: `Web App`, `Mobile App`, `Landing Page`, `Table`, `Tailwind`, `Design System`, `Slides`, `Code`) and **Styles** (visual archetypes you may load when step 2's direction names one). Load the guides that match the surface, e.g. `get_guidelines({ category: "guide", name: "Web App" })`. If the direction names a style archetype, load it via `get_guidelines({ category: "style", name: "Soft Bento" })`. See `references/mcp-tools.md` § `get_guidelines` for the full live category lists and the *for task X load name Y* decision table. Read the guidelines for **schema rules** (layout properties, node types, sizing syntax) and accessibility checks. Treat stylistic defaults in the guidelines critically, filter any that conflict with the user's stated aesthetic direction.
 
    **Then inventory components** per the Components-first rule above: `batch_get({ patterns: [{ reusable: true }], readDepth: 2 })` against the open doc, and again with `filePath` set against each `.lib.pen` in the document's `imports`. By the end of this step, hold a written list of the components available by id. If the list is empty, name that to the user before continuing. Step 4 must reference this list when planning; step 5 must reference it when issuing ops. An agent that names 'a button' instead of `ButtonPrimary` has not done step 3.
 
-4. **Plan.** State a plan to the user before any `batch_design` call. It must include four things: (a) the aesthetic direction summary from step 2 — the concrete moves you're applying (typography, density, accent, surface treatment); (b) the top-level frames by name; (c) the library component ids you will instantiate, from step 3's inventory; (d) the layout shape in one phrase. If you cannot name all four, the plan is incomplete; return to steps 2 and 3. Stating the aesthetic direction is what stops the model defaulting to balanced-symmetric-fluid for everything and producing generic work.
+4. **Plan.** State a plan to the user before any `batch_design` call. A production-grade plan covers **nine things**, not four. Skipping any of (e) to (i) is what produces a generic, happy-path-only deliverable:
+   - (a) **Aesthetic direction summary** from step 2, the concrete moves you're applying (typography, density, accent, surface treatment).
+   - (b) **Top-level frames by name**, including state variants and viewport companions (see e/f below).
+   - (c) **Library component ids** you will instantiate, from step 3's inventory.
+   - (d) **Layout shape** in one phrase.
+   - (e) **State matrix.** For every interactive node (button, link, input, toggle, tab, dropdown, card-as-target), name which states ship: default, hover, focus, pressed, disabled, loading, error, success, skeleton, empty. The states you skip must be justified. Default-only is almost never acceptable for a surface that real users will touch. Render each state either as a sibling frame inside a `reusable` component, or via the `state` theme axis (see `references/states.md`). Token declarations alone are not state design.
+   - (f) **Viewport coverage.** Name every breakpoint you will ship. Desktop-only is a deviation that needs a reason; default coverage for a screen-level surface is desktop + mobile, named explicitly (e.g. `SignIn_Desktop` + `SignIn_Mobile`). Use the canonical breakpoints in the responsive section unless the user has named others.
+   - (g) **Edge cases.** Enumerate the screen-level fault states that apply: 404, 403, 500, 503, 408, 429, offline, partial-failure (see `references/states.md` § Screen-level fault states). For an auth surface, also: account-locked, rate-limited, server-side validation error, expired-session redirect. Name which ones ship and which are deferred.
+   - (h) **Flow context.** Name the surface before and after this one in the user's flow. "Sign-in card" alone is not a flow; "marketing /pricing → /signup → email verification → workspace selector → /app" is. The surrounding surfaces shape the copy, the error fallbacks, and the back-stack behaviour.
+   - (i) **Annotation commitments.** List the `note` nodes you will ship alongside the design: state contract, accessibility contract (contrast pairs, focus order, ARIA roles), validation copy variants, motion contract, analytics events, i18n notes. These are not optional polish; they are part of the deliverable. See § Metadata and annotations below.
 
-5. **Build, screenshot, react.** Work in small chunks: **≤8 ops per `batch_design` call for visual work** (up to 25 ops only for non-visual sweeps such as renames, context backfills, metadata). After each visual chunk: screenshot the affected subtree, narrate what you see in one or two sentences (*'the form card landed at 360px wide; the title sits tight against the subtitle, gap looks about 4px when it should be 16'*), then either keep building or issue a small adjustment. The user is watching; they should see the design take shape on the canvas as you work, with each chunk visible. **First chunk on a new document:** declare the mode theme axis with `U(docRootId, { themes: { mode: ["light", "dark"] } })`, add imports, declare tokens via `set_variables`. Do this before placing frames so every colour resolves to a variable downstream, never raw hex. Use the `foo=I("parent", {...})` binding form for in-call references. For images, use `G(nodeId, "ai", "<prompt>")` rather than placeholder rectangles. **Apply the discipline rules at every op:** every node gets a meaningful `name`; every non-trivial node gets a `context`; theme-aware colours come from variables with both light and dark values; designs target a canonical breakpoint. See `references/batch-design-grammar.md` for the full op grammar.
+   If you cannot name all nine, the plan is incomplete. Return to steps 2 and 3 (and load `references/states.md`, `references/flows.md`, `references/onboard.md`, `references/interaction-design.md` as relevant before re-planning).
+
+5. **Build, screenshot, react.** Work in small chunks: **≤8 ops per `batch_design` call for visual work** (up to 25 ops only for non-visual sweeps such as renames, context backfills, metadata). After each visual chunk: screenshot the affected subtree, narrate what you see in one or two sentences (*'the form card landed at 360px wide; the title sits tight against the subtitle, gap looks about 4px when it should be 16'*), then either keep building or issue a small adjustment. The user is watching; they should see the design take shape on the canvas as you work, with each chunk visible. **First chunk on a new document:** call `set_variables` first to declare the design tokens, themed values like `{ value: "#FAFAFA", theme: { mode: "light" } }` auto-register the `mode` theme axis. There is no `U(docRootId, themes: ...)` step; the server handles axis registration for you. After tokens, issue the first `batch_design` skeleton call. Every new top-level frame is created with `placeholder: true`, and the flag is removed per-frame as each frame is complete. Use the `foo=I("parent", {...})` binding form for in-call references. For images, use `G(nodeId, "ai", "<prompt>")` rather than placeholder rectangles. See `references/batch-design-grammar.md` for the full op grammar.
+
+   **Pre-flight checklist (run mentally before sending every `batch_design` call):**
+   1. **Name?** Every node has a meaningful PascalCase `name` (no `Frame 1`, `wrapper`, `f4`).
+   2. **Context?** Every page-level frame, every reusable component, every form field, every interactive element (button, link, tab, toggle, input, dropdown), and every data-display node has a `context` string in this call. Do not defer.
+   3. **Variable bindings?** Every rendered colour resolves to `$variable`, not raw hex. Sizes use `$space-*` / `$text*` tokens where possible.
+   4. **Layout / sizing consistency?** Children intended to span the cross axis use `width: "fill_container"` (vertical parent) or `height: "fill_container"` (horizontal parent), not the rejected `alignItems: "stretch"`. Text nodes use the right `textGrowth` for their role (`auto` for single-line; `fixed-width` plus an explicit width for wrapping).
+   5. **Placeholder?** Every new top-level frame carries `placeholder: true`; flag is removed in a later `U` op once the frame is complete.
+
+   If any item is missing, fix the call before sending. Backfilling later costs round-trips and risks the chunk-context fading from memory before the rule fires.
 
    **First-screenshot protocol.** After placing the skeleton and taking the first screenshot, run this check before continuing with detail work:
    1. **Direction match:** does this match the aesthetic direction stated in step 2? If the user gave a reference, compare directly. If you used negative-space defaults, verify nothing reads as AI-generic.
    2. **Drift signal:** name one element that already looks AI-default and fix it before continuing (e.g. "card has a drop shadow that wasn't in the direction; fixing now with `U(cardId, { effect: [] })`").
    If either check fails, fix it before adding any detail. A wrong skeleton under 60 ops is nearly unrecoverable. For a fuller 5-question diagnostic, read `references/design-eye.md`.
 
-6. **Verification checklist + accessibility.** Once visual chunks are done, run the 9-question taste pass from `references/distinctiveness-checklist.md`. For each fail, issue a targeted `U` or `R` op and re-screenshot. The pass exits after one revision round, or immediately if the user said "go fast" / "ship it" / "this is good enough". Then run the five accessibility checks: contrast under both modes, 44×44 hit targets, colour-not-only signal, semantic names, focus states declared. Take one screenshot of the design in dark mode if it uses theme-conditional colours. If an accessibility check fails, fix it and re-screenshot. `snapshot_layout` and `batch_get` are available for structural debugging when a screenshot reveals something off and you need numbers; they are not the verification path.
+6. **Verification checklist + accessibility.** Once visual chunks are done, run all of the following. Each is a gate, failing any one of them means the design is not done.
 
-7. **Iterate or report.** If verification surfaced issues, return to step 5 with targeted `R` (replace) or `U` (update) ops. If clean, summarise what landed in one paragraph and stop. Do not keep polishing past the user's stated requirements.
+   - **Taste pass**, 9-question distinctiveness check from `references/distinctiveness-checklist.md`. Fixes via targeted `U` or `R` ops + re-screenshot.
+   - **State coverage**, for every interactive node named in step 4 (e)'s state matrix, verify the state ships either as a rendered sibling (`Button_Hover`, `Input_Error`, etc.) or as an active `state` theme-axis activation backed by state-conditional variables. Default-only is a fail. Token declarations without rendered or activated variants are a fail.
+   - **Viewport coverage**, every breakpoint named in step 4 (f) has its own frame on the canvas, screenshot-verified.
+   - **Edge-case coverage**, every fault state named in step 4 (g) is rendered or explicitly deferred with a reason captured in a `note` annotation.
+   - **Annotation coverage**, every commitment named in step 4 (i) ships as a `note` node alongside the design. State contract, accessibility contract, validation copy, motion contract, analytics events, i18n notes, each one a discrete `note` so future readers can find it.
+   - **Metadata coverage**, every interactive node carries `metadata` with at least: `{ type: "interactive", testId, analytics?, aria? }` (see § Metadata and annotations).
+   - **Accessibility**, five checks: contrast under both modes (WCAG AA on body text and interactive surfaces), 44×44 hit targets, colour-not-only signal, semantic `name` and `context`, focus states declared and rendered.
+   - **Mode parity**, one screenshot in each declared theme axis value (typically `light` + `dark`).
+
+   `snapshot_layout` and `batch_get` are available for structural debugging when a screenshot reveals something off and you need numbers; they are not the verification path. The screenshot loop is.
+
+7. **Iterate or report.** If verification surfaced issues, return to step 5 with targeted `R` (replace) or `U` (update) ops. If clean, summarise what landed in one paragraph, name every frame, every state variant, every annotation note shipped, and stop. Do not keep polishing past the user's stated requirements.
+
+## Metadata and annotations
+
+Every interactive node (button, link, input, toggle, tab, dropdown, card-as-target) carries a `metadata` object that travels with the file and feeds engineering, QA, and analytics hand-off. Every screen-level surface ships a set of `note` nodes positioned beside (not inside) the design frame on the canvas.
+
+### Metadata on interactive nodes
+
+`Entity.metadata` is `{ type: string, [key: string]: any }`. Use these keys:
+
+- `metadata.type`, required. `"interactive"` for buttons / links / form controls / toggles. `"display"` for data nodes (KPI cards, table cells with data). `"static"` for visual primitives.
+- `metadata.testId`, short, stable, kebab-case. Used by QA automation. Example: `"signin-submit-button"`.
+- `metadata.analytics`, `{ event: "<event-name>", props?: { ... } }`. The analytics event that fires on the primary interaction. Example: `{ event: "auth.signin_attempt", props: { method: "password" } }`.
+- `metadata.aria`, `{ role?: string, label?: string, describedBy?: string }`. ARIA role and label for accessibility hand-off when the rendered semantics don't match the visual role.
+- `metadata.copy`, `{ namespace: string, key: string }`. i18n string key for the visible content when the design captures translatable copy.
+- `metadata.validation`, for form inputs only: `{ required: boolean, pattern?: string, errorCopy: { format?: string, required?: string, mismatch?: string } }`.
+
+Set metadata in the same `batch_design` call where you create the node. Do not defer.
+
+### Annotation `note` nodes (one per concern)
+
+Every screen-level surface ships these `note` nodes as siblings of the design frame, positioned to the right of the canvas at consistent spacing (e.g. 80 px gutter). Each note covers exactly one concern:
+
+1. **State contract**, every interactive node and the states it ships. Tokens cited by name.
+2. **Accessibility contract**, contrast pairs (with computed ratios), focus order, ARIA roles, keyboard map.
+3. **Validation copy**, for every form field: the empty-error message, the format-error message, the server-error message. Plus the submit-time card-level error copy.
+4. **Motion contract**, durations and easings for each transition (hover, focus, pressed, page-load, submit-success).
+5. **Analytics events**, every fired event with name and props. Cross-references the `metadata.analytics` entries.
+6. **i18n notes**, string-length tolerances (German labels expand 30%+), RTL considerations, locale-specific copy variants.
+7. **Flow context**, what precedes and follows this surface. Back-stack behaviour. Deep-link handling.
+
+`note` nodes accept TextStyle properties (`fontFamily`, `fontSize`, `lineHeight`, `textAlign`) but **not** `fill`, `stroke`, or `effect`. They don't render in `get_screenshot`; they live for the human or agent reading the `.pen` in the editor.
+
+Do not bundle multiple concerns into one note. One concern per note keeps them findable and editable.
 
 ## Design intelligence: when to deviate
 
@@ -233,7 +297,7 @@ The default workflow assumes a fresh, end-to-end design. Most tasks aren't that.
 - **Big screen (>30 visible elements).** Plan multiple `batch_design` calls before starting. Build the page-level frame and main columns first, screenshot, then fill in. Cramming 60 ops into one call is asking for ordering bugs.
 - **"Quick sketch" / "throwaway" / "just mock something up".** Skip steps 2 (aesthetic direction) and 3 (guidelines + inventory) entirely. Go straight from step 1 → step 5 using the negative-space defaults in the Aesthetic foundation. Verification still happens, but the taste pass also skips.
 - **User shows you a reference image.** This is the canonical input for step 2 (aesthetic direction). Read the image, name the layout pattern and aesthetic direction out loud (e.g. "split-screen with hero left, form right; dense, dark, monospace figures"), then plan the tree.
-- **Adding frames to a populated canvas** (multiple existing top-level frames already on the canvas). Before placing a new top-level frame at step 5, call `find_empty_space_on_canvas` at step 4 to locate a coordinate region that doesn't overlap existing content. Pass the returned position as `x`/`y` on the outermost frame in your first `batch_design` call. Skipping this on a crowded canvas produces invisible overlaps that look like rendering failures.
+- **Adding frames to a populated canvas** (multiple existing top-level frames already on the canvas). Before placing a new top-level frame at step 5, call `find_empty_space_on_canvas({ width, height, padding, direction })` at step 4 to locate a coordinate region that doesn't overlap existing content. All four parameters are required; `direction` accepts `"top" | "right" | "bottom" | "left"`. Optionally pass `nodeId` to anchor the search to a specific frame instead of the whole canvas. Pass the returned position as `x`/`y` on the outermost frame in your first `batch_design` call. Skipping this on a crowded canvas produces invisible overlaps that look like rendering failures.
 - **"Export this", "generate assets", "hand off the design".** Use `export_nodes` with the target node id(s). Ask the user what format (PNG, SVG, PDF) and destination path if not stated, the answer shapes the call. Do not substitute `get_screenshot` for an export; `get_screenshot` produces a canvas preview, not a properly-sized export artifact.
 - **User asks for an error, 404, 500, offline, or empty screen.** Load `references/states.md` before planning. It owns the screen-level fault state taxonomy and the empty-state taxonomy (first-use / no-results / no-permission / post-action). See `assets/examples/example-error-screen.md` for a worked walkthrough.
 - **User asks for a multi-step form, wizard, signup, onboarding, or any flow that crosses screens.** Load `references/flows.md` before planning. It owns validation timing, modal-vs-page decisions, the back-stack model, and multi-step confirmation anatomy. See `assets/examples/example-form-flow.md` for a worked walkthrough.
@@ -276,7 +340,7 @@ When to import a library on the user's behalf: only when the open document's `im
 - **Update:** `U("nodeId", { ...partialProps })`, merges partial property changes.
 - **AI image:** `G(nodeId, "ai", "<prompt>")`, fills an existing node with an AI-generated image (use Unsplash mode `"unsplash"` for stock photos).
 
-**Rules (verified live 2026-05):**
+**Rules:**
 
 - Cap calls at **≤8 ops for visually-significant changes** so each call advances visible state by an amount the user can scan in one screenshot. Up to 25 ops is acceptable only for non-visual sweeps (renames, context backfills, metadata updates) where there is nothing to screenshot. Crossing 25 risks ordering bugs and slow round trips even for non-visual work.
 - IDs cannot contain `/`. The server rejects them.
@@ -287,7 +351,7 @@ When to import a library on the user's behalf: only when the open document's `im
 - **`justifyContent`** values use underscores: `"space_between"`, `"space_around"`, not hyphens.
 - **Fill object type** is `"color"` not `"solid_color"`. Plain color strings (`"#RRGGBB"` or `"$variable"`) are accepted as shorthand and preferred.
 - For sizing, use `width: "fill_container"` or `width: "fit_content"` (bare strings), not `"100%"`. With fallback: `width: "fill_container(320)"`.
-- `U("document", ...)` is not supported, use `set_variables` for tokens; `document` binding is insert-only.
+- `U("document", ...)` is not supported. The `document` binding is insert-only. Tokens go through `set_variables` (themes auto-register from variable values). Imports currently have no documented MCP path, edit the `.pen` JSON directly if you need to add an `imports` entry.
 - For colors, prefer `"$variableName"` over raw `#RRGGBB`. Raw colors are accepted but lose theme-axis behavior.
 
 See `references/batch-design-grammar.md` for the complete grammar including delete and move ops, ordering rules, and common error fixes.
@@ -336,8 +400,8 @@ Four concrete cases. Detect, respond, do not improvise.
 |---|------|------------------|----------|
 | 1 | MCP not connected | `get_editor_state` errors with `transport not connected to app: desktop` (or any connection-refused message) | Stop. Tell the user: *"Pencil's MCP server isn't reachable. Open the Pencil desktop app or the Pencil IDE extension, then ask me again."* Do not fall back to the CLI silently. |
 | 2 | No .pen file open | `get_editor_state` succeeds but reports no active document | Ask the user: *"No `.pen` file is open. Should I (a) open an existing one, give me the path, or (b) create a new one with `open_document('new')`?"* Wait for the answer. |
-| 3 | .lib.pen import missing | The open doc's `imports` doesn't include a library the user or project docs reference | If the file exists: add the `imports` entry via `U(docRootId, { imports: { "ds": "./path.lib.pen" } })` where `docRootId` is the actual node ID returned by `open_document` (not the literal `"document"` binding, which is insert-only). If the file doesn't exist: tell the user the path is stale, ask whether to update it or create the library. Don't silently invent. |
-| 4 | batch_design schema error | Server returns an error mentioning invalid op, unknown type, invalid property, or missing parent | Read the error verbatim. Cross-reference `references/batch-design-grammar.md` and `references/pen-schema.md`. Common causes: id contains `/`; used `width: "100%"` (use `"fill_container"`); used `padding: { top: N }` object form (use array `[top, right, bottom, left]`); used `text:` or `value:` on a text node (use `content:`); used `solid_color` fill type (use `"color"`); used `iconName`/`iconLibrary` on icon_font (use `iconFontName`/`iconFontFamily`); set `x`/`y` on a child in a flex parent (they're ignored); referenced a parent before binding it. Retry with the fix; never blindly. |
+| 3 | .lib.pen import missing | The open doc's `imports` doesn't include a library the user or project docs reference | If the file exists: there is currently no documented MCP path to add an `imports` entry through `batch_design` (`U("document", ...)` errors with `Node 'document' not found`; `U(<frameId>, { imports: ... })` errors with `/imports unexpected property`). Ask the user to add the entry to their `.pen` JSON directly: `"imports": { "ds": "./path.lib.pen" }`. If the file doesn't exist: tell the user the path is stale, ask whether to update it or create the library. Don't silently invent. |
+| 4 | batch_design schema error | Server returns an error mentioning invalid op, unknown type, invalid property, or missing parent | Read the error verbatim. Cross-reference `references/batch-design-grammar.md` and `references/pen-schema.md`. Common causes: id contains `/`; used `width: "100%"` (use `"fill_container"`); used `padding: { top: N }` object form (use array `[top, right, bottom, left]`); used `text:` or `value:` on a text node (use `content:`); used `solid_color` fill type (use `"color"`); used `iconName`/`iconLibrary` on icon_font (use `iconFontName`/`iconFontFamily`); set `x`/`y` on a child in a flex parent (they're ignored); used `layout: "flex"` or other CSS vocab (use `"vertical"` or `"horizontal"`); used `effect: [{ type: "drop_shadow" }]` (use `type: "shadow"` with `shadowType: "outer"`); referenced a parent before binding it. Retry with the fix; never blindly. **Of these, `x`/`y` on flex children is the only silent failure, the op succeeds but the child renders in the wrong place. The rest hard-error and roll the whole call back.** See `references/batch-design-grammar.md` Common errors table for the full silent/hard split. |
 
 ## Platform-specific tool names
 

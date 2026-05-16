@@ -126,13 +126,7 @@ Modern operating systems expose user preferences to the browser. Designs that re
 - Increase focus-ring weight from 2px to 3px.
 - Surfaces gain a 1px border even when they didn't have one before, so adjacent regions are distinguishable.
 
-In Pencil, declare a `contrast` theme axis:
-
-```
-U("doc", { themes: { mode: ["light", "dark"], contrast: ["normal", "more"] } })
-```
-
-Then variables can carry contrast-conditional values:
+In Pencil, the `contrast` theme axis registers automatically once you declare contrast-conditional variable values. You don't declare the axis explicitly — `set_variables` reads the `theme: {...}` entries in your values and creates the axis. Variables carry contrast-conditional values:
 
 ```
 border: { type: "color", value: [
