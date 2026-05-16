@@ -106,21 +106,24 @@ The full OWASP AST risk-to-control mapping lives in [SECURITY.md](./SECURITY.md)
 
 ## Versioning
 
-After any meaningful change, bump the version in three places and add a changelog entry:
+The plugin is currently pre-release and holds at `0.8.0` across all four manifests. **Don't bump the version in a PR without explicit owner approval.** Add your changes under `[Unreleased]` in `docs/CHANGELOG.md` and let the owner decide when to cut a tagged release.
+
+When a release is authorised, bump the `version` field in all four manifests, keeping them in sync:
 
 | File | Field |
 |------|-------|
 | `.claude-plugin/plugin.json` | `version` |
+| `.claude-plugin/marketplace.json` | `version` inside the `plugins[]` entry |
 | `.cursor-plugin/plugin.json` | `version` |
-| `skills/pencil-design/SKILL.md` | `metadata.version` in frontmatter |
-| `docs/CHANGELOG.md` | new entry |
+| `.codex-plugin/plugin.json` | `version` |
+| `docs/CHANGELOG.md` | replace `[Unreleased]` heading with the new version and date |
 
 Follow [Semantic Versioning](https://semver.org/):
 
 | Change type | Bump |
 |-------------|------|
-| Typo fix, clarification | PATCH (`0.1.x`) |
-| New capability or trigger phrases | MINOR (`0.x.0`) |
+| Typo fix, clarification | PATCH (`0.x.y`) |
+| New capability or trigger phrases | MINOR (`0.y.0`) |
 | Breaking workflow restructure | MAJOR (`x.0.0`) |
 
 ---

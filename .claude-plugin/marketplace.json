@@ -1,0 +1,26 @@
+{
+  "$schema": "https://anthropic.com/claude-code/marketplace.schema.json",
+  "name": "pencil-dev-skill",
+  "metadata": {
+    "description": "Teach AI coding tools to design, edit, and validate pencil.dev UIs through the Pencil MCP server."
+  },
+  "owner": {
+    "name": "Travis Polland",
+    "email": "tpolland@gmail.com"
+  },
+  "plugins": [
+    {
+      "name": "pencil-dev-skill",
+      "description": "Use this skill for any pencil.dev work: designing UI in a .pen file, editing an open Pencil canvas, instantiating components from a .lib.pen library, fixing batch_design schema errors, or recovering from Pencil MCP host-not-connected issues. Routes every read and write through the Pencil MCP server for schema validation, live screenshots, and editor sync.",
+      "version": "0.8.0",
+      "author": {
+        "name": "Travis Polland",
+        "email": "tpolland@gmail.com"
+      },
+      "source": "./",
+      "category": "design",
+      "homepage": "https://github.com/Nisus74/pencil-skill",
+      "tags": ["design", "pencil-dev", "ui", "mcp", "design-tool", "ai-skill"]
+    }
+  ]
+}

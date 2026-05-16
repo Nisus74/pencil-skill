@@ -13,20 +13,20 @@ This isn't a polish loop. It runs **at most once**, with an explicit kill switch
 ## How to run it
 
 1. Take the final screenshot of the design (whole page, not a subtree).
-2. Walk the 8 questions below in order. For each, answer aloud: *yes (passes)*, *no (fails, propose one fix)*, or *not applicable (skip this one for this task)*.
+2. Walk the 9 questions below in order. For each, answer aloud: *yes (passes)*, *no (fails, propose one fix)*, or *not applicable (skip this one for this task)*.
 3. If any item fails, propose ONE concrete fix per failed item, not a list, one fix that addresses the root issue. Apply the fixes in a single follow-up `batch_design` chunk.
 4. Take a final post-revision screenshot. Stop. Hand back.
 
 If 0 items fail: the design passed. Hand back without changes.
 
-## The 8 questions
+## The 9 questions
 
 ### 1. Aesthetic direction named in the plan
 
 Did you state a specific aesthetic direction before building? If the plan says only "a SaaS dashboard" with no specific direction — no typography call, no density register, no surface treatment decision — the design is operating without intent and will default to the generic.
 
 **Fail mode:** the plan is silent on aesthetic direction; the design landed in violet-on-white balanced-SaaS shell.
-**Fix:** name the direction now (post-hoc): *"dense data product, hairline borders, no shadows, mono numerals."* Check if the design already contradicts it and propose the specific revisions.
+**Fix:** name the direction now (post-hoc): *"dense data product, hairline borders, no shadows, mono numerals."* Also name one reference brand, designer, or publication the direction maps to: *"reads like a Stripe internal tool"*, *"reads like the FT's data graphics"*, *"reads like Plain's settings UI"*. Adjective-only directions slide back into generic; a named reference anchors the call. Check if the design already contradicts the direction and propose specific revisions.
 
 ### 2. Accent used in a non-obvious place
 
@@ -77,6 +77,31 @@ Does the chrome (borders vs shadows, corner radii, surface hierarchy, light vs d
 **Fail mode:** direction called for a dense data product with hairline borders, but every card has a soft shadow and `cornerRadius: 12`.
 **Fix:** swap the chrome to match the direction. Remove shadows where the direction didn't call for them. Tighten radii for utilitarian surfaces.
 
+### 9. Category-reflex test (two-tier)
+
+This is the sharpest single distinctiveness check. Run both tiers; if either is obvious, the design hasn't escaped training-data gravity.
+
+**First-order:** could someone guess the theme and palette from the product category alone?
+- Observability → dark blue
+- Healthcare → white plus teal
+- Fintech → navy plus gold
+- Crypto → neon on black
+- AI product → off-white plus violet or orange
+- Developer tool → dark mono on black
+
+If the answer is *"yes, obviously"*, the design is operating from the first reflex tier.
+
+**Second-order:** could someone guess the aesthetic family from the category plus the anti-references the user named?
+- *"AI workflow tool that's not SaaS-cream"* → editorial-typographic
+- *"Fintech that's not navy-and-gold"* → terminal-native dark mode
+- *"Healthcare that's not white-and-teal"* → editorial photo-led
+- *"Developer tool that's not Linear-dark"* → maximalist colour
+
+If this second answer is obvious too, the design avoided the first reflex but landed in the second.
+
+**Fail mode:** the design's direction *"AI workflow tool, modern, clean"* produced a violet-on-cream layout indistinguishable from the rest of the category. Or the direction *"AI workflow tool, but not the SaaS-cream default"* produced an editorial serif on warm-grey that's now itself the next-tier default.
+**Fix:** rework the aesthetic direction until both tiers fail. Name what specifically would surprise someone who knows the category AND the anti-reference. Reach further from the reflex. The reflex-reject aesthetic lanes in [brand.md](brand.md) catch the currently-saturated second-tier families.
+
 ## Kill switch
 
 The pass exits immediately if any of these are true:
@@ -108,7 +133,8 @@ A SaaS analytics dashboard built without stating an aesthetic direction:
 | 6 | AI-default tells absent? | **Fail.** Soft shadows on every card. Pill badges. Blue default primary. |
 | 7 | Microcopy product-specific? | **Fail.** *"How your product performed over the last 7 days"* — interchangeable with any SaaS. |
 | 8 | Surface treatment matches direction? | **N/A.** No direction was stated. |
+| 9 | Category-reflex test (both tiers)? | **Fail.** *"SaaS analytics dashboard"* → violet-on-white is the first-tier reflex; the design landed exactly there. Second tier doesn't apply because no anti-reference was named to escape from. |
 
-Fail count: 5. The design is competent but undirected. Stating a direction in step 2 — *"dense data product: hairline borders, no shadows, mono on all numerals"* — and re-running the build against it would address all 5 fails.
+Fail count: 6. The design is competent but undirected. Stating a direction in step 2 (*"dense data product: hairline borders, no shadows, mono on all numerals; reads like a Stripe internal tool, explicitly not the SaaS-violet default"*) and re-running the build against it would address all 6 fails.
 
 This is exactly the gap this checklist is designed to catch.

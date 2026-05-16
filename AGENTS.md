@@ -39,7 +39,7 @@ skill is the capability the AI invokes.
 
 ```
 skills/pencil-design/              # The platform-agnostic core
-  SKILL.md                         # The skill — YAML frontmatter + instructions (v1.4.0)
+  SKILL.md                         # The skill — YAML frontmatter + instructions
   references/                      # On-demand references loaded by the skill
     mcp-tools.md                   # Cookbook for all 13 MCP tools + composite recipes
     states.md                      # Component states + screen-level fault states
@@ -49,6 +49,19 @@ skills/pencil-design/              # The platform-agnostic core
     pencil-cli.md                  # Full Pencil CLI reference + When CLI vs MCP table
     pen-schema.md                  # .pen file JSON schema reference
     batch-design-grammar.md        # batch_design op syntax (I/C/R/U/G/D/M)
+    brand.md                       # Brand-register depth: anti-references, aesthetic lanes, palette strategies
+    product.md                     # Product-register depth: density, surface, semantic colour, data typography
+    typography.md                  # Reflex-reject fonts, pairing rules, scale, readability, OpenType moves
+    color-and-contrast.md          # OKLCH theory, palette strategies, tinted neutrals, light + dark parity
+    ux-writing.md                  # Buttons, errors, empty states, microcopy, AI cliché list to refuse
+    layout.md                      # Grid systems, spatial rhythm strategies, register-specific spacing, the squint test
+    motion-design.md               # Easing curves, durations, register-specific motion, reduced-motion
+    interaction-design.md          # State design philosophy, register-specific state recipes, focus management depth
+    cognitive-load.md              # Three load types, attention budget per surface, density-vs-familiarity
+    heuristics-scoring.md          # Ten heuristics + 1–5 scoring rubric + composite-score interpretation
+    delight.md                     # Signature moments, personality in functional moments, polish discipline
+    onboard.md                     # Activation moment, three onboarding shapes, empty-states by user-state
+    extract.md                     # Tokens/components/patterns extraction workflow, library lifecycle
     codex-tools.md                 # OpenAI Codex tool name mappings
   assets/
     design-system/                 # 12 scaffold templates — copy into any project
@@ -61,21 +74,22 @@ skills/pencil-design/              # The platform-agnostic core
       voice.md                     # Copy tone + empty/error copy rules
       code-export.md               # Token export to CSS/Tailwind
       states.md                    # Per-component state matrix + screen fault coverage
-    examples/                      # 5 worked examples with real MCP tool sequences
+    examples/                      # 4 worked examples with real MCP tool sequences
       example-login-screen.md      # Greenfield auth screen
       example-import-library.md    # Import .lib.pen library + instantiate components
-      example-scaffold-system.md   # Bootstrap a full design-system scaffold
       example-error-screen.md      # 404 + offline page pair
       example-form-flow.md         # Multi-step signup with email verification
 
 # Platform install adapters (required by each platform's installer)
 .claude-plugin/plugin.json         # Claude Code plugin manifest
+.claude-plugin/marketplace.json    # Claude Code marketplace listing (single-plugin marketplace)
 .cursor-plugin/plugin.json         # Cursor plugin manifest (Cursor 2.5+)
 .codex-plugin/plugin.json          # Codex plugin manifest
 
 # Project context files
 AGENTS.md                          # This file — canonical, platform-agnostic
 CLAUDE.md                          # Thin pointer to AGENTS.md (for Claude Code)
+HARNESSES.md                       # Cross-platform skill capability matrix (frontmatter, directories, substitution)
 
 # Public-facing
 README.md
@@ -138,9 +152,10 @@ Don't edit files inside a plugin install directory (e.g. `~/.claude/plugins/.../
 ## Plugin System Rules
 
 - The Claude Code plugin manifest MUST live at `.claude-plugin/plugin.json`
+- The Claude Code marketplace listing MUST live at `.claude-plugin/marketplace.json`. This makes the repo installable via `/plugin marketplace add github:Nisus74/pencil-skill` followed by `/plugin install pencil-dev-skill`
 - The Cursor plugin manifest MUST live at `.cursor-plugin/plugin.json` (Cursor 2.5+)
 - The Codex plugin manifest MUST live at `.codex-plugin/plugin.json`
-- All three manifests MUST carry matching `name` and `version` fields (enforced by `tools/skill-lint.py`)
+- All three plugin manifests MUST carry matching `name` and `version` fields (enforced by `tools/skill-lint.py`). The marketplace.json plugin entry should match these too
 - `skills/` MUST be at the repo root
 - Each skill is a subdirectory under `skills/` containing one `SKILL.md`
 - The YAML frontmatter `description` field controls when the skill activates, so edit it carefully
@@ -203,13 +218,15 @@ The OWASP AST compliance map lives in [docs/SECURITY.md](./docs/SECURITY.md).
 
 ## Version Bumping
 
-Follow semantic versioning. Bump the `version` field in three places, keeping them in sync: `.claude-plugin/plugin.json`, `.cursor-plugin/plugin.json`, and the `skills/pencil-design/SKILL.md` frontmatter.
+The plugin is currently pre-release and **holds at version `0.8.0`** across all four manifests. Don't bump the version without explicit owner approval. All in-flight work accumulates under `[Unreleased]` in `docs/CHANGELOG.md` until the owner decides to cut a release.
 
-- **PATCH** (`0.1.x`): Content fixes, typos, clarifications
-- **MINOR** (`0.x.0`): New capability documented, new trigger phrases added
+When a release is authorised, bump the `version` field in four places, keeping them in sync: `.claude-plugin/plugin.json`, `.claude-plugin/marketplace.json` (inside the `plugins[]` entry), `.cursor-plugin/plugin.json`, and `.codex-plugin/plugin.json`. Follow semantic versioning:
+
+- **PATCH** (`0.x.y`): Content fixes, typos, clarifications
+- **MINOR** (`0.y.0`): New capability documented, new trigger phrases added
 - **MAJOR** (`x.0.0`): Breaking restructuring of the skill workflow
 
-After bumping, add an entry to `docs/CHANGELOG.md`.
+After bumping, replace the `[Unreleased]` heading in `docs/CHANGELOG.md` with the new version and date.
 
 ---
 
@@ -233,3 +250,4 @@ After bumping, add an entry to `docs/CHANGELOG.md`.
 
 - GitHub repo: https://github.com/Nisus74/pencil-skill
 - pencil.dev: https://pencil.dev
+- [HARNESSES.md](./HARNESSES.md): cross-platform skill capability matrix (frontmatter support, directory conventions, substitution syntax) — consult when adding a new platform manifest or auditing existing ones

@@ -2,7 +2,7 @@
 
 Teach your AI coding tool to design in [pencil.dev](https://pencil.dev). Works with Claude Code, Cursor, and Codex.
 
-[![version](https://img.shields.io/badge/version-1.4.0-blue)](https://github.com/Nisus74/pencil-skill/releases) [![license](https://img.shields.io/badge/license-MIT-green)](./LICENSE)
+[![version](https://img.shields.io/badge/version-0.8.0_pre--release-orange)](https://github.com/Nisus74/pencil-skill/commits/main) [![license](https://img.shields.io/badge/license-MIT-green)](./LICENSE)
 
 ⭐ [Star the repo](https://github.com/Nisus74/pencil-skill) if it saves you time.
 
@@ -14,11 +14,12 @@ Teach your AI coding tool to design in [pencil.dev](https://pencil.dev). Works w
 
 - Runs a seven-step design workflow: detect host, orient, load guidelines, plan, execute, verify, report
 - Covers all 13 Pencil MCP tools with worked invocations, a cost cheatsheet, and composite recipes
-- Ships 2026 design depth: user flows, component and screen states, full accessibility coverage, and modern patterns (container queries, fluid type, AI-UI affordances)
+- Ships **25 on-demand reference files** that load progressively as the design surfaces them: brand and product registers, typography theory (font selection, pairing, OpenType moves), OKLCH colour and palette construction, UX writing patterns, motion design, interaction states, cognitive load, layout grids, onboarding flows, design extraction workflow, accessibility depth, chart anatomy, design-eye and distinctiveness checklists, heuristic scoring, delight, modern patterns, and more
 - Includes 12 design-system scaffold templates you copy into your project. Tokens, components, layout, states, and more
-- Provides 5 worked examples showing real MCP tool sequences from scratch
+- Provides 4 worked examples showing real MCP tool sequences from scratch
+- Cross-platform skill capability matrix ([HARNESSES.md](./HARNESSES.md)) for plugin authoring across Claude Code, Cursor, Codex, Gemini, and others
 
-> **Status:** v1.4.0, production-ready.
+> **Status:** `0.8.0` pre-release. No tagged release yet; pin to a commit SHA if you want a stable reference point.
 
 ---
 
@@ -46,10 +47,19 @@ Most people want plugin install. If you plan to customise the skill's instructio
 
 ### Plugin install
 
-**Claude Code:**
+**Claude Code:** two install paths, pick either.
+
+Direct install:
 
 ```bash
 /plugin install github:Nisus74/pencil-skill
+```
+
+Or via the marketplace listing (lets you pin and update via marketplace commands):
+
+```bash
+/plugin marketplace add github:Nisus74/pencil-skill
+/plugin install pencil-dev-skill
 ```
 
 **Cursor 2.5+:** in the editor, run `/add-plugin` and point it at `github.com/Nisus74/pencil-skill`.
