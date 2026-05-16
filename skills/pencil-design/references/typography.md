@@ -75,6 +75,17 @@ A type system is two to three fonts maximum: a display, a body, and optionally a
 - Using script or hand-drawn fonts as either display or body (a 2010s wedding-invitation reflex)
 - Stacking three weights in headlines (e.g. *Bold quick* **Black brown** *Light fox*) for "expressive" effect; reads as designed-with-no-discipline
 
+### Condensed and extended widths
+Modern variable fonts often ship multiple widths along the same family. Söhne ships Breit (extended) and Schmal (condensed); GT America ships Condensed and Extended; Geist's width axis runs from Compressed to Expanded. The width axis is the most under-used differentiation move in current AI design output.
+
+A condensed display next to a regular-width body reads as designed; the eye picks up the width contrast without having to ask why. The reverse (extended display, regular body) reads as confident on brand pages with plenty of horizontal space.
+
+Discipline:
+
+- **One width contrast per surface, not three.** If the display is condensed, the body stays regular. Mixing condensed display with extended body with regular kicker reads as the family being misused.
+- **Stay inside the family.** Mixing Söhne Schmal with a different family's condensed produces two fonts arguing; stay in the Söhne family or in another single family.
+- **Tune the tracking.** Condensed widths need slightly more positive tracking than regular widths at the same size; extended widths often want slightly negative tracking to keep the letterforms from drifting apart.
+
 ## Scale and hierarchy
 
 ### Modular scale
@@ -86,6 +97,23 @@ A 1.25 scale starting at 16px body: 12.8, 16, 20, 25, 31, 39, 49, 61, 76, 95. Ro
 A common AI default: inflate the heading sizes to create hierarchy. *"Make the headline bigger."* The result is a giant headline above tiny body, no middle ground.
 
 Better: contrast weight first, size second. A 24px semibold heading above 16px regular body reads as more hierarchy than a 36px regular heading above 16px regular body. Reserve size jumps for top-level hierarchy (page title, hero), use weight contrast for everything below.
+
+### Extreme weight pairing
+Most type systems sit in the middle of the weight axis. Body at 400, headings at 600, occasional emphasis at 700. That range produces competent designs and rarely produces memorable ones.
+
+When the brand or the surface earns it, pair extremes. A 900 display weight next to a 200 (or 300) body reads as committed; a 600 display next to 400 body reads as default. The visible difference is large; the reader notices the type system is doing work.
+
+Modern variable fonts (Geist, Inter, Söhne, GT America) ship the full weight axis. Activating it costs nothing on the design side; the only constraint is what the production font subset includes for runtime weight delivery. Document the weights actually used per family in `context` so engineering knows what to load.
+
+When extreme weight is right:
+- Brand heroes with a single committed message; the 900 headline carries the page.
+- Marketing pages where the visual contrast IS part of the argument.
+- Editorial layouts where the display sets a strong typographic voice.
+
+When extreme weight is wrong:
+- Dense product UIs where 900 headings shout at every section.
+- Surfaces with many similar headings; extreme weight needs quiet around it.
+- Brands whose voice is restrained or scholarly; extreme weight reads as too loud.
 
 ### Avoid flat scales
 Three consecutive type sizes within 2px of each other (14, 16, 18) read as no scale at all. Pick a ratio and skip steps. The 16/20/24 + bold trio of headlines reads flatter than 16/24/40 with weight contrast.
@@ -162,6 +190,18 @@ Check what the brand's chosen font supports and pick one stylistic set explicitl
 
 ### True small caps and old-style figures together
 Editorial layouts (long-form blog, manifesto pages, magazine-style) benefit from combining old-style (text) figures with small caps. Both move the design out of UI-default territory into editorial territory. Avoid mixing in the same surface as tabular figures.
+
+### Monospace as intentional accent
+Monospace as a default body font is the developer-tool reflex. Monospace as a deliberate accent (a data column, a code reference, a kicker label, a metadata strip) signals intent; the reader picks up *"this is a different kind of content"* from the type alone.
+
+When mono earns its place:
+
+- **Numeric columns** in tables and dashboards; mono guarantees the alignment that tabular figures get partway to. JetBrains Mono, Berkeley Mono, Geist Mono are the reach-for picks.
+- **Code references** inline in prose; a single mono span in a sentence about the API reads as the API, not as decoration.
+- **Kicker labels** above editorial headlines; a small mono kicker before a serif display headline reads as a deliberate type system.
+- **Metadata strips** in product UIs; *"ID 4521  •  Created 2026-05-16"* in mono reads as system-generated and stays out of the way.
+
+Pair mono with a grotesque body or a serif body, not with another mono. Two monos on the same surface produces *"is this a terminal?"* unless the brand is explicitly developer-tooling.
 
 ## Per-register guidance
 
