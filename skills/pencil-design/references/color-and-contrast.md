@@ -31,6 +31,10 @@ Tinted neutrals plus one accent used at ≤10% of the surface area. The identity
 ### Committed
 One saturated colour carries 30–60% of the surface. The colour IS the brand for the duration of the page. Brand default for identity-driven pages; rare in product.
 
+**The 60% rule.** When committing to a dominant colour, the visible-surface share matters as much as the choice. 30% reads as accent-shy (the surface still wants to be neutral). 80% reads as suffocating (the eye has nowhere to rest). 60% lands in the middle: dominant enough to read as committed, restrained enough to keep the secondary content legible. The other 40% is neutrals plus one supporting role.
+
+Restrained committal (40%) suits product surfaces that need a strong brand presence without losing function. Maximal committal (70–80%) suits brand heroes and campaign launch pages where atmosphere wins over content density.
+
 ### Full palette
 3–4 named roles, each used deliberately. Each role gets its own surface treatment. Brand campaigns; product data visualisation (categorical encoding).
 
@@ -61,6 +65,16 @@ A worked example for a brand whose accent is OKLCH(0.6 0.2 145) (a saturated gre
 Every neutral leans toward the brand's green hue at a chroma the eye can't quite read as colour. The result is coherence; the same neutrals against a different brand hue would feel slightly off.
 
 Pick warm or cool tinting per brand; never mix the two in the same design. Mixing warm-grey backgrounds with cool-grey surfaces is the most common subtle palette mistake.
+
+### Never gray on colour
+A pure grey text run on a coloured background reads as accidental. The grey belongs to no system; the colour belongs to the brand. Two systems on the same element.
+
+The fix has two shapes:
+
+- **Use a darker or lighter shade of the colour itself.** Text on a green panel resolves to a near-black version of that green (OKLCH lightness around 0.2, chroma slightly reduced); text on a deep blue panel resolves to an off-white tinted toward the same blue. The text and surface are then the same system.
+- **Use the original text colour at reduced opacity.** The text inherits the surface's hue through the transparency. Works best for muted secondary text on coloured surfaces.
+
+Either approach reads as system. Gray-on-colour reads as the design system not having been finished.
 
 ## Semantic role catalogue
 
@@ -122,6 +136,19 @@ Every colour variable in a `.pen` document carries both light and dark values fr
 - **Saturated accents stay too saturated.** A vibrant accent on dark backgrounds tends to glow. Reduce chroma slightly (10–20%) or shift lightness up.
 - **No line-height bump.** Light text on dark backgrounds visually compresses. Add 0.05 to body line-height in dark mode (covered in [typography.md](typography.md)).
 - **Borders disappear.** Light-mode borders at L=0.92 against L=0.985 surface read fine; the same delta in dark mode against an L=0.15 surface is invisible. Widen the delta in dark mode.
+
+### Gentler contrasts where it doesn't matter
+High contrast everywhere produces visual noise. Every element fighting for the same attention level reads as the surface having no opinion about which element is primary.
+
+Reserve high contrast for the focal points (primary CTA, primary heading, the one number the user is here to read). Let secondary elements use gentler contrast (3:1 to 4:1) so they read as supporting rather than competing.
+
+- **Body text:** ≥4.5:1 against its surface (WCAG AA floor).
+- **Secondary text and labels:** 3:1 to 4.5:1 is fine; below 3:1 starts failing accessibility.
+- **Borders and dividers:** 1.5:1 to 3:1 against the surface; high-contrast borders are loud.
+- **Decorative icons:** 2:1 to 3:1 is often enough; high-contrast decoration competes with the content it supports.
+- **Disabled state:** 2:1 contrast against the surface; disabled text should read as quietly-not-available, not as missing.
+
+The squint test ([layout.md](layout.md)) reveals whether contrast is doing hierarchy work or competing. If everything reads as the same priority when squinting, the contrast is over-applied.
 
 Test under both modes before declaring the design done. The first-screenshot protocol in SKILL.md applies under both modes individually.
 
