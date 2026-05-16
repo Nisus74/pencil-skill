@@ -68,6 +68,17 @@ Brand can be choreographed. The page-load sequence is part of the brand expressi
 - **Atmospheric loops.** A background video or subtle continuous motion in the hero. Keep it slow enough not to compete with content.
 - **Expressive hover affordances on CTAs.** A CTA can grow, shift, reveal a secondary element. The hover state has more room to express than in product.
 
+### Scroll-anchored staggering
+When a section reveals on scroll-into-view, the children inside the section can stagger their entrance for a layered effect. Each child gets 200–300ms with 50–100ms stagger between steps; the eye reads the cascade as composition without it feeling choreographed.
+
+Discipline:
+
+- **Three to five steps is the working ceiling.** Beyond that, the reveal reads as performance rather than as content arriving.
+- **One reveal per session.** The intersection observer fires once; scrolling back doesn't replay. Replays read as restless.
+- **Stagger by visual order, not DOM order.** The headline arrives before the supporting copy regardless of which sits first in the source.
+- **Pair with ease-out-quart.** The crisp deceleration matches the choreographed entrance better than ease-out-cubic or ease-in-out.
+- **Cap the translate distance.** 8–16px reveal translate; larger distances read as marketing flourish, which is fine on a hero and noisy on a third-fold section.
+
 ### Product motion
 Product motion is functional, not expressive. Every animation is doing one of the three jobs above; nothing is for show.
 
@@ -94,6 +105,18 @@ A meaningful percentage of users have motion sensitivity (vestibular disorders, 
 - Keep state confirmations (button press, focus appearance); these are functional, not expressive, and removing them harms feedback.
 
 Pencil tokens can carry motion preferences as variables (`$transitionFast`, `$transitionMedium`, `$transitionExpressive`); the `prefers-reduced-motion` branch sets all expressive durations to zero while leaving functional ones intact.
+
+## Motion intensity reduction
+
+When toning a design's motion down (often during a [soften.md](soften.md) pass), apply these recipes consistently across the surface. Half-reductions read as inconsistent; commit to the full pass.
+
+- **Cut translate distances by half.** 40px reveals soften to 20px; 20px reveals soften to 10px. The motion still confirms; it stops performing.
+- **Shift easing toward ease-out-quart.** Less character than ease-out-expo or ease-out-quint; reads as understated. Refuse ease-in-out, bounce, and elastic across the board.
+- **Reduce durations by 25–40%.** A 300ms transition softens to 200ms; a 200ms transition softens to 150ms. The motion is shorter and lands sooner.
+- **Remove decorative motion entirely.** Hover affordances that grow elements, bouncy CTAs, idle loops, scroll parallax. Keep functional motion (state transitions, panel reveals); cut everything else.
+- **Document the original intent in `context` strings.** When engineering reads the design, the `context` should still say what the un-softened motion would have done so they can dial it back up if the soften pass overcorrects.
+
+The softened motion still earns the three jobs above (continuity, confirmation, personality); it just runs quieter.
 
 ## Anti-patterns
 
