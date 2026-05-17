@@ -113,13 +113,13 @@ For Codex and Copilot CLI, use folder copy. The end result is the same; you just
 
 ## Customising the skill
 
-Two parts can be customised.
+There's two parts you can customise.
 
-The **design-system files** in [skills/pencil-design/assets/design-system/](skills/pencil-design/assets/design-system/) are starting points. The skill copies them into your project (typically at `docs/design/`), and you edit those copies to match your brand. They live with your code, so plugin updates never touch them; plugin install is fine here. If you're not a developer or designer, [CUSTOMISING.md](skills/pencil-design/assets/design-system/CUSTOMISING.md) walks you through each file in plain English.
+The **design-system files** in [skills/pencil-design/assets/design-system/](skills/pencil-design/assets/design-system/) are starting points. The skill copies them into your project (typically at `docs/design/`), and you edit those copies to match your brand. They live with your code, so plugin updates don't touch them; plugin install is fine here. If you're not a developer or designer, [CUSTOMISING.md](skills/pencil-design/assets/design-system/CUSTOMISING.md) walks you through each file in plain English.
 
-The **skill content** (`SKILL.md`, the references, the worked examples) tells the AI how to do its work. To rewrite it for your team's workflow, pick folder copy or fork-and-install. Editing it inside a plugin install will be wiped on the next update.
+The **skill content** (`SKILL.md`, the references, the worked examples) tells the AI how to work. To rewrite it for your team's workflow, pick folder copy or fork-and-install. Editing it inside a plugin install won't stick—the next update wipes it.
 
-For example: if you want the AI to use your brand's colour tokens, plugin install is enough. The AI copies `tokens.md` into your project, and you change the values there. To make the AI follow a different design workflow, you're editing `SKILL.md` itself, so pick folder copy or fork-and-install.
+For example: if you want the AI to use your brand's colour tokens, plugin install's enough. The AI copies `tokens.md` into your project, and you change the values there. To make the AI follow a different design workflow, you're editing `SKILL.md` itself, so pick folder copy or fork-and-install.
 
 ---
 
