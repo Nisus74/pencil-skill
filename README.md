@@ -36,19 +36,9 @@ Pencil.dev is a collaborative design tool for creating web and mobile interfaces
 
 ## Install
 
-Three ways to install. Plugin install is the right default.
+**Most people want plugin install.** If you plan to customise the skill's instructions for your team, use folder copy or fork + install instead.
 
-| | One command | Edit freely | Auto-updates |
-|---|---|---|---|
-| **Plugin install** | yes | no | yes |
-| **Folder copy** | yes | yes | manual |
-| **Fork + install** | yes (after forking) | yes | yes (after rebasing) |
-
-Most people want plugin install. If you plan to customise the skill's instructions for your team, use folder copy or fork + install instead.
-
-> Don't edit files inside the plugin install directory. The next update overwrites them. To customise the skill itself, use folder copy or fork + install.
-
-### Plugin install
+### Plugin install (recommended)
 
 **Claude Code:** two install paths, pick either.
 
@@ -68,8 +58,6 @@ Or via the marketplace listing (lets you pin and update via marketplace commands
 **Cursor 2.5+:** in the editor, run `/add-plugin` and point it at `github.com/Nisus74/pencil-skill`.
 
 **Codex:** use folder copy below. The Codex public plugin directory isn't available yet for third-party plugins.
-
----
 
 ### Folder copy
 
@@ -98,8 +86,6 @@ Where `<target>` lives:
 
 To update, re-run the same `degit` or `cp` command. If you've edited the files locally, diff and merge by hand.
 
----
-
 ### Fork + install
 
 Available for Claude Code and Cursor.
@@ -112,6 +98,16 @@ Available for Claude Code and Cursor.
 4. To pull upstream changes, rebase your fork against `Nisus74/pencil-skill`.
 
 For Codex and Copilot CLI, use folder copy. The end result is the same; you just don't get an automatic update path.
+
+## Install Methods Comparison
+
+| | One command | Edit freely | Auto-updates |
+|---|---|---|---|
+| **Plugin install** | yes | no | yes |
+| **Folder copy** | yes | yes | manual |
+| **Fork + install** | yes (after forking) | yes | yes (after rebasing) |
+
+> **Note:** Don't edit files inside a plugin install directory. The next update overwrites them. To customise the skill itself, use folder copy or fork + install.
 
 ---
 
