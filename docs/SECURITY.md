@@ -43,7 +43,7 @@ If you believe any of the above has occurred, please report it via the channels 
 
 ## OWASP Agentic Skills Top 10: Compliance Map
 
-This repo's controls against the [OWASP Agentic Skills Top 10](https://owasp.org/www-project-agentic-skills-top-10/).
+This repo's controls against [OWASP Agentic Skills Top 10](https://owasp.org/www-project-agentic-skills-top-10/).
 
 | Code | Risk | Control in this repo |
 |------|------|----------------------|

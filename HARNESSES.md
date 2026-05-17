@@ -5,7 +5,7 @@ Source of truth for what each AI coding harness supports in terms of agent skill
 **Currently supported:** Claude Code, Cursor (2.5+), Codex CLI.
 **Future-supported (folder-copy install today, plugin manifest when warranted):** Gemini CLI, OpenCode, Pi, Kiro, Qoder, Trae, Rovo Dev.
 
-Last verified: 2026-05-16.
+Last verified: 2026-05-16. Note that platform documentation and tool capabilities evolve frequently; this file represents a point-in-time snapshot and should be re-verified before any major platform updates.
 
 ## Official documentation
 
