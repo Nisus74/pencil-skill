@@ -106,6 +106,42 @@ Four loading shapes. Picking the wrong one is the most common loading mistake.
 
 **Don't** show a full-page spinner for a partial update — render the rest of the page and let the in-progress region carry its own loading state. Full-page spinners are an AI default that mistakes "I don't know what to do" for "tell the user to wait."
 
+### Loading state timing
+
+The loading shapes above are the visual recipes; the *timing* rules live in [`interactions.md`](interactions.md) § Loading states. The short version: don't show a spinner before 150-300ms, and once shown, keep it visible for at least 300-500ms even if the operation completes. Without the floor, the spinner flashes and reads as broken.
+
+## Onboarding states
+
+The user's first encounter with the product. Onboarding states differ from empty states. Onboarding fires on the user's first encounter with the product. Empty states fire when a page has nothing to show after the product has been used.
+
+| State | When it shows | Visual recipe |
+|-------|---------------|---------------|
+| **Welcome** | First launch after sign-up. Before any user data exists. | Full-screen takeover or centred modal. Brand voice, single primary action, optional 'skip' link. Don't gate; the user can always come back to onboarding from settings. |
+| **Sample data** | The user wants to explore the product without creating their own data first. | A pre-populated workspace, project, or document with realistic content. Clearly marked 'sample' so the user knows it's for exploration. A 'Replace with my own' CTA stays visible. |
+| **Coach marks** | Discoverable hints for non-obvious features (keyboard shortcuts, command palette, contextual menus). | Small floating cards anchored to the relevant UI element. Always dismissible. Never auto-show more than one at a time. Stop showing after 2-3 dismissals (the user knows). |
+| **Loaded-with-suggestions** | The user has done one action; the product can now suggest the next. | Inline 'next steps' panel or a banner above the main content. Suggestions are specific to what the user just did. Generic 'next steps' don't earn their space. |
+
+The visual lockup matches what empty states use (illustration + title + description + CTA). The trigger is different: onboarding fires on first visit only.
+
+Don't combine all four. A welcome modal + sample data + coach marks + suggestions all firing on the first visit overwhelms the user. Pick the one or two that genuinely help.
+
+## Settings states
+
+Settings have their own state vocabulary distinct from generic forms. The dominant pattern is autosave; explicit-save is the exception.
+
+| State | When it shows | Visual recipe |
+|-------|---------------|---------------|
+| **Saved** | The default. Values persist on change. | No special indicator. The absence of an 'unsaved' marker is the signal. Optional 'Last saved 2 minutes ago' timestamp for the user's reassurance. |
+| **Saving** | In flight, between user change and server confirmation. | Subtle indicator near the field or in the page chrome: small spinner + 'Saving...' text. Don't block the rest of the form. |
+| **Saved-just-now** | Transient state after a successful save. | A check-mark icon next to the field for ~2 seconds, then decay to default. Or a non-blocking toast: 'Saved.' Pick one based on how prominent the change was. |
+| **Dirty** | For explicit-save forms only. The user has changed values; nothing's been saved yet. | A 'Save' button enables; an 'Unsaved changes' indicator appears in the page chrome. The browser's beforeunload warning fires on navigation. |
+| **Validation** | The user entered something invalid. Save is blocked until they fix it. | Inline error next to the offending field (per [`forms.md`](forms.md) § Error display). The Save button stays visible but indicates blocked: tooltip on hover explains why. |
+| **Conflict** | Another session (another device, another user) changed the same setting since the user opened this page. | Banner above the form: '<Other user> changed this setting <time> ago. <View their version> or <Save anyway>.' Force a conscious choice; don't silently overwrite. |
+
+The conflict state is rare but critical for collaborative or multi-device products. Without it, the last save wins silently and the user's history quietly disappears. The conflict banner forces a conscious choice.
+
+Per `assets/design-system/patterns.md` § Settings page (when populated), each settings section in the project commits to one save pattern (autosave or explicit). The states above apply to whichever pattern was chosen.
+
 ## Screen-level fault states
 
 When something has gone wrong at a system level — not a single component — the page itself becomes the state. Every product should have a coherent answer to each of these.

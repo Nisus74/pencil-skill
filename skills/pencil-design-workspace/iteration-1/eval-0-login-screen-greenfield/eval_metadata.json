@@ -1,0 +1,7 @@
+{
+  "eval_id": 0,
+  "eval_name": "login-screen-greenfield",
+  "prompt": "I need to design a login screen in pencil. It should have email + password inputs, a primary submit button, and a 'forgot password?' link. Walk me through what you'd do step by step before touching any tools.",
+  "expected_output": "Agent describes the seven-step workflow: detects host first, locates context (open .pen, design-system/ folder, selection), loads guidelines, plans, executes via batch_design, verifies via the verification ladder (structural-first: batch_design response \u2192 snapshot_layout \u2192 batch_get \u2192 get_screenshot reserved for visual-only questions or final sign-off), iterates. References design-system/ check and library import. Plans before executing. Does NOT prescribe screenshotting after every chunk. Treats dual-mode (light + dark) screenshotting as conditional on mode-specific color usage, not mandatory. Describes calling get_variables() as a mandatory pre-execution step before any batch_design call to check existing tokens.",
+  "assertions": []
+}

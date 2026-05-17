@@ -1,0 +1,22 @@
+[
+  {"query": "i need to design a login screen in pencil with email and password fields and a submit button. its for our internal employee portal at acme corp. can you walk me through it?", "should_trigger": true},
+  {"query": "open my .pen file at design/dashboard.pen and add a new card showing the q4 mrr number from our metrics page", "should_trigger": true},
+  {"query": "the marketing site landing page is in landing.pen and the cta button needs to be a deeper teal not the current minty green. can you fix it", "should_trigger": true},
+  {"query": "scaffold a design-system folder for this repo, theres no design tokens defined yet anywhere", "should_trigger": true},
+  {"query": "i have my reusable button and input components in design/system.lib.pen but my new pen file isn't using them. how do i wire it up", "should_trigger": true},
+  {"query": "build me a settings page mockup, three sections: profile, notifications, security. you know what to do", "should_trigger": true},
+  {"query": "this pen file has 60 nodes and looks chaotic. can you reorganize it so the hero section comes first and the form is a single auto-layout column?", "should_trigger": true},
+  {"query": "im using pencil dev for the first time, can you help me set up a project the right way?", "should_trigger": true},
+  {"query": "the agent in my IDE keeps telling me .pen files are encrypted but my file is clearly readable JSON, whats going on here", "should_trigger": true},
+  {"query": "i need a hero section with a big headline, a subhead, and two ctas side by side - sketch it for me in pencil", "should_trigger": true},
+  {"query": "write me a python script that converts a CSV file with columns date, amount, category into a monthly summary as JSON", "should_trigger": false},
+  {"query": "the build is failing on github actions with 'cannot find module @typescript-eslint/parser'. how do i fix this in our pnpm monorepo", "should_trigger": false},
+  {"query": "explain what an mcp server is and how it works in claude code. high level, not super deep", "should_trigger": false},
+  {"query": "draw me a flowchart for our user signup flow showing the email verification step. plain ascii is fine", "should_trigger": false},
+  {"query": "help me design a postgres schema for a multi-tenant saas, the team is debating if we should use schemas or row-level security", "should_trigger": false},
+  {"query": "i'm using figma for the wireframes and need to know which figma plugin extracts color tokens to css variables", "should_trigger": false},
+  {"query": "set up a design tokens folder in this react project so we can have consistent spacing and colors. tailwind based", "should_trigger": false},
+  {"query": "review my pull request - it's a refactor of the auth middleware and i want a second pair of eyes on the session token handling", "should_trigger": false},
+  {"query": "help me write a design doc for our new event-driven notification service, target audience is the platform engineering team", "should_trigger": false},
+  {"query": "i'm sketching out a new mobile app idea on paper and want to turn the photos into a clickable prototype. whats the easiest way", "should_trigger": false}
+]

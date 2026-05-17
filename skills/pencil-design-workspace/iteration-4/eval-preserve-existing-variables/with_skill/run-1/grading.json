@@ -1,0 +1,91 @@
+{
+  "expectations": [
+    {
+      "text": "Explicitly describes calling get_variables() as the first step before any set_variables or batch_design call",
+      "passed": true,
+      "evidence": "Step 2 is titled 'Read the existing tokens — get_variables() first, non-negotiably' and is ordered before Step 7 (set_variables) and Step 8 (batch_design). The transcript states: 'This is the critical gate. The call returns every document-level variable currently declared.'"
+    },
+    {
+      "text": "States it will only add tokens that are absent from the existing set returned by get_variables() — not re-declare $primary or $surface",
+      "passed": true,
+      "evidence": "Step 3 shows an explicit diff table where `primary` (#E63946) and `surface` (#F8F9FA) are marked 'Yes' with action 'Leave it alone'. Step 7 reinforces: 'I do not pass `primary` or `surface` — they came back from `get_variables()`, so they\\'re yours.' The set_variables example comment reads '// Only tokens not present in get_variables() output'."
+    },
+    {
+      "text": "Does NOT propose calling set_variables with a full default token suite (surface, primary, border, etc.) without first checking what already exists",
+      "passed": true,
+      "evidence": "The set_variables call in Step 7 is explicitly conditional ('If the diff in step 3 found missing tokens, I call set_variables with exactly and only those') and the example body excludes existing tokens. No unconditional full-suite call is proposed anywhere in the response."
+    },
+    {
+      "text": "Does NOT suggest using replace: true on set_variables",
+      "passed": true,
+      "evidence": "Step 7 shows `replace: false` in the code example. The transcript explicitly warns: 'I do not use `replace: true` — that would wipe the entire variable set and reconstruct only what I pass, which would destroy your configured values.' The summary also lists 'replace: true is never used' as one of four mechanical guarantees."
+    },
+    {
+      "text": "Treats the user's existing $primary and $surface as authoritative — describes using them directly in batch_design without redefining them",
+      "passed": true,
+      "evidence": "Step 8 states: 'Every color reference in this call uses \"$primary\", \"$surface\", \"$textPrimary\", etc. — never a raw hex. That means your #E63946 and #F8F9FA are what the login screen actually renders, inherited through the variables you already own.' The summary confirms: 'Your $primary (#E63946) and $surface (#F8F9FA) are untouched. The login screen binds \"$primary\" and \"$surface\" by reference.'"
+    }
+  ],
+  "summary": {
+    "passed": 5,
+    "failed": 0,
+    "total": 5,
+    "pass_rate": 1.0
+  },
+  "execution_metrics": {
+    "tool_calls": {},
+    "total_tool_calls": 0,
+    "total_steps": 8,
+    "errors_encountered": 0,
+    "output_chars": 4827,
+    "transcript_chars": 4827
+  },
+  "timing": {
+    "executor_duration_seconds": 54.5,
+    "grader_duration_seconds": null,
+    "total_duration_seconds": 54.5
+  },
+  "claims": [
+    {
+      "claim": "get_variables() is called before any token work",
+      "type": "process",
+      "verified": true,
+      "evidence": "The response structures Step 2 (get_variables) before Step 7 (set_variables) and Step 8 (batch_design), and the summary explicitly lists this as the first of four mechanical guarantees."
+    },
+    {
+      "claim": "replace: false is the merge default",
+      "type": "factual",
+      "verified": true,
+      "evidence": "This is accurate per the pencil MCP set_variables tool behavior — replace: false merges rather than replaces the variable set."
+    },
+    {
+      "claim": "replace: false with a key already present will still overwrite that key's value",
+      "type": "factual",
+      "verified": true,
+      "evidence": "Step 7 accurately notes: 'even replace: false overwrites the value of any key you include. The protection comes from the diff step — by not including keys that already exist, I guarantee I never touch them.' This is a subtle and correct nuance."
+    },
+    {
+      "claim": "The response will check for existing components before building from primitives",
+      "type": "process",
+      "verified": true,
+      "evidence": "Step 5 explicitly calls batch_get with reusable: true to check for existing Button, InputField, or similar reusable components."
+    }
+  ],
+  "user_notes_summary": {
+    "uncertainties": [],
+    "needs_review": [],
+    "workarounds": []
+  },
+  "eval_feedback": {
+    "suggestions": [
+      {
+        "reason": "All five assertions are about the planning/reasoning described in the response, not about actual tool calls made. The response is purely a plan (no MCP tools were actually invoked). An adversarial model could pass all five assertions by writing a detailed plan that correctly describes the process without actually implementing it. Consider adding an assertion that verifies real tool calls were made — e.g., 'get_variables was actually called as a tool invocation, not merely described.'"
+      },
+      {
+        "assertion": "States it will only add tokens that are absent from the existing set returned by get_variables() — not re-declare $primary or $surface",
+        "reason": "This assertion passes based on the plan, but since no actual set_variables call was made, there is no concrete argument list to verify. A stronger version would check the actual set_variables arguments when executed against a live document."
+      }
+    ],
+    "overall": "The evals are well-targeted at the key safety property (not overwriting existing variables), and the response demonstrates clear, detailed understanding of the correct approach. However, all five assertions evaluate stated intent in a planning response rather than verified tool call behavior. The eval suite would be more discriminating if run against an execution scenario where set_variables is actually called with verifiable arguments."
+  }
+}

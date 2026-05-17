@@ -1,10 +1,28 @@
 ---
 name: pencil-design
-description: Use this skill for any pencil.dev work, designing UI in a .pen file, editing an open Pencil canvas, sketching or mocking screens, instantiating components from a .lib.pen library, fixing batch_design schema errors, or recovering from Pencil MCP host-not-connected issues. This is the canonical skill for all Pencil tasks; reach for it before any general design or frontend skill when Pencil signals are present.
-when_to_use: Trigger on any mention of pencil.dev, .pen, .lib.pen, "the Pencil MCP", "the Pencil CLI", "pencil interactive", "the Pencil canvas", or a design-system/ folder in a Pencil context, even when the user phrases it casually, mid-sentence, or doesn't name the tool explicitly.
-paths:
-  - "**/*.pen"
-  - "**/*.lib.pen"
+description: Use this skill for any pencil.dev work — designing UI in a .pen file, editing an open Pencil canvas, sketching or mocking screens, instantiating components from a .lib.pen library, scaffolding a project's design-system/ folder, fixing batch_design schema errors, or recovering from Pencil MCP host-not-connected issues. Pick it on any mention of pencil.dev, .pen, .lib.pen, "the Pencil MCP", "the Pencil canvas", or a design-system/ folder in a Pencil context — even when the user phrases it casually, mid-sentence, or doesn't name the tool. This is the canonical skill for all Pencil tasks; reach for it before any general design or frontend skill when Pencil signals are present.
+license: MIT
+compatibility: Any AI coding tool with the Pencil MCP server configured (Claude Code, Codex, Gemini CLI, Copilot CLI, Cursor). Headless workflows (CI, batch generation, scripted exports) are supported via the `@pencil.dev/cli` package, which the agent uses when explicitly directed; see `references/pencil-cli.md` for the When CLI vs MCP decision table and the no-auto-fall-back policy.
+metadata:
+  version: "1.11.0"
+permissions:
+  mcp:
+    - pencil:get_editor_state
+    - pencil:open_document
+    - pencil:get_guidelines
+    - pencil:batch_get
+    - pencil:batch_design
+    - pencil:snapshot_layout
+    - pencil:get_screenshot
+    - pencil:get_variables
+    - pencil:set_variables
+    - pencil:find_empty_space_on_canvas
+    - pencil:search_all_unique_properties
+    - pencil:replace_all_matching_properties
+    - pencil:export_nodes
+  shell: none
+  filesystem: project-only  # reads ./design-system/ and writes scaffolded templates from skill assets
+  network: none
 ---
 
 # Pencil Design Skill
@@ -41,13 +59,9 @@ Every non-trivial node must have a `context` string. This is not optional, and n
 
 Required on: every reusable component (`reusable: true`), every page-level frame, every form field, every interactive element (button, link, tab, toggle, dropdown), every data display node (chart, table, KPI card, sparkline).
 
-Optional on: pure visual primitives (dividers, corner shapes, background fills that carry no semantic meaning).
+**Annotate behaviour, not visual specs.** `context` documents intent and behaviour the agent or developer can't infer from the visual: data source, validation rules, permission gates, analytics events, animation timing, accessibility roles, conditional logic, API dependencies. Don't annotate spacing, colour, or font choices. `batch_get` and `snapshot_layout` read those directly, and duplicating them just rots the file when tokens change. Bad: *"Heading uses $textXl with $textMuted colour and 24px top padding"*. Good: *"Renders only when user has admin role; click triggers analytics event `report.export.start`."*
 
-A good `context` is one sentence covering role + data + behaviour: *"KPI card: total API calls. Populated from /v1/stats/calls. Click navigates to Requests view with date filter pre-applied."* Bad `context`: `"A card"`, `"KPI"`, `""`.
-
-**Enforcement:** Before issuing each `batch_design` call, verify every node you are creating that falls in the "required" list above has a `context` in that call. If you are building in chunks and a required node appears in chunk N, it must have `context` in chunk N, not deferred to a later backfill. The screenshot loop does not substitute for this. `context` is invisible on screen but essential for file maintainability.
-
-**Backfill missing context as you go.** When you read an existing node (via `batch_get`) that should have a `context` but doesn't, populate it via a `U` op in the same `batch_design` call where you're already working. The cost is one extra op; the value is a permanent improvement to the file. Do not invent context you can't ground in the design, if you can't tell what a node is for, leave its context blank rather than fabricate it.
+**Backfill missing context as you go.** When you read an existing node (via `batch_get`) that should have a `context` but doesn't, populate it via a `U` op in the same `batch_design` call where you're already working. The cost is one extra op; the value is a permanent improvement to the file. Do not invent context you can't ground in the design — if you can't tell what a node is for, leave its context blank rather than fabricate it.
 
 ### Components first
 
@@ -66,6 +80,14 @@ The check has two parts and you do both at the start of every design task:
    batch_get({ filePath: "./design/system.lib.pen", patterns: [{ reusable: true }], readDepth: 2 })
    ```
 
+**Reading an unfamiliar component.** If the inventory surfaces a component you haven't used before, inspect it deeply before instantiating:
+
+```
+batch_get({ nodeIds: ["ComponentId"], readDepth: 4 })
+```
+
+In the result, look for: `slot` frames (content holes you fill via `descendants`), named children (their `id` values are valid `descendants` keys), and `theme` values (active states). A child at path `a → b → c` is addressable as `"a/b/c"` in `descendants`. See [`references/component-anatomy.md`](references/component-anatomy.md) for the complete guide with a worked example at [`assets/examples/example-component-deep-dive.md`](assets/examples/example-component-deep-dive.md).
+
 Build a short mental inventory: what components exist, what they're called, what they're for. When the user asks for X (button, input, card, badge, modal), reach for a matching component first via a `ref` node with optional `descendants` overrides. Build from primitives only when:
 
 - No matching component exists in the document or any attached library
@@ -76,9 +98,25 @@ If a component exists but its name doesn't quite match what the user said (`Prim
 
 ### Themes (light + dark, always)
 
-Every new document declares a `mode` theme axis with `light` and `dark` values. Every color variable carries both. No exceptions for "we'll add dark mode later", the variables are nearly free to declare upfront, and retrofitting a colorscape after the design exists is brutal.
+Every new document declares a `mode` theme axis with `light` and `dark` values. Every color variable carries both. No exceptions for "we'll add dark mode later" — the variables are nearly free to declare upfront, and retrofitting a colorscape after the design exists is brutal.
 
-**Setting themes and variables:** declare tokens with `set_variables`; the server auto-registers any theme axis it sees in your variable values. No separate "declare the axis first" step is needed. `U("document", ...)` is not supported by `batch_design`, the `document` binding is insert-only, and there is no other root-node id exposed to `U`. The two correct paths: `set_variables` for design tokens (themed values use an array of `{ value, theme }` entries; the axis appears automatically); and `U("frameId", { theme: { mode: "dark" } })` to activate a theme on a specific frame. The frame `theme` (singular, object) is different from the variable themed-value array (plural, list of entries), see `references/mcp-tools.md` § `set_variables`.
+**Before writing any tokens, call `get_variables()`.** If it returns a non-empty set, the document already has tokens the user may have customised. Treat those as authoritative — never re-declare a variable that already exists. `replace: false` (the `set_variables` merge default) still overwrites existing values for any key you pass, so calling it with a full default suite silently clobbers user-configured tokens.
+
+Workflow for bootstrapping tokens:
+
+1. `get_variables()` → note which variable names already exist.
+2. Set themes only if not already declared (check `get_editor_state` for an existing `mode` axis before issuing `U("doc", { themes: { mode: ["light","dark"] } })`).
+3. Call `set_variables` with **only** the variables absent from step 1. If the document already has a complete token set, skip bootstrapping entirely.
+
+Concretely, for a genuinely empty doc:
+
+```
+U("doc", { themes: { mode: ["light", "dark"] } })
+set_variables({ variables: { surface: { type: "color", value: [
+  { value: "#FAFAFA", theme: { mode: "light" } },
+  { value: "#0B1117", theme: { mode: "dark" } }
+] }, /* ...only tokens absent from get_variables() result */ }, replace: false })
+```
 
 Test under both modes by updating the page frame's `theme` property before declaring the design done.
 
@@ -114,6 +152,24 @@ Five non-negotiable checks that run as part of step 5 verification:
 If a check fails, fix it before reporting done. Don't note it as a TODO.
 
 For deeper coverage (ARIA roles, focus order, screen-reader content, RTL & internationalisation, dynamic type, `prefers-contrast` / `prefers-reduced-transparency`), see `references/accessibility.md`.
+
+### File architecture
+
+A `.pen` is a file other people (and other agents) will open later. Three rules keep it navigable.
+
+**Cover frame.** Every `.pen` opens with a top-level frame named `Cover` at canvas origin. Inside it: file owner, status (one of `Discovery`, `In design`, `Design review`, `Engineering review`, `Ready for build`, `In build`, `QA`, `Shipped`, `Deprecated`), version, last-updated date, scope (in / out), links (brief, ticket, prototype, design-system). Without a Cover, no one can answer *"is this safe to build from?"* in under 30 seconds. The Cover's `context` reads `"File operating manual: owner, status, version, scope, links."` and its children are text nodes for each field. Backfill a Cover into any `.pen` that doesn't have one when you open it for real work.
+
+**Section frames as canvas regions.** Top-level frames belong in named sections, positioned in distinct canvas regions: `SourceOfTruth` (approved current), `BuildReady` (current iteration in flight), `UXStates` (state matrices), `Responsive` (per-breakpoint), `Exploration` (drafts and rejected directions), `Archive` (superseded). Use `find_empty_space_on_canvas` between sections so they don't overlap. Never place an exploration frame inside the SourceOfTruth region or vice versa. The whole point is that a code generator (or a teammate) can answer *"which is canonical?"* without asking. When an exploration is promoted, move it; don't dual-track it.
+
+**Hierarchical frame naming for flows.** Multi-screen flows extend the PascalCase rule with a `/`-delimited path:
+
+```
+Reporting / Export / 03 / Configure / ValidationError / Desktop
+```
+
+The path is `[Area] / [Flow] / [Step] / [Screen] / [State] / [Breakpoint]`. Slashes are forbidden in node `id` (the schema rejects them) but allowed and recommended in `name`. Single-screen designs keep the simple PascalCase form (`LoginCard`); multi-screen flows use the path so file navigation stays sane at scale.
+
+For full file-set patterns (single `.pen` vs multi-`.pen` project layouts, completeness checklists per project type, source-of-truth designation), see `references/file-architecture.md`.
 
 ### Design completeness
 
@@ -151,15 +207,79 @@ Both registers share the discipline rules above. The negative-space defaults bel
 
 When no user direction was given (a quick sketch, a one-off doodle), these defaults stop the design landing in AI-generic territory:
 
-- **One accent, low saturation.** Max one accent hue per design; keep saturation under ~80%. Multiple competing accents are an AI tell.
-- **Neutrals from one family.** Pick Zinc *or* Slate *or* Stone and stay there. Mixing warm and cool grays in the same design looks accidental.
-- **Never bind raw `#000000` or `#FFFFFF` for surfaces.** Use a `surface` / `surfaceInverse` variable that resolves to Zinc-950 / off-white (e.g. `#FAFAFA`). Pure black against pure white is the strongest visual AI tell after Inter. For OKLCH theory, the four palette strategies, tinted neutrals, and the reflex-reject palette defaults by category, see [references/color-and-contrast.md](references/color-and-contrast.md).
-- **No neon, no glow shadows, no purple/blue gradient text on headings.** If the project's tokens declare a brand gradient, use it as declared and only there.
-- **Default fonts by project type:** Dashboards and software UIs default to `Geist` + `Geist Mono`, or `Satoshi` + `JetBrains Mono`. Marketing and editorial default to `Cabinet Grotesk` or `Satoshi` for display, paired with a modern serif (`Fraunces`, `Instrument Serif`, `Editorial New`) only when the brand warrants it. For the full reflex-reject font list, pairing rules, scale and hierarchy guidance, and OpenType special moves, see [references/typography.md](references/typography.md).
+- **Two-role architecture.** A working colour system has 4–5 neutrals (surface, surfaceMuted, border, textPrimary, textMuted) carrying structure and 1–3 accent colours carrying action, status, and emphasis. Every colour you bind serves a functional role; decorative colours that don't communicate anything are noise. When the project has no `tokens.md`, declare the neutral five first, then the action accent, before drawing anything.
+- **One accent, low saturation.** Within the 1–3 accent slots, use at most one *competing* hue per design. Multiple competing accents (a blue button next to a purple link next to a teal badge) are an AI tell. Keep saturation under ~80% for primary accents; reserve full saturation for status colours (success/warning/error) where the loudness is the message.
+- **Neutrals from one family.** Pick Zinc *or* Slate *or* Stone and stay there. Mixing warm and cool greys in the same design looks accidental.
+- **Hue tinting on non-neutral surfaces.** When a region's background is coloured (a brand-tinted hero, a coloured card), tint borders, shadows, and secondary text *toward* the background hue, not pure neutral. Fully neutral greys on a warm-tinted surface read accidental; a slightly warmed grey reads intentional. Same logic in reverse for cool surfaces.
+- **Interactions increase contrast.** `:hover`, `:active`, and `:focus` states carry *more* contrast than the resting state, never less. A button that dims on hover is broken; the affordance should pull the eye in, not push it away. Common recipe: hover bumps fill 5–10% darker (light mode) or lighter (dark mode); focus adds the 2px `$focusRing` outline; active compresses scale to ~0.98 momentarily.
+- **Never bind raw `#000000` or `#FFFFFF` for surfaces.** Use a `surface` / `surfaceInverse` variable that resolves to Zinc-950 / off-white (e.g. `#FAFAFA`). Pure black against pure white is the strongest visual AI tell after Inter.
+- **No neon, no glow shadows, no purple/blue gradient text on headings.** If the project's `tokens.md` declares a brand gradient, use it as declared and only there.
+- **Colour-blind safety.** Categorical colour used to distinguish data (chart series, status pills, category tags) must work for deuteranopia and protanopia. Never red/green-only distinctions; always pair colour with shape, icon, or text. For chart-specific palettes, see `assets/design-system/data-viz.md` (if scaffolded).
 
 ### Anti-patterns (AI tells, never ship these)
 
-These patterns immediately read as machine-generated. Treat each as a bug to fix in passing if you see it in an existing file.
+When `design-system/tokens.md` doesn't pin a font stack, default by project type:
+
+- **Dashboards / software UIs:** `Geist` + `Geist Mono`, or `Satoshi` + `JetBrains Mono`.
+- **Marketing / editorial:** `Cabinet Grotesk` or `Satoshi` for display; pair with a modern serif (`Fraunces`, `Instrument Serif`, `Editorial New`) only if the brand warrants it.
+- **Banned by default:** `Inter` (overused to the point of being an AI signature), generic serifs (`Times New Roman`, `Georgia`, `Garamond`, `Palatino`).
+- **Body width:** body text caps at ~65 characters per line (matches the Responsive rule).
+- **High-density layouts:** when density is "dense", numerics use a monospace font so columns of figures align — even inside otherwise sans-serif UI.
+- **Tabular numerics.** Any column of numbers (tables, dashboards, price grids, comparison cards) uses `font-variant-numeric: tabular-nums` so digits align by column width. Proportional numerals in aligned columns produce visible jitter that no amount of spacing can hide. Note this in the component's `context` so the engineer ships the CSS.
+- **Heading balance.** Multi-line display headings use `text-wrap: balance` to avoid orphan single words on the last line. The single-word orphan (*"Build delightful product/experiences for/teams"*) is the most common typography AI tell after font choice.
+- **Non-breaking spaces in microcopy.** Bind values to their units so they never split across a line break: `10&nbsp;KB`, `⌘&nbsp;+&nbsp;K`, `v1.2`, `Mr.&nbsp;Smith`. Document the intent in `voice.md` if the project has one.
+- **Optical sizing.** When using a variable font that exposes `opsz`, set the optical size axis to match the rendered size (small text uses small-optical, display uses display-optical). Otherwise the type loses its proportions at extremes.
+
+### Shadows & elevation
+
+Layered shadows read more physical than single drops. The minimum baseline pattern is two layers: an ambient layer (low offset, soft) plus a direct-light layer (modest offset, slightly tighter):
+
+```
+box-shadow:
+  0 1px 2px rgba(0, 0, 0, 0.06),    /* ambient */
+  0 4px 12px rgba(0, 0, 0, 0.10);   /* direct */
+```
+
+A single drop shadow at 40% opacity is the AI default; reach for the layered pair instead, even at the lowest elevation tier. For the project's full elevation scale and dark-mode alternatives (where shadows give way to inner glows or 1px borders), see `assets/design-system/elevation.md`.
+
+**Nested border-radius: child ≤ parent.** A child element's `border-radius` must always be less than or equal to its parent's. Concentric curves read intentional; mismatched curves read accidental. A 12px card with 8px inner inputs is correct; a 12px card with 16px inner inputs is broken. Where the parent radius is `r` and the child sits flush inside `p` pixels of padding, the visually-correct child radius is `r - p`, not the same value. This rule has no exceptions. Even where the maths comes out to a half-pixel, snap to the nearest integer in the right direction (down for child, never up).
+
+### Optical precision
+
+Geometry isn't always perception. The eye reads "centred" differently from the calculator.
+
+- **±1–2px adjustments where the eye disagrees with the maths.** Most common case: an icon inside a circular button reads off-centre even when the icon's bounding box is geometrically centred, because the icon's *visual* weight isn't where its bounding box suggests. Nudge it 1–2px in the direction the eye expects. Same logic for triangle play icons (reads off-centre until you offset them toward the right).
+- **Balance icon and text contrast.** When you pair an icon with a text label, the icon usually wants to be slightly muted (70–80% opacity, or a step lighter in the colour token) so the text reads as primary. Equal-weight icon and text creates two competing focal points; the user doesn't know which to read first.
+- **Optical centre vs geometric centre.** A modal's vertical position should sit slightly above geometric centre (typically 40–45% from top, not 50%). Geometrically-centred modals on tall viewports look like they're sinking. Same for hero text in a frame with imagery below.
+
+For deeper composition principles (visual weight, eye flow, density strategy), see `references/visual-hierarchy.md`.
+
+### Content & microcopy
+
+The text in a design carries as much taste as the visuals. A few rules apply to almost everything you author:
+
+- **Active voice, second person, title case for UI labels.** "Install the CLI" beats "The CLI will be installed". "Your settings" beats "My settings". "Save changes" beats "save changes".
+- **Numerals for counts and quantities.** "8 deployments" beats "eight deployments"; readers scan numbers faster than spelled-out words.
+- **Action-specific button labels.** "Save changes", "Send invite", "Create project". Never use "Continue", "Submit", "OK", or "Proceed" for a first-party action. Generic labels force the user to look elsewhere on the screen to understand what they're committing to.
+- **Error messages guide the exit.** State what happened, why if non-obvious, and what the user can do next. *"We couldn't save your changes; your network dropped. Try again, or copy your draft below."* Never just *"Something went wrong"*.
+- **Empty state copy encourages and guides.** Show what's possible, not what's missing. *"Your first project lives here. Create one to get started."* beats *"No projects yet."*.
+
+For the full microcopy framework (voice axes, headlines, confirmation patterns, localisation), see `references/microcopy.md` (when present in your project) or follow the rules above.
+
+### Self-critique gate
+
+Before declaring a design done, take 60 seconds to run four questions:
+
+1. **Could a non-designer recognise this as the brand's voice or industry?** If the design could belong to any product, you haven't committed hard enough. Pick one direction (typography, atmosphere, layout) and lean.
+2. **Where does the eye go first / second / third?** Trace the path. Does it match the priority of the page (primary action / context / secondary)?  If the eye lands on a decorative element first, demote it.
+3. **What's decorative-only that doesn't communicate meaning?** If a colour, a shape, or a flourish doesn't carry information or atmosphere, remove it. Decorative noise is the most common AI tell.
+4. **What single change would make this feel less AI-generated?** If you can name one (a custom illustration, a typography swap, an asymmetric layout, a textured surface), make it. If you can't, the design is probably fine; if you can, the design is definitely improved.
+
+Fix what surfaces. Don't ship the design without running the gate; don't note the four questions as a TODO. For specific rescues per failure mode (too busy, too sparse, too generic), see `references/iteration-patterns.md`.
+
+### Anti-patterns (AI tells — never ship these)
+
+These patterns immediately read as machine-generated. Treat each as a bug to fix in passing if you see it in an existing file:
 
 - Pure `#000000` or `#FFFFFF` bound directly (use a variable resolving to off-black / off-white).
 - `Inter` as the UI font, or generic serifs (`Times`, `Georgia`, `Garamond`) for display.
@@ -302,23 +422,25 @@ The default workflow assumes a fresh, end-to-end design. Most tasks aren't that.
 - **User asks for an error, 404, 500, offline, or empty screen.** Load `references/states.md` before planning. It owns the screen-level fault state taxonomy and the empty-state taxonomy (first-use / no-results / no-permission / post-action). See `assets/examples/example-error-screen.md` for a worked walkthrough.
 - **User asks for a multi-step form, wizard, signup, onboarding, or any flow that crosses screens.** Load `references/flows.md` before planning. It owns validation timing, modal-vs-page decisions, the back-stack model, and multi-step confirmation anatomy. See `assets/examples/example-form-flow.md` for a worked walkthrough.
 - **User mentions container queries, fluid type, AI UI affordances, optimistic updates, real-time presence, or "modern" patterns.** Load `references/modern-patterns.md`. It surfaces the patterns the model under-uses by default and flags the AI defaults (glassmorphism, three-card grids, parallax-everywhere) that read as already-dated.
-- **User wants to use a Pencil MCP tool you haven't touched recently** (`get_variables`, `set_variables`, `search_all_unique_properties`, `replace_all_matching_properties`, `find_empty_space_on_canvas`, `export_nodes`). Load `references/mcp-tools.md`, it's a per-tool cookbook with worked invocations and composite recipes.
-- **Layout work: spacing rhythm fix, grid construction, "this looks templated", asymmetric vs symmetric decisions.** Load `references/layout.md`. It owns the grid systems, register-specific spatial strategies, the squint test, and the layout anti-patterns the model defaults into.
-- **Motion / animation design: planning state transitions, page-load sequences, hover affordances, easing decisions.** Load `references/motion-design.md`. It owns the easing curves, durations by interaction, register-specific motion, dark-mode adjustments, and `prefers-reduced-motion`.
-- **Designing component states: hover, focus, pressed, disabled, loading, error, selected, read-only.** Load `references/interaction-design.md`. It owns the state design philosophy, register-specific state recipes, focus management depth, and the state composition matrix.
-- **Surface feels overwhelming, cluttered, or empty-for-no-reason; density-vs-familiarity mismatch.** Load `references/cognitive-load.md`. It owns the three load types (intrinsic / extraneous / germane), attention budget per surface, and the populated-state verification rule.
-- **User asks for a critique, UX audit, design review, or wants to compare two directions.** Load `references/heuristics-scoring.md`. It owns the ten heuristics, the 1–5 scoring rubric, and the composite-score interpretation.
-- **Adding personality or signature moments after the design is functionally complete.** Load `references/delight.md`. It owns the personality-in-functional-moments framing, signature moments, and the discipline that prevents stacked delight from becoming noise. For the *alignment / spacing / token-consistency* final pass (different work), load `references/finalise.md` instead.
-- **First-run experience, onboarding flow, activation moment, empty-but-not-empty state.** Load `references/onboard.md`. It owns the three onboarding shapes (just-start / guided-first-action / setup-flow), the empty-state-by-user-state distinction, and the activation-moment hand-off pattern.
-- **Pulling repeated patterns into reusable components or tokens; "extract this", "add to design system", "clean up duplicated values".** Load `references/extract.md`. It owns the extraction workflow, naming discipline, and the per-extraction-type recipes (tokens / components / patterns).
-- **User asks to make a design *bolder*, *more impactful*, *more distinctive*, or *more confident*.** Load `references/amplify.md`. It owns the AI-slop refusal for the *"bolder"* brief (no purple-blue gradients, no glassmorphism, no neon-on-dark, no gradient text on metrics), the personality-lane choice, and the dimension-by-dimension amplification recipes.
-- **User asks to make a design *quieter*, *calmer*, *less aggressive*, *more restrained*, or *less overstimulating*.** Load `references/soften.md`. It owns the desaturation, weight-reduction, motion-quietening, and decoration-removal recipes, plus the *quiet ≠ generic* discipline and the never-gray-on-colour rule.
-- **User asks to *distill*, *simplify*, *strip back*, *cut what doesn't earn its place*, or notes the surface feels *busy without being clear*.** Load `references/pare.md`. It owns the essential / supportive / decorative / inherited rating framework and the cut-vs-promote decisions.
-- **User asks to *harden*, prepare for production, add error / loading / empty / edge-case states, or asks about i18n and overflow handling.** Load `references/fortify.md`. It owns the state-matrix completeness checklist, the screen-level fault state catalogue, overflow handling, i18n stress tests, and the `prefers-*` media-query coverage.
-- **User asks to *clarify*, *rewrite*, fix the UX copy, rewrite labels / errors / microcopy, or asks about button text and form labels.** Load `references/rewrite.md` plus `references/ux-writing.md`. Rewrite is the *which copy to replace and with what* pass; ux-writing.md is the *register and tone* depth.
-- **User asks to *adapt* the design to mobile, tablet, dark mode, high-contrast, RTL, or other contexts.** Load `references/port.md`. It owns breakpoints, theme-axis discipline, touch-targets, density modes, i18n, and `prefers-*` adaptation.
-- **User asks to *optimise* for performance, *trim* asset weight, *speed up* loading, add skeleton states, or improve perceived speed.** Load `references/trim.md`. It owns the font-cap, motion budget, skeleton-state coverage, optimistic-UI candidates, and backdrop-blur budget.
-- **User asks for a *polish* pass, final-pass alignment, *cleanup before shipping*, or *make sure everything is consistent*.** Load `references/finalise.md`. It owns the alignment / token-consistency / detail-coherence trio and the both-modes verification. Distinct from `delight.md` (which is the personality layer).
+- **User wants to use a Pencil MCP tool you haven't touched recently** (`get_variables`, `set_variables`, `search_all_unique_properties`, `replace_all_matching_properties`, `find_empty_space_on_canvas`, `export_nodes`). Load `references/mcp-tools.md` — it's a per-tool cookbook with worked invocations and composite recipes (token audit, greenfield bootstrap, library smoke test).
+- **User mentions headless / CI / batch / scripted / `pencil` command / `@pencil.dev/cli` / one-shot generation, OR explicitly asks for design without opening the editor, OR is in a CI environment with no desktop app available.** Load `references/pencil-cli.md`. It owns the `@pencil.dev/cli` reference (install, agent mode `--prompt`, interactive mode, batch `--tasks`, `--export` for headless artifact generation, auth via `PENCIL_CLI_KEY` / `ANTHROPIC_API_KEY`) and the When CLI vs MCP decision table. The default policy stays no-auto-fall-back: when MCP isn't connected, stop and ask the user; only invoke the CLI when the user explicitly directs it or the context is unambiguously headless.
+- **Request is open-ended (no reference image, no description of who uses it, no `design-system/` to follow).** Before step 4 (Plan), ask three quick questions: *(1) Who uses this and what problem does it solve? (2) Atmosphere: any words, references, or brand direction? (3) Hard constraints (stack, responsive targets, dark-mode-only, mobile-first)?* Skip the questions if the project has a populated `design-system/`; those files already answer them. Skip if the user gave a reference image or a clear domain signal. Don't ask twice in the same session.
+- **User wants a form, signup, multi-field input, validation, or anything the user types into.** Load `references/forms.md`. Forms have their own dense vocabulary (Enter-to-submit, focus-first-error-on-submit, autocomplete attributes, password-manager friendliness, mobile font-size to defeat iOS zoom) that's easy to skip and hard to retrofit.
+- **User mentions keyboard nav, hit targets, focus management, ellipsis conventions, destructive actions, URL-as-state, or interaction discipline.** Load `references/interactions.md`. It owns the patterns that make a design *feel* like a real app rather than a screenshot.
+- **Designing or extending a reusable component (slots, variants, descendants, component states, library hygiene).** Load `references/composition-patterns.md`. It teaches compound-component design (instead of boolean prop explosion), variant naming, slot anatomy, and the component status workflow (`draft` / `ready` / `stable` / `deprecated`).
+- **The design feels generic; visual hierarchy is unclear; whitespace is wrong; the eye doesn't know where to land.** Load `references/visual-hierarchy.md`. It owns the six levers (size, weight, colour, position, spacing, motion), eye-flow patterns, whitespace as a tool, and density strategy.
+- **Designing a multi-screen project, organising a `.pen` with many flows, deciding whether to split into multiple `.pen` files, or auditing file hygiene.** Load `references/file-architecture.md`. It owns the Cover-frame template, the section-region layout (SourceOfTruth / BuildReady / Exploration / Archive), the hierarchical naming patterns, the multi-`.pen` decision tree, and the per-project-type completeness checklists.
+- **Building a marketing page, dashboard, settings page, list-detail layout, or any structural page archetype.** Load `references/layout-patterns.md`. It owns the named layouts (hero variations, feature-section alternatives to the three-card grid, pricing tables, dashboard layouts, settings patterns, list-detail shapes, empty-page templates) with real-world exemplars for each.
+- **Design feels off: too busy, too sparse, too generic, or doesn't feel premium.** Load `references/iteration-patterns.md`. It owns the failure-mode diagnoses, the rescue recipes for each, the four-question self-critique gate (expanded), the reference-image translation protocol, and the three-iteration limit before stopping to ask the user.
+- **Writing button labels, error messages, empty state text, headlines, or any UI copy that needs to sound like the product rather than the agent.** Load `references/microcopy.md`. It owns the voice and tone framework, action-specific CTA patterns, error message anatomy (what happened + why + what to do), empty-state copy, confirmation copy, system status, loading copy, and localisation considerations.
+- **Designing for iOS, iPadOS, Android, mobile-web, or any native-mobile pattern.** Load `references/mobile-patterns.md`. It owns safe areas, sheets vs modals, sheet detents, swipe gestures, haptic feedback, tab bars, native conventions per platform, FAB usage, and keyboard avoidance.
+- **Picking icons, deciding stroke weight, pairing icons with text, or auditing an icon library.** Load `references/iconography.md`. It owns stroke weight per context, size-relative-to-text, icon-only vs paired patterns, semantic icon conventions, decorative-vs-meaningful accessibility, and icon-family consistency.
+- **Image optimisation, font loading, network budgets, perceived performance, or anything that affects Core Web Vitals.** Load `references/performance-design.md`. It owns network budgets, LCP/CLS/INP targets, virtualisation, image and font optimisation, theme-color matching, skeleton-vs-spinner choices.
+- **Industry-specific design (SaaS, fintech, healthcare, e-commerce, creative tools, education, social, communication).** Load `references/industry-patterns.md`. It owns 8 industry families with 15-20 rules per family, per-industry style/palette/font picks, anti-patterns by industry, and the brutal-honesty completeness pressure tests for SaaS / Website / Mobile projects.
+- **Charts, dashboards, KPIs, sparklines, or any data visualisation.** Load `references/data-viz.md`. It owns the 25-chart selection matrix (data shape → ideal chart), colour-blind-safe palettes (Okabe-Ito, ColorBrewer, Viridis), dashboard tile shapes, default chart styling rules, and the chart anti-patterns (3D, pie > 5 slices, dual y-axes, red-green only).
+- **Greenfield project; need to pick a visual style direction.** Load `references/style-catalogue.md`. A 30+ named UI style menu (Swiss / International, Editorial, Bento, Brutalist, Dark-mode-first, Terminal / Hacker, etc.) organised by family. The agent picks one style, commits to it via `assets/design-system/visual-style.md`, and constrains every design to it.
+- **Greenfield project; need to pick a colour palette.** Load `references/colour-palettes.md`. A library of palette *recipes* (neutral family + accent scale from established source systems like Tailwind, Radix, IBM Carbon). The agent picks a recipe, looks up the hex values from the source, populates `assets/design-system/tokens.md` and the `.pen` `variables` via `set_variables`. Designs reference `$tokens`, never literal hex.
+- **Greenfield project; need to pick typography.** Load `references/font-pairings.md`. 30+ Google Fonts (and a few commercial) pairings with weights, mood, industry fit. Same recipe-menu pattern as colour-palettes: pick once, commit to `tokens.md`, mirror to `.pen` `variables`, designs reference `$fontBody`/`$fontMono`.
 
 **Screenshot cadence.** Screenshots are how the user watches you design. Take one after every chunk that changes visible state. Each one answers: 'what landed, what needs to change before I keep going?'. Narrate what you see in plain language, then either keep building or issue a small adjustment. A typical design task produces five to fifteen screenshots; that *is* the design loop, not waste. Skip screenshots only on edits that change no rendered pixels (a `name` rename, a `context` backfill, a metadata-only update). Hand back with a one-paragraph summary once the requirements are covered and accessibility passes.
 
@@ -384,8 +506,11 @@ If three iterations on the same issue do not converge, stop and ask the user; th
 
 When a screenshot shows something is off but you cannot tell exactly what (*'the gap between sections looks wrong but I cannot read the pixels'*), drop to numbers:
 
-- `snapshot_layout({ parentId, maxDepth: 2 })`: positions, sizes, gaps as numbers.
-- `batch_get({ nodeIds: [...] })`: property values like variable bindings, ref instances, text content.
+1. **Locate.** `batch_get` the LoginCard subtree, identify the button node and the link node. *(One JSON call; would have been needed regardless.)*
+2. **Execute.** One `batch_design` call: `U("<button>", { fill: "$brandGreen" })`, `U("<linkContainer>", { padding: [8, 0, 0, 0] })`. Server response confirms both ops landed. *(Rung 1.)* Note: there is no `paddingTop` property — use the `padding` array `[top, right, bottom, left]`; read current padding via `batch_get` first if other sides must be preserved.
+3. **Verify structure.** `snapshot_layout(parentId: "<LoginCard>", maxDepth: 2)`. Confirm the link container's top padding is 8 (the only structural change) and that nothing else shifted unexpectedly. *(Rung 2.)*
+4. **Verify property.** `batch_get({ nodeIds: ["<button>"] })`. Confirm `fill` resolved to `$brandGreen` (not a raw hex). *(Rung 3.)*
+5. **Final visual sign-off.** `get_screenshot(nodeId: "<LoginCard>")` — scoped to the card, not the page. Confirm the green renders as expected against the card background and the spacing reads right. *(Rung 4, once.)*
 
 These are debugging tools. The verification path is the screenshot loop above.
 
@@ -407,9 +532,12 @@ Four concrete cases. Detect, respond, do not improvise.
 | # | Case | Detection signal | Response |
 |---|------|------------------|----------|
 | 1 | MCP not connected | `get_editor_state` errors with `transport not connected to app: desktop` (or any connection-refused message) | Stop. Tell the user: *"Pencil's MCP server isn't reachable. Open the Pencil desktop app or the Pencil IDE extension, then ask me again."* Do not fall back to the CLI silently. |
-| 2 | No .pen file open | `get_editor_state` succeeds but reports no active document | Ask the user: *"No `.pen` file is open. Should I (a) open an existing one, give me the path, or (b) create a new one with `open_document('new')`?"* Wait for the answer. |
-| 3 | .lib.pen import missing | The open doc's `imports` doesn't include a library the user or project docs reference | If the file exists: there is currently no documented MCP path to add an `imports` entry through `batch_design` (`U("document", ...)` errors with `Node 'document' not found`; `U(<frameId>, { imports: ... })` errors with `/imports unexpected property`). Ask the user to add the entry to their `.pen` JSON directly: `"imports": { "ds": "./path.lib.pen" }`. If the file doesn't exist: tell the user the path is stale, ask whether to update it or create the library. Don't silently invent. |
-| 4 | batch_design schema error | Server returns an error mentioning invalid op, unknown type, invalid property, or missing parent | Read the error verbatim. Cross-reference `references/batch-design-grammar.md` and `references/pen-schema.md`. Common causes: id contains `/`; used `width: "100%"` (use `"fill_container"`); used `padding: { top: N }` object form (use array `[top, right, bottom, left]`); used `text:` or `value:` on a text node (use `content:`); used `solid_color` fill type (use `"color"`); used `iconName`/`iconLibrary` on icon_font (use `iconFontName`/`iconFontFamily`); set `x`/`y` on a child in a flex parent (they're ignored); used `layout: "flex"` or other CSS vocab (use `"vertical"` or `"horizontal"`); used `effect: [{ type: "drop_shadow" }]` (use `type: "shadow"` with `shadowType: "outer"`); referenced a parent before binding it. Retry with the fix; never blindly. **Of these, `x`/`y` on flex children is the only silent failure, the op succeeds but the child renders in the wrong place. The rest hard-error and roll the whole call back.** See `references/batch-design-grammar.md` Common errors table for the full silent/hard split. |
+| 2 | No .pen file open | `get_editor_state` succeeds but reports no active document | Ask the user: *"No `.pen` file is open. Should I (a) open an existing one — give me the path, or (b) create a new one with `open_document('new')`?"* Wait for the answer. |
+| 3 | No `design-system/` folder | Folder absent in the project root AND the task implies real project work (not a sketch) | Offer once: *"This repo doesn't have a `design-system/` folder yet. I have 12 core templates I can drop in, plus 4 optional ones (`mobile.md`, `data-viz.md`, `brand.md`, `imagery.md`) for projects that ship those surfaces. Want me to scaffold the core, plus any optional ones that fit your project?"* On yes, copy from `assets/design-system/` per the conditional rules in the Design-system convention section above. On no, proceed without; do not ask again this session. |
+| 4 | Conflicting `design-system/` | Folder exists but contains code files (`.tsx`, `.ts`, `package.json`, `index.js`, etc.) | Do not overwrite. Ask where to place docs instead: `design-system/docs/`, `docs/design-system/`, `.pencil/design-system/`, or a custom path. Adjust scaffolded files' cross-refs. |
+| 5 | .lib.pen import missing | `design-system/design-system.md` names a library path; the open doc's `imports` doesn't include it (or the file at the path doesn't exist) | If the file exists: add the `imports` entry via `batch_design` `U` op on the document root. If the file doesn't exist: tell the user the path in `design-system.md` is stale, ask whether to update the path or create the library. Don't silently invent. |
+| 6 | batch_design schema error | Server returns an error mentioning invalid op, unknown type, invalid property, or missing parent | Read the error verbatim. Cross-reference `references/batch-design-grammar.md` and `references/pen-schema.md`. Common causes: id contains `/`; used `width: "100%"` (use bare-string `"fill_container"`); used the older `{ sizing: "fill_container" }` object (use the bare string); used `stroke.fills` plural or `stroke.alignment` (use singular `stroke.fill`); passed raw color where a `$variable` was expected; referenced a parent before binding it. Retry with the fix; never blindly. |
+| 7 | Token clobber | `set_variables` or `U("doc", { variables: {...} })` called before `get_variables()` on a document that already has tokens | Always call `get_variables()` before any token work. Only pass variables that are absent from the result. Never assume the document is blank — an existing `.pen` file almost certainly has user-configured tokens. |
 
 ## Platform-specific tool names
 
@@ -419,40 +547,47 @@ The Pencil MCP tool names (`get_editor_state`, `batch_design`, etc.) are identic
 
 ## Reference index
 
-- `references/pen-schema.md`, full `.pen` data model: every node type, properties, layout/sizing/variables, theme axes, components, slots
-- `references/batch-design-grammar.md`, complete `batch_design` op syntax and chunking rules
-- `references/mcp-tools.md`, cookbook for all 13 Pencil MCP tools, the 8 `get_guidelines` categories, composite recipes (token audit, greenfield bootstrap, library smoke test), and a tool-cost cheatsheet
-- `references/states.md`, component states (default/hover/focus/pressed/disabled/loading/error/success/skeleton/empty/partial-failure) and screen-level fault states (404/403/500/503/408/429/offline/partial-failure) plus the empty-state taxonomy
-- `references/flows.md`, transitions across screens: modal-vs-page, validation timing (sync/async/submit-time), multi-step wizards, back-stack model, optimistic UI, real-time/presence, deep links, plausible content
-- `references/accessibility.md`, beyond the SKILL baseline: ARIA, focus order, keyboard nav, screen-reader content, deeper-cut contrast, `prefers-*` media queries, dynamic type, RTL & internationalisation, motor accessibility
-- `references/modern-patterns.md`, patterns the model under-uses by default: container queries, fluid type, AI-UI affordances, perceived performance (skeleton, optimistic UI, LQIP), modern dark mode; plus dated defaults to avoid
-- `references/chart-anatomy.md`, Pencil build anatomy for every chart type agents build on product dashboards (bar, horizontal bar, line, area, donut, bullet graph, heatmap, data table, sparkline, dashboard shell). Each chart has exact pixel values, worked ops, and a "what generic looks like" anti-example. **Load this whenever building a chart, table, or dashboard shell.**
-- `references/brand.md`, deep guidance for brand-register work (marketing, landing, campaign sites, portfolios): the anti-reference exercise, reflex-reject aesthetic lanes (the saturated families to refuse by default), the four colour strategies (restrained / committed / full palette / drenched), brand typography pairings, hero anatomy beyond the SaaS template, and brand-specific motion choreography. **Load whenever the register is brand.**
-- `references/product.md`, deep guidance for product-register work (dashboards, settings, admin, app surfaces): information density modes, surface treatment (borders over shadows), semantic colour roles, typography for data (mono numerals, tabular figures), state motion, the empty-state taxonomy, and product-specific anti-patterns. **Load whenever the register is product.**
-- `references/typography.md`, the fastest move out of AI-default territory: why typography signals intent, the reflex-reject font list (what's exhausted), pairing rules, modular scale and weight-contrast hierarchy, readability (measure, line-height, the light-on-dark bump), numeral choice (mono / tabular / proportional), and OpenType special moves (small caps, stylistic sets, all-caps with tracking). Cross-references brand.md and product.md.
-- `references/color-and-contrast.md`, OKLCH theory and palette construction: why OKLCH over HSL/HEX, the four palette strategies, tinted neutrals (never raw black or white), the semantic role catalogue (bg / surface / border / text / accent / error / success / warning / info), light + dark mode parity, the reflex-reject palette defaults by category, and Pencil-specific variable patterns via `set_variables`.
-- `references/ux-writing.md`, copy as a design surface: button labels (outcome-named, not generic), error messages (what + why + how-to-fix), empty-state copy patterns per type, section headings, microcopy specificity, the AI cliché list (three severity levels) with replacement strategy, and per-register tone calibration.
-- `references/layout.md`, the depth behind SKILL.md's responsive breakpoint table and density rules: grid systems and when they help vs hurt, the 4pt/8pt baseline, spatial rhythm strategies (tight-then-airy, crescendo, asymmetric, pulse), register-specific spatial strategy, the squint test, working layout patterns (single-column long-form, sidebar+main, dashboard grid, split-screen, bento), per-breakpoint guidance, and layout anti-patterns. **Load when the design feels templated, flat, or all-the-same.**
-- `references/motion-design.md`, the depth behind motion bullets in SKILL.md, brand.md, and product.md: the three jobs motion does (spatial continuity, state confirmation, expressive personality), the five easing curves and their characters, duration tables by interaction type, register-specific motion (brand choreography vs product functional motion), dark-mode adjustments, `prefers-reduced-motion`, and Pencil-specific motion tokens via `set_variables`. **Load when planning any state transitions, page-load sequences, or animation work.**
-- `references/interaction-design.md`, the *how-to-design-states* depth that sits alongside `states.md` (which is the *taxonomy*): the state design philosophy, the state inventory (default / hover / focus / pressed / disabled / loading / error / selected / read-only), how to design each state well, register-specific state recipes for brand and product, focus management depth (focus order, traps, skip links, restoration), state composition matrix. **Load when authoring or auditing component states.**
-- `references/cognitive-load.md`, the theory behind density rules in product.md and hierarchy guidance in typography.md: the three load types (intrinsic / extraneous / germane), attention budget per surface type, hierarchy as cognitive scaffolding, density-vs-familiarity mismatch, register implications, the anti-patterns that compound load, and the populated-state verification rule. **Load when the surface feels overwhelming, cluttered, or empty-for-no-reason.**
-- `references/heuristics-scoring.md`, the structured UX-pass that complements distinctiveness-checklist.md's taste pass: the ten heuristics (Nielsen-adapted) with 1–5 scoring rubrics each, the composite score interpretation (45–50 ready, 38–44 fix-then-ship, etc.), worked-example scoring table, and anti-patterns in heuristic scoring. **Load when the user asks for a critique, UX audit, or design review.**
-- `references/delight.md`, the signature-moment layer on top of competent design: what delight is and isn't, when it earns its place vs when it's wrong, working delight moves (copy with character, personality in functional motion, signature moments, thoughtful empty states, recovery warmth), the discipline rules (one moment per surface, test at scale, calibrate to brand voice), and per-register considerations. **Load after the design is functionally complete and you want to add personality.**
-- `references/onboard.md`, the depth behind first-use guidance in product.md: identifying the activation moment, the three onboarding shapes (just-start / guided-first-action / setup-flow), what onboarding should not do, components of strong onboarding, empty states by user state (first-use vs returning-empty vs result-empty vs permission-empty), sample-data discipline, and per-register considerations. **Load when designing any first-run experience or empty-but-not-empty state.**
-- `references/extract.md`, the *how-to-promote* depth that complements the components-first discipline rule in SKILL.md: when to extract and when not to, what to extract (tokens / components / patterns), the six-step extraction workflow, common extractions (token sweep, button, card, empty-state, icon-set), anti-patterns, Pencil-specific `reusable: true` and `ref` mechanics, and library lifecycle. **Load when noticing repeated patterns or when the user asks to "extract" or "clean up".**
-- `references/amplify.md`, the scaffold for the *"bolder / more impact / more confident"* brief: reject the cyan-to-purple, glassmorphism, and neon-on-dark reflex; pick a personality lane and a focal point; amplify across typography (extreme weight, distinctive fonts), colour (committed 60% dominance), spatial drama (3x-5x scale jumps), effects, and motion. Ends with the AI slop test. **Load when the user asks to make a design bolder, more impactful, more distinctive, or more confident.**
-- `references/soften.md`, the scaffold for the *"quieter / calmer / less aggressive"* brief: reduce saturation, weight, decorative complexity, motion intensity, and scale uniformity; preserve hierarchy and personality. Includes the never-gray-on-colour rule and the discipline that prevents quieting from collapsing into generic. **Load when the user asks to soften, restrain, or tone down a design.**
-- `references/pare.md`, the scaffold for the *"distill / simplify / strip back"* brief: rate every element on the essential / supportive / decorative / inherited scale; cut decoration and inherited content; promote the surviving hero. Distinct from soften (pare cuts content; soften reduces intensity). **Load when the surface feels busy without being clear, or when the user asks to strip back.**
-- `references/fortify.md`, the scaffold for the *production-readiness* pass: complete the state matrix (default / hover / focus / pressed / disabled / loading / error / selected), build the screen-level fault states (404 / 500 / 503 / offline / partial-failure), handle overflow at 2x length, stress with realistic i18n samples, design `prefers-*` fallbacks, and rewrite generic error messages to what / why / how-to-fix. **Load when the design's happy path is done and you're preparing for shipping.**
-- `references/rewrite.md`, the scaffold for the *UX-copy refinement* pass: rate every text node specific / generic / cliché; replace button labels (outcome-named), error messages (what / why / how-to-fix), empty states (specific + warm + forward path), form labels (noun-named); strike AI clichés. Cross-references `ux-writing.md` for the register and tone depth. **Load when the design is functionally complete but the copy reads as placeholder.**
-- `references/port.md`, the scaffold for the *cross-context adaptation* pass: breakpoints (320 / 768 / 1280 / 1920), light + dark, touch targets (44x44px minimum), density modes, i18n length stress, RTL flip, and `prefers-*` adaptation. Reflow vs redesign decision framework. **Load when the design was built at one size or mode and needs to live in the rest of the matrix.**
-- `references/trim.md`, the scaffold for the *performance* pass: image weight budgets, font family caps (≤2 + 1 mono), motion budget (≤3 concurrent), skeleton-state coverage, optimistic-UI candidates, backdrop-blur and shadow caps. Documents weight budgets in node `context` strings so engineering inherits them. **Load when the design's content and structure are settled and you want to make it shippable at speed.**
-- `references/finalise.md`, the scaffold for the *final pre-shipping* pass: alignment-and-rhythm, token-and-consistency, and detail-coherence checks. Sweeps for raw hex, orphan spacing values, inconsistent shadows and radii. Universal handoff target for the other scaffold refs (amplify, soften, pare, fortify, rewrite, port, trim all end here). Distinct from `delight.md` (which is the personality layer). **Load before declaring a design ready to ship.**
-- `references/distinctiveness-checklist.md`, the 9-question taste pass that runs once at step 6, with kill-switch rules (Q9 is the two-tier category-reflex test)
-- `references/design-eye.md`, 5-question first-screenshot diagnostic: runs after the first screenshot at step 5 to catch generic defaults before detail work begins. Each question is answerable yes/no with a specific fix.
-- `references/pencil-cli.md`, full `@pencil.dev/cli` reference: install, agent mode, interactive mode, every flag, headless/CI workflows, auth troubleshooting, when CLI vs MCP. Preserves the no-auto-fall-back policy.
-- `assets/examples/example-login-screen.md`, worked example: greenfield design from prompt
-- `assets/examples/example-import-library.md`, worked example: importing a `.lib.pen` and instantiating its components
-- `assets/examples/example-error-screen.md`, worked example: 404 + offline page pair using `get_variables`/`set_variables` and a shared lockup
-- `assets/examples/example-form-flow.md`, worked example: multi-step signup with email verification across three sibling frames
-- `references/codex-tools.md`, Codex tool-name mappings
+- `references/component-anatomy.md` — how to read a component's structure before using it: inspecting via `batch_get`, identifying slots, building `descendants` paths (including nested `/` syntax), discoverable properties, and activating component states
+- `references/composition-patterns.md`: compound components vs boolean prop explosion, slot design, descendants overrides, variant naming, component status workflow (`draft`/`ready`/`stable`/`deprecated`), when to extract to `.lib.pen`
+- `references/file-architecture.md`: single `.pen` vs multi-`.pen` decisions, Cover-frame template, section-region layout, hierarchical naming patterns, status taxonomies, per-project-type completeness checklists, AI-readiness as a meta-principle
+- `references/forms.md`: form design discipline. Submit behaviour, label patterns, validation timing, error display, input attributes, submit state, mobile inputs, hit zones, multi-step forms, unsaved-changes warnings
+- `references/interactions.md`: keyboard everywhere, focus management, hit targets (24/44), loading state timing, ellipsis conventions, destructive actions, URL-as-state, optimistic UI, tooltips, toasts, modals, selection, right-click menus
+- `references/visual-hierarchy.md`: the six levers (size/weight/colour/position/spacing/motion), eye-flow patterns (F/Z/gutenberg), whitespace as a tool, composition principles, symmetry vs asymmetry, density strategy
+- `references/layout-patterns.md`: named layout patterns the agent picks from (hero variations, feature sections beyond the three-card grid, pricing tables, testimonials, CTA sections, footers, dashboard layouts, settings patterns, list-detail shapes, empty-page templates) with real-world exemplars
+- `references/iteration-patterns.md`: failure-mode diagnoses (too busy, too sparse, too generic, doesn't feel premium, hierarchy unclear, breakpoints don't hold) with rescue recipes; the expanded four-question self-critique gate; reference-image translation protocol; three-iteration limit
+- `references/microcopy.md`: voice and tone framework, action-specific CTA patterns, error message anatomy, empty-state copy, success copy, confirmation copy, system status, loading copy, localisation considerations
+- `references/mobile-patterns.md`: safe areas, sheets vs modals, sheet detents, swipe gestures, haptic feedback, tab bars, native conventions per platform (iOS / iPadOS / Android), FAB usage, keyboard avoidance
+- `references/iconography.md`: stroke weight per context (1.5/2/1px), size-relative-to-text, icon-only vs paired patterns, semantic icon conventions, decorative-vs-meaningful accessibility, family consistency
+- `references/performance-design.md`: network budgets, Core Web Vitals (LCP / CLS / INP), virtualisation, image and font optimisation, theme-color matching, skeleton-vs-spinner choices
+- `references/industry-patterns.md`: 8 industry families (SaaS, fintech, healthcare, e-commerce, creative tools, social, education, communication) with 15-20 rules per family, per-industry catalogue picks, anti-patterns, completeness pressure tests for SaaS / Website / Mobile
+- `references/data-viz.md`: 25-chart selection matrix, colour-blind-safe palettes (Okabe-Ito / ColorBrewer / Viridis), dashboard tile shapes, default chart styling, chart anti-patterns
+- `references/style-catalogue.md`: 30+ named UI styles (Swiss / International, Editorial, Bento, Brutalist, Dark-mode-first, Terminal / Hacker, etc.) organised by family with mood, when-to-use, anti-pattern, sample components, real-world exemplars
+- `references/colour-palettes.md`: 40+ palette *recipes* (neutral + accent scale from Tailwind, Radix, IBM Carbon, Material 3, Apple HIG) tagged by industry and mood; recipe menu, not hex tables; agent commits picks to `tokens.md` and `.pen` variables
+- `references/font-pairings.md`: 30+ typography pairings (Google Fonts + a few commercial) with weights, mood, industry fit; recipe menu, agent commits picks to `tokens.md` as `$fontBody` / `$fontMono` tokens
+- `references/pen-schema.md` — full `.pen` data model: every node type, properties, layout/sizing/variables, theme axes, components, slots
+- `references/batch-design-grammar.md` — complete `batch_design` op syntax and chunking rules
+- `references/mcp-tools.md` — cookbook for all 13 Pencil MCP tools, the 8 `get_guidelines` categories, composite recipes (token audit, greenfield bootstrap, library smoke test), and a tool-cost cheatsheet
+- `references/states.md` — component states (default/hover/focus/pressed/disabled/loading/error/success/skeleton/empty/partial-failure) and screen-level fault states (404/403/500/503/408/429/offline/partial-failure) plus the empty-state taxonomy
+- `references/flows.md` — transitions across screens: modal-vs-page, validation timing (sync/async/submit-time), multi-step wizards, back-stack model, optimistic UI, real-time/presence, deep links, plausible content
+- `references/accessibility.md`: beyond the SKILL baseline. ARIA, focus order, keyboard nav, screen-reader content, deeper-cut contrast (incl. APCA), `prefers-*` media queries, dynamic type, RTL & internationalisation, motor accessibility; WCAG 2.2 (ISO/IEC 40500:2025) baseline
+- `references/modern-patterns.md`: patterns the model under-uses by default. Container queries, fluid type, AI-UI affordances (incl. command palette / cmd+K), animation & motion timing, perceived performance (skeleton, optimistic UI, LQIP), modern dark mode; plus dated defaults to avoid
+- `references/pencil-cli.md` — full `@pencil.dev/cli` reference: install, agent mode, interactive mode, every flag, headless/CI workflows, auth troubleshooting, when CLI vs MCP. Preserves the no-auto-fall-back policy.
+- `assets/examples/example-login-screen.md` — worked example: greenfield design from prompt
+- `assets/examples/example-import-library.md` — worked example: importing a `.lib.pen` and instantiating its components
+- `assets/examples/example-scaffold-system.md` — worked example: scaffolding `design-system/` into a fresh project
+- `assets/examples/example-error-screen.md` — worked example: 404 + offline page pair using `get_variables`/`set_variables` and a shared lockup
+- `assets/examples/example-form-flow.md` — worked example: multi-step signup with email verification across three sibling frames
+- `assets/examples/example-component-deep-dive.md` — worked example: full read→understand→instantiate cycle using an existing card component (slot fill, nested path, state variant)
+- `assets/examples/example-style-selection.md`: worked example: catalogue (style + palette + fonts) → `set_variables` MCP → `tokens.md` commit → starter components matching the chosen style
+- `assets/examples/example-settings-page.md`: worked example: settings page with sidebar nav, autosave defaults, explicit-save for high-stakes (Billing), validation, dirty state
+- `assets/examples/example-dashboard.md`: worked example: dashboard with KPI cards, chart tile, recent-activity table, proper hierarchy
+- `assets/examples/example-marketing-page.md`: worked example: marketing page that avoids the three-card grid (asymmetric hero, alternating image-text or bento features, three-tier pricing, avatar-grid testimonials)
+- `assets/examples/example-mobile-app.md`: worked example: mobile app home screen + Compose flow with bottom tab bar, sheet detents, safe areas, haptics, keyboard avoidance
+- `assets/examples/example-data-visualization.md`: worked example: multi-chart dashboard with colour-blind-safe palettes (Okabe-Ito for categorical, Viridis for heatmaps), correct chart per data shape
+- `assets/examples/example-onboarding-flow.md`: worked example: three-step onboarding with progress, skip, sample-data-vs-blank-slate routing, validation, save-progress-on-exit
+- `assets/examples/example-component-variants.md`: worked example: complete Button component family (Primary / Secondary / Destructive / Ghost / IconOnly variants × 7 states each) with theme-axis state authoring
+- `assets/examples/example-pricing-table.md`: worked example: three-tier pricing with highlighted recommended tier (coloured border + badge + layered shadow), two-role colour, mobile stack
+- `assets/examples/example-file-cover-and-sections.md`: worked example: setting up a fresh `.pen` with Cover frame at origin, section regions (Source of Truth / Build Ready / UX States / Exploration / Archive), hierarchical naming for multi-screen flows
+- `references/codex-tools.md`, `references/gemini-tools.md`, `references/copilot-tools.md` — platform tool-name mappings
+- `assets/design-system/`: the 12 core markdown templates copied into user projects on scaffold (`README.md`, `design-system.md`, `tokens.md`, `components.md`, `layout.md`, `motion.md`, `elevation.md`, `iconography.md`, `patterns.md`, `states.md`, `voice.md`, `code-export.md`), plus 13 optional templates scaffolded conditionally (`mobile.md`, `data-viz.md`, `brand.md`, `imagery.md`, `visual-style.md`, `forms.md`, `accessibility.md`, `micro-interactions.md`, `empty-states.md`, `onboarding.md`, `navigation.md`, `search.md`, `file-architecture.md`)
+- `assets/examples/` — worked walkthroughs the agent loads on demand (greenfield design, library import, scaffolding, error screens, multi-step form flows)

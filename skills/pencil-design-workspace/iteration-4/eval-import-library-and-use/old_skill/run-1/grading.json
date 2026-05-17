@@ -1,0 +1,89 @@
+{
+  "expectations": [
+    {
+      "text": "Describes checking the document's imports field to see if the library is already imported before attempting to add it",
+      "passed": true,
+      "evidence": "Step 4 explicitly reads: 'From the get_editor_state result in step 1, I look at the imports field. If the library is already imported (e.g. { \"ds\": \"./design/system.lib.pen\" }): nothing to do; the components are already in scope. If it isn't imported, I add it.' The get_editor_state call in Step 1 also calls out 'what's in the imports field. That last part determines whether step 4 is needed at all.'"
+    },
+    {
+      "text": "Instantiates Button and Input via ref nodes — does NOT describe building them from primitives (frame + text, etc.)",
+      "passed": true,
+      "evidence": "All four component instantiations in Step 7 use type: \"ref\" (emailField, passwordField, confirmField, submitBtn). The rationale explicitly states: 'ref nodes, not hand-built frames: Components-first rule. Your library has Button and Input; recreating them from primitives would produce one-off look-alikes that won't update when the library does.' No frame+text primitive construction appears anywhere in the response."
+    },
+    {
+      "text": "Describes using snapshot_layout or batch_get to verify structure and bindings BEFORE reaching for get_screenshot",
+      "passed": true,
+      "evidence": "Step 8 sequences verification as an explicit ladder: Rung 2 is snapshot_layout({ parentId: \"form\", maxDepth: 2 }) checking positions, sizes, child order, and zero-height refs; Rung 3 is batch_get on the ref nodes checking ref resolution and descendant overrides; only then Rung 4 is get_screenshot. The text explicitly states 'If something is wrong here I fix it with a targeted U op — I don't jump to screenshots.'"
+    },
+    {
+      "text": "Uses at most one get_screenshot call as final sign-off, scoped to the form or card subtree (NOT the page frame or document root)",
+      "passed": true,
+      "evidence": "Rung 4 shows exactly one call: get_screenshot({ nodeId: \"form\" }), scoped to the form node. The response explicitly adds: 'I do not take a second screenshot for dark mode unless I used raw hex colors somewhere.' No other get_screenshot call appears in the response."
+    }
+  ],
+  "summary": {
+    "passed": 4,
+    "failed": 0,
+    "total": 4,
+    "pass_rate": 1.0
+  },
+  "execution_metrics": {
+    "tool_calls": {},
+    "total_tool_calls": 0,
+    "total_steps": 8,
+    "errors_encountered": 0,
+    "output_chars": 8123,
+    "transcript_chars": 8123
+  },
+  "timing": {
+    "executor_duration_seconds": 134.8,
+    "grader_duration_seconds": null,
+    "total_duration_seconds": 134.8
+  },
+  "claims": [
+    {
+      "claim": "Component ids are read from batch_get before instantiation, not guessed",
+      "type": "process",
+      "verified": true,
+      "evidence": "Step 3 batch_get on the library with patterns: [{ reusable: true }] is explicitly described as the source of real component ids. Step 7 references 'cmpInput and cmpButton — the real ids come from that batch_get result'. Pitfalls section reiterates 'Component id case sensitivity. I got the real ids from batch_get on the library (step 3). I didn't guess Button or button.'"
+    },
+    {
+      "claim": "The import op runs in its own batch_design call before any ref nodes are created",
+      "type": "process",
+      "verified": true,
+      "evidence": "Pitfalls section states: 'The U(\"doc\", { imports: ... }) op runs in its own batch_design call before any ref nodes are created. Refs to unimported libraries fail silently.' The response structure confirms separate Steps 4 and 7."
+    },
+    {
+      "claim": "All colors use variables, not raw hex values",
+      "type": "quality",
+      "verified": true,
+      "evidence": "Step 7 uses $surface and $textPrimary throughout. Step 8 Rung 3 checks 'fill on form resolves to $surface, not a raw hex.' The screenshot justification notes 'the form is built entirely from $variables that carry both light and dark values.'"
+    },
+    {
+      "claim": "find_empty_space_on_canvas is called before placing the frame",
+      "type": "process",
+      "verified": true,
+      "evidence": "Step 5 calls find_empty_space_on_canvas() explicitly and Step 7 references '<x from find_empty_space>' and '<y from find_empty_space>' as coordinate sources. The rationale explains why: to avoid invisible canvas overlap with existing frames."
+    }
+  ],
+  "user_notes_summary": {
+    "uncertainties": [],
+    "needs_review": [],
+    "workarounds": []
+  },
+  "eval_feedback": {
+    "suggestions": [
+      {
+        "reason": "All four assertions passed cleanly, but none checks whether the import is added with the correct merge behavior when other imports already exist. The response correctly describes this ('I'd read the existing imports object via batch_get({ nodeIds: [\"doc\"] }) first and combine'), but no assertion verifies it. A skill that overwrites existing imports rather than merging would pass all four assertions but silently break the document."
+      },
+      {
+        "assertion": "Instantiates Button and Input via ref nodes — does NOT describe building them from primitives (frame + text, etc.)",
+        "reason": "This assertion is well-discriminating and hard to satisfy superficially. No change needed, but consider adding a companion assertion that the ref ids come from an actual batch_get on the library rather than being hardcoded guesses — the current assertion doesn't check sourcing discipline."
+      },
+      {
+        "reason": "No assertion checks that context properties are set on non-trivial nodes. The response demonstrates strong context discipline ('context' on every non-trivial node), which is a key skill behavior that could regress without an eval covering it."
+      }
+    ],
+    "overall": "All four assertions are well-targeted and discriminating. The main gap is the import merge behavior — a skill that blindly overwrites the imports object would pass every assertion here but cause real damage. Adding a fifth assertion covering merge-safe import handling would close the most significant unchecked risk."
+  }
+}

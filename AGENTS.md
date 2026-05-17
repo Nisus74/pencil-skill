@@ -8,15 +8,17 @@ are thin pointers to this file.
 
 ## Project Purpose
 
+> **Unofficial community plugin.** This project is not affiliated with or endorsed by the Pencil.dev team. For the Pencil editor, MCP server, and official documentation, visit [pencil.dev](https://pencil.dev).
+
 This repository is a standalone, **platform-agnostic** AI coding skill plugin that teaches
 AI coding tools how to work with [pencil.dev](https://pencil.dev) design files (`.pen` format)
 via the Pencil MCP server.
 
 **Core artifact:** `skills/pencil-design/SKILL.md`, the platform-agnostic skill content.
-**Platform adapters:** `.claude-plugin/plugin.json`, `.cursor-plugin/plugin.json`, and
-`.codex-plugin/plugin.json` are the minimum files required by each platform's installer;
-they exist only so users on those platforms can run a one-line install command. They are
-not the substance of the project.
+**Platform adapters:** `.claude-plugin/plugin.json`, `.cursor-plugin/plugin.json`,
+`.codex-plugin/plugin.json`, and `gemini-extension.json` are the minimum files required
+by each platform's installer; they exist only so users on those platforms can run a
+one-line install command. They are not the substance of the project.
 
 ---
 
@@ -39,52 +41,84 @@ skill is the capability the AI invokes.
 
 ```
 skills/pencil-design/              # The platform-agnostic core
-  SKILL.md                         # The skill — YAML frontmatter + instructions
+  SKILL.md                         # The skill: YAML frontmatter + instructions (v1.11.0)
   references/                      # On-demand references loaded by the skill
     mcp-tools.md                   # Cookbook for all 13 MCP tools + composite recipes
-    states.md                      # Component states + screen-level fault states
-    flows.md                       # Transitions between screens (modal, validation, back-stack)
-    accessibility.md               # ARIA, focus order, RTL, prefers-*, dynamic type
-    modern-patterns.md             # Container queries, fluid type, AI-UI, perceived perf
+    states.md                      # Component states + screen-level fault states + onboarding/settings states
+    flows.md                       # Transitions between screens (modal, validation, back-stack, onboarding, settings, search)
+    accessibility.md               # ARIA, focus order, APCA, ARIA live regions, keyboard shortcuts, WCAG 2.2
+    modern-patterns.md             # Container queries, fluid type, AI-UI, animation timing, command palette, perceived perf
     pencil-cli.md                  # Full Pencil CLI reference + When CLI vs MCP table
     pen-schema.md                  # .pen file JSON schema reference
     batch-design-grammar.md        # batch_design op syntax (I/C/R/U/G/D/M)
-    brand.md                       # Brand-register depth: anti-references, aesthetic lanes, palette strategies
-    product.md                     # Product-register depth: density, surface, semantic colour, data typography
-    typography.md                  # Reflex-reject fonts, pairing rules, scale, readability, OpenType moves
-    color-and-contrast.md          # OKLCH theory, palette strategies, tinted neutrals, light + dark parity
-    ux-writing.md                  # Buttons, errors, empty states, microcopy, AI cliché list to refuse
-    layout.md                      # Grid systems, spatial rhythm strategies, register-specific spacing, the squint test
-    motion-design.md               # Easing curves, durations, register-specific motion, reduced-motion
-    interaction-design.md          # State design philosophy, register-specific state recipes, focus management depth
-    cognitive-load.md              # Three load types, attention budget per surface, density-vs-familiarity
-    heuristics-scoring.md          # Ten heuristics + 1–5 scoring rubric + composite-score interpretation
-    delight.md                     # Signature moments, personality in functional moments, polish discipline
-    onboard.md                     # Activation moment, three onboarding shapes, empty-states by user-state
-    extract.md                     # Tokens/components/patterns extraction workflow, library lifecycle
+    component-anatomy.md           # Reading component structure: slots, descendants paths, state activation
+    composition-patterns.md        # Compound components, slot design, variant naming, status workflow
+    file-architecture.md           # Cover frame, section regions, hierarchical naming, multi-.pen layouts
+    forms.md                       # Submit behaviour, validation, error display, autofill, mobile inputs
+    interactions.md                # Keyboard, focus, hit targets, loading timing, destructive actions, URL-as-state
+    visual-hierarchy.md            # Six levers, eye-flow patterns, whitespace, density strategy
+    layout-patterns.md             # Hero variations, feature sections beyond three-card grid, pricing, dashboards, settings, list-detail, empty pages (cited 2025/2026 exemplars)
+    iteration-patterns.md          # Failure-mode rescues (too busy/sparse/generic/un-premium), self-critique gate, reference-image translation, three-iteration limit
+    microcopy.md                   # Voice/tone framework, action-specific CTAs, error message anatomy, empty/success/confirmation copy, loading copy, localisation
+    mobile-patterns.md             # Safe areas, sheets vs modals, sheet detents, gestures, haptics, tab bars, native conventions per platform
+    iconography.md                 # Stroke weight, sizing, semantic icons, accessibility (aria-hidden vs accessible name), family consistency
+    performance-design.md          # Network budgets, Core Web Vitals (LCP/CLS/INP), virtualisation, image and font optimisation, theme-color
+    industry-patterns.md           # 8 industry families with 15-20 rules each + completeness pressure tests for SaaS / Website / Mobile
+    data-viz.md                    # 25-chart selection matrix, colour-blind palettes (Okabe-Ito, ColorBrewer, Viridis), dashboard tiles, anti-patterns
+    style-catalogue.md             # 30+ named UI styles (menu) organised by family with mood, when-to-use, anti-pattern, exemplars
+    colour-palettes.md             # 40+ palette recipes (menu) tagged by industry/mood; recipes point to Tailwind/Radix/IBM Carbon/Material 3/Apple HIG
+    font-pairings.md               # 30+ typography pairings (menu); recipes point to Google Fonts/Vercel/GitHub/commercial foundries
     codex-tools.md                 # OpenAI Codex tool name mappings
   assets/
-    design-system/                 # 12 scaffold templates — copy into any project
+    design-system/                 # 12 core + 13 optional scaffold templates: copy into any project
       README.md                    # Index + how to use
       design-system.md             # Top-level design system doc
-      tokens.md                    # Color, spacing, type tokens
+      tokens.md                    # Colour, spacing, type tokens
       components.md                # Component catalogue + state table
       layout.md                    # Grid, breakpoints, spacing
-      patterns.md                  # Page-level templates (landing, dashboard, auth, …)
+      motion.md                    # Durations, easings, skeleton shimmer
+      elevation.md                 # Shadow scale + dark-mode treatment
+      iconography.md               # Stroke weight, sizes per context
+      patterns.md                  # Page-level templates (landing, dashboard, auth, ...)
+      states.md                    # Per-component state matrix + screen fault coverage
       voice.md                     # Copy tone + empty/error copy rules
       code-export.md               # Token export to CSS/Tailwind
-      states.md                    # Per-component state matrix + screen fault coverage
-    examples/                      # 4 worked examples with real MCP tool sequences
+      mobile.md                    # Optional: native-mobile patterns
+      data-viz.md                  # Optional: chart palettes, default chart types
+      brand.md                     # Optional: logo lockups, OG / social imagery
+      imagery.md                   # Optional: photo / illustration style, AI-imagery rules
+      visual-style.md              # Optional: project's chosen style identity (style + palette + font picks from references catalogues)
+      forms.md                     # Optional: project's form conventions (validation timing, error display, save patterns by surface)
+      accessibility.md             # Optional: project's a11y standards (WCAG / APCA target, keyboard shortcuts, screen reader patterns)
+      micro-interactions.md        # Optional: per-interaction motion specs (button press, card hover, modal entrance, sheet drag, toast)
+      empty-states.md              # Optional: per-surface empty state catalogue (first-use / no-results / no-permission / post-action) with copy templates
+      onboarding.md                # Optional: first-run experience (sample-data vs blank slate, sequence, coach marks)
+      navigation.md                # Optional: primary nav (sidebar / top / hamburger / command-driven), workspace switcher, mobile tab bar
+      search.md                    # Optional: search shape (instant / submit / hybrid), suggestions, filters, URL state
+      file-architecture.md         # Optional: project's chosen .pen file structure, naming conventions, status taxonomy
+    examples/                      # 16 worked examples with real MCP tool sequences
       example-login-screen.md      # Greenfield auth screen
       example-import-library.md    # Import .lib.pen library + instantiate components
       example-error-screen.md      # 404 + offline page pair
       example-form-flow.md         # Multi-step signup with email verification
+      example-component-deep-dive.md # Full read→understand→instantiate cycle
+      example-style-selection.md   # Catalogue (style + palette + fonts) → set_variables MCP → tokens commit → starter components
+      example-settings-page.md     # Settings with sidebar nav, autosave + explicit-save for high-stakes
+      example-dashboard.md         # KPI cards + chart tile + recent-activity table
+      example-marketing-page.md    # Marketing page avoiding three-card grid (asymmetric hero, bento features)
+      example-mobile-app.md        # Mobile app with bottom tab bar, sheet detents, safe areas, haptics
+      example-data-visualization.md # Multi-chart dashboard with colour-blind-safe palettes
+      example-onboarding-flow.md   # Three-step onboarding with progress, skip, sample-data routing
+      example-component-variants.md # Complete Button family with all variants and states
+      example-pricing-table.md     # Three-tier pricing with highlighted recommended tier
+      example-file-cover-and-sections.md # .pen file with Cover frame, section regions, hierarchical naming
 
 # Platform install adapters (required by each platform's installer)
 .claude-plugin/plugin.json         # Claude Code plugin manifest
 .claude-plugin/marketplace.json    # Claude Code marketplace listing (single-plugin marketplace)
 .cursor-plugin/plugin.json         # Cursor plugin manifest (Cursor 2.5+)
-.codex-plugin/plugin.json          # Codex plugin manifest
+.codex-plugin/plugin.json          # OpenAI Codex plugin manifest
+gemini-extension.json              # Gemini CLI extension manifest
 
 # Project context files
 AGENTS.md                          # This file — canonical, platform-agnostic
@@ -132,8 +166,12 @@ docs/
 | Platform | Plugin install | Folder-copy target |
 |----------|---------------|-------------------|
 | Claude Code | `/plugin install github:Nisus74/pencil-skill` (manifest at `.claude-plugin/plugin.json`) | `~/.claude/skills/` or `.claude/skills/` |
-| Cursor (2.5+) | `/add-plugin` pointing at `github.com/Nisus74/pencil-skill` (manifest at `.cursor-plugin/plugin.json`) | `.cursor/skills/` |
-| OpenAI Codex | (public plugin directory coming soon — use folder copy for now) | `~/.codex/skills/` |
+| Google Gemini CLI | `gemini-extension.json` at repo root | `~/.gemini/skills/` or `.gemini/skills/` (alias `.agents/skills/`) |
+| Cursor (2.5+) | `/add-plugin` pointing at `github.com/Nisus74/pencil-skill` (manifest at `.cursor-plugin/plugin.json`) | `.cursor/skills/` (Cursor also reads `AGENTS.md` from project root) |
+| OpenAI Codex | `codex plugin install github:Nisus74/pencil-skill` (manifest at `.codex-plugin/plugin.json`) | `~/.codex/skills/` |
+| GitHub Copilot CLI | (no plugin manifest) | `~/.copilot/skills/` (alias `~/.agents/skills/`) or project `.github/skills/` |
+
+All platforms also accept a `SKILL.md` in their respective skills directory; folder copy works universally.
 
 ---
 
@@ -155,7 +193,8 @@ Don't edit files inside a plugin install directory (e.g. `~/.claude/plugins/.../
 - The Claude Code marketplace listing MUST live at `.claude-plugin/marketplace.json`. This makes the repo installable via `/plugin marketplace add github:Nisus74/pencil-skill` followed by `/plugin install pencil-dev-skill`
 - The Cursor plugin manifest MUST live at `.cursor-plugin/plugin.json` (Cursor 2.5+)
 - The Codex plugin manifest MUST live at `.codex-plugin/plugin.json`
-- All three plugin manifests MUST carry matching `name` and `version` fields (enforced by `tools/skill-lint.py`). The marketplace.json plugin entry should match these too
+- `gemini-extension.json` MUST live at the repo root (Gemini CLI requirement)
+- `.claude-plugin/plugin.json`, `.cursor-plugin/plugin.json`, and `gemini-extension.json` MUST carry a `permissions` block matching SKILL.md (enforced by `tools/skill-lint.py`)
 - `skills/` MUST be at the repo root
 - Each skill is a subdirectory under `skills/` containing one `SKILL.md`
 - The YAML frontmatter `description` field controls when the skill activates, so edit it carefully
@@ -218,7 +257,7 @@ The OWASP AST compliance map lives in [docs/SECURITY.md](./docs/SECURITY.md).
 
 ## Version Bumping
 
-The plugin is currently pre-release and **holds at version `0.8.0`** across all four manifests. Don't bump the version without explicit owner approval. All in-flight work accumulates under `[Unreleased]` in `docs/CHANGELOG.md` until the owner decides to cut a release.
+Follow semantic versioning. Bump the `version` field in four places, keeping them in sync: `.claude-plugin/plugin.json`, `.cursor-plugin/plugin.json`, `.codex-plugin/plugin.json`, and the `skills/pencil-design/SKILL.md` frontmatter. (`gemini-extension.json` does not declare a version field.)
 
 When a release is authorised, bump the `version` field in four places, keeping them in sync: `.claude-plugin/plugin.json`, `.claude-plugin/marketplace.json` (inside the `plugins[]` entry), `.cursor-plugin/plugin.json`, and `.codex-plugin/plugin.json`. Follow semantic versioning:
 
@@ -239,7 +278,19 @@ After bumping, replace the `[Unreleased]` heading in `docs/CHANGELOG.md` with th
 # Then describe a pencil task; verify pencil-design skill triggers
 ```
 
-**Codex:**
+**Gemini CLI:**
+```bash
+# Install the extension; AGENTS.md loads automatically as project context
+# Describe a pencil task; the skill activates via the description trigger
+```
+
+**OpenAI Codex:**
+```bash
+codex plugin install github:Nisus74/pencil-skill
+# Then describe a pencil task; verify pencil-design skill triggers
+```
+
+**Copilot CLI:**
 ```bash
 # Skills are auto-discovered from skills/ — no install step needed
 ```

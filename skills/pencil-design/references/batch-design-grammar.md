@@ -36,7 +36,7 @@ btn2=C("PrimaryButton", "form", { x: 0, y: 80, descendants: { label: { content: 
 Full property replacement on an existing node.
 
 ```
-R("heroTitle", { type: "text", content: "Welcome back", fontSize: "$text2xl", fontWeight: 700 })
+R("heroTitle", { type: "text", content: "Welcome back", fontSize: "$text2xl", fontWeight: "700" })
 ```
 
 - Wipes all current properties and applies the new object. Use sparingly, `U` is usually safer.
@@ -99,7 +99,44 @@ submit=I(form, { type: "ref", ref: "ButtonPrimary", descendants: { label: { cont
 - Don't reference a binding before it's been declared. Server reads top to bottom.
 - A returned binding's id can also be used after the call completes, the server reports the assigned id back in the response.
 
-## Chunking: ≤8 ops visual, ≤25 ops non-visual
+### The `document` predefined binding
+
+`document` is a built-in binding that always resolves to the document root. Use it **only** when inserting top-level frames (screens, canvas-level containers):
+
+```
+page=I(document, { type: "frame", name: "LoginPage", width: 1440, height: 900 })
+```
+
+**Never name your own binding `document`** — it overwrites the predefined one and breaks all subsequent inserts into the root.
+
+## Placeholder frames
+
+**Every new top-level frame (screen) must carry `placeholder: true` for the entire duration you're building it.** The server uses this to signal to the editor that the frame is in-progress. Rules:
+
+- Set `placeholder: true` in the same `I` op that creates the frame.
+- You can update layout and size props on the placeholder frame while building its contents.
+- Remove it — `U("frameId", { placeholder: false })` — as soon as the frame is finished. Don't wait until all screens are done.
+- Do **not** set `placeholder: true` on inner content frames — only on top-level page frames.
+
+```
+page=I(document, { type: "frame", name: "LoginPage", width: 1440, height: 900, placeholder: true })
+card=I(page, { type: "frame", name: "LoginCard", width: 440, layout: "vertical" })
+// ... build contents ...
+U("page", { placeholder: false })
+```
+
+## Sizing and layout constraints
+
+These cause silent bugs or server errors if you get them wrong:
+
+- **`fill_container` requires a flex parent.** A child set to `width: "fill_container"` does nothing if its parent has `layout: "none"` (absolute positioning). The parent must have `layout: "vertical"` or `"horizontal"`.
+- **`fit_content` requires a flex node.** Same constraint — only meaningful on nodes with flex layout.
+- **Circular dependency.** A frame sized `fit_content` (shrink to children) whose *all* direct children are `fill_container` (grow to parent) creates a circular dependency. The server resolves it unpredictably. Always have at least one child with a fixed size or `fit_content` sizing when the parent is `fit_content`.
+- **`x`/`y` are ignored in flex children.** When a parent has `layout: "vertical"` or `"horizontal"`, child `x`/`y` values are completely ignored — position is determined by the parent's flex rules. Only set `x`/`y` on a child when its parent has `layout: "none"`.
+- **Text is invisible without `fill`.** Text nodes have no default color. Always set `fill: "$textColor"` (or a raw hex) explicitly — omitting it produces an invisible node with no error.
+- **There is no `image` node type.** Images are fills (`fill: { type: "image", url: "..." }`) applied to `frame` or `rectangle` nodes. To add an AI-generated image, create a frame first, then call `G(nodeId, "ai", "prompt")`.
+
+## Chunking: the ≤25-ops rule
 
 Visual work caps at **≤8 ops per `batch_design` call** so each call advances visible state by an amount the user can take in with one screenshot. Non-visual sweeps (renames, `context` backfills, metadata-only updates) may go up to ≤25 ops, no further. Why:
 
@@ -127,30 +164,15 @@ In two ops it confirms: the `document` predefined binding works as a parent for 
 
 ## Common errors and their fixes
 
-The **Fail mode** column reads `hard` (server returns an error and rolls back the whole call) or `silent` (the op succeeds, but the result is wrong, no error to read).
-
-| Server error | Cause | Fix | Fail mode |
-|--------------|-------|-----|-----------|
-| `Can't find parent node with id '<x/y>'` (when referencing a previously-inserted node whose id contains `/`) | The server accepted the `/`-containing id on insert but cannot resolve it as a parent reference downstream | Don't include `/` in ids; let the server auto-generate. The `/` separator is meaningful only inside `descendants` path keys and inside `U(instance+"/childId", ...)` overrides. The insert succeeds silently; the downstream parent reference hard-errors. | silent → hard |
-| `parent not found: <name>` | Referenced a binding before declaring it, or a parent that was never created | Reorder ops. Verify the binding name matches exactly. | hard |
-| `/width expected one of: number, "$variable", sizing behavior (fit_content or fill_container, with optional fallback)` | Used `width: "100%"` or the old `{ sizing: "fill_container" }` object form | Use the bare-string form: `width: "fill_container"` or `width: "fit_content"`. With fallback: `"fill_container(320)"`. | hard |
-| `unknown type: button` | Used a UI-framework word as a node type | There is no `button` node type. A button is a `frame` with `reusable: true`, or a `ref` to one. | hard |
-| `expected variable, got string` | Passed `"#1F6FEB"` where the document declares a variable for that role | Use `"$primary"` (or whatever the variable is). Raw colours are accepted, but if the schema for that property requires a variable, the server enforces it. | hard |
-| `slot frame must be empty in origin` | Tried to put children directly inside a slot frame in the component origin | Slots are filled at the instance level, not the origin. Move the contents out of the origin's slot frame. | hard |
-| `/text unexpected property` | Used `text:` on a `text` node | The text content field is `content`, not `text`. Use `{ type: "text", content: "Hello" }`. | hard |
-| `/padding expected number, [horizontal, vertical], or [top, right, bottom, left]` | Used `padding: { top: N, left: N, ... }` object form | Padding takes a number, a 2-element array `[horizontal, vertical]`, or a 4-element array `[top, right, bottom, left]`. Object form is rejected. | hard |
-| `/paddingTop unexpected property` (or Left/Right/Bottom) | Used individual `paddingTop` / `paddingLeft` etc. | No individual padding properties. Only the combined `padding` array. | hard |
-| `Node 'document' not found` on `U("document", ...)` | Tried to update document-level `themes`, `variables`, or `imports` via `U("document", ...)` | `U` on `document` is not supported. Tokens go through `set_variables` (themes auto-register from variable values). Imports currently have no documented MCP path, edit the `.pen` JSON directly. | hard |
-| `/themes unexpected property` or `/imports unexpected property` on a frame `U` | Tried `U(<frameId>, { themes: ... })` or `U(<frameId>, { imports: ... })` | `themes` and `imports` are document-level only. They cannot be set via `U` on any frame. Use `set_variables` for themes; edit JSON for imports. | hard |
-| `/fill[0].type expected one of: "color", "gradient", "image", "mesh_gradient"` | Used `type: "solid_color"` in a fill object | The correct type string is `"color"`, not `"solid_color"`. Use `{ type: "color", color: "$surface" }`. | hard |
-| `/effect[0]/type expected one of: "blur", "background_blur", "shadow"` | Used `type: "drop_shadow"` in an effect | Type is `"shadow"`, with `shadowType: "inner"` or `"outer"`. Example: `{ type: "shadow", shadowType: "outer", offset: { x: 0, y: 4 }, blur: 8, color: "#00000033" }`. | hard |
-| `/layout expected one of: "none", "vertical", "horizontal"` | Used CSS flexbox vocab (`"flex"`, `"row"`, `"column"`, `"grid"`) | Map `row → horizontal`, `column → vertical`. There is no `"flex"` or `"grid"` layout. | hard |
-| `/alignItems expected one of: "start", "center", "end"` | Used `"stretch"` (the standard CSS flexbox value for "make children fill the cross axis") | Pencil rejects `"stretch"`. To make children span the cross axis, set `width: "fill_container"` (vertical parent) or `height: "fill_container"` (horizontal parent) on each child. The flex-prefixed aliases `"flex_start"` and `"flex_end"` are accepted; `"stretch"` is not. | hard |
-| `/fill unexpected property` on a `note`, `prompt`, or `context` node | Annotation nodes accept TextStyle properties only, not graphics. Same applies to `stroke` and `effect`. | Remove the graphics property. Annotation nodes are non-rendering anyway; colour them with text-style properties (`fontFamily`, `fontSize`, `fontStyle`, `lineHeight`) only. If you need a coloured rendering, use a `text` node inside a regular `frame` (which does accept fills). | hard |
-| Child appears at wrong position / x+y ignored | Set `x`/`y` on a child inside a flex parent | x/y are completely ignored when the parent has `layout: "vertical"` or `"horizontal"`. Remove x/y; use `gap`, `justifyContent`, `alignItems`, and `padding` on the parent instead. | silent |
-| `/iconName unexpected property` or `/iconLibrary unexpected property` | Used `iconName`/`iconLibrary` on an `icon_font` node | Correct properties are `iconFontName` (icon name) and `iconFontFamily` (library: `"lucide"`, `"feather"`, etc.). Size the icon with `width`/`height`, not `fontSize`. | hard |
-| Text node renders nothing visible | Set `width`/`height` on a `text` node with `textGrowth: "auto"` (the default) | `textGrowth: "auto"` always sizes the text node to its content and ignores any width/height you set. To wrap text, use `textGrowth: "fixed-width"` plus an explicit `width` (number, variable, or `"fill_container"` inside a flex parent). | silent |
-| `Variable '<x>' does not have a valid definition` | Called `set_variables` with a bare value like `{ accent: "#FF0000" }` instead of `{ accent: { type: "color", value: "#FF0000" } }` | Wrap every variable value: `{ type: "color" \| "number" \| "string" \| "boolean", value: ... }`. Themed values use `value: [{ value, theme }, ...]`. | hard |
+| Server error | Cause | Fix |
+|--------------|-------|-----|
+| `invalid id: contains '/'` | You set `id: "section/title"` | Pick an id with no slash. `descendants` paths are the only place `/` is meaningful. |
+| `parent not found: <name>` | Referenced a binding before declaring it, or a parent that was never created | Reorder ops. Verify the binding name matches exactly. |
+| `width expected one of: number, "$variable", sizing behavior (fit_content or fill_container...)` | Used `width: "100%"` OR the older `width: { sizing: "fill_container" }` object form | Use the bare-string form: `width: "fill_container"` or `width: "fit_content"`. With fallback, use the function-call form baked into the string: `"fill_container(320)"`. **Verified live (2026-05).** |
+| `unknown type: button` | Used a UI-framework word as a node type | There is no `button` node type. A button is a `frame` with `reusable: true`, or a `ref` to one. |
+| `expected variable, got string` | Passed `"#1F6FEB"` where the document declares a variable for that role | Use `"$primary"` (or whatever the variable is). Raw colors are accepted, but if the schema for that property requires a variable, the server enforces it. |
+| `slot frame must be empty in origin` | Tried to put children directly inside a slot frame in the component origin | Slots are filled at the instance level, not the origin. Move the contents out of the origin's slot frame. |
+| `unexpected property: paddingTop` (or `paddingLeft`, `paddingRight`, `paddingBottom`) | Used CSS-style individual padding shorthands | There are no `paddingTop` etc. properties. Use `padding: [top, right, bottom, left]` (4-value array). To add only top padding while keeping others at 0: `padding: [8, 0, 0, 0]`. If other sides already have values, read them first via `batch_get` before overwriting. |
 
 ## Order-of-operations cheats
 
@@ -159,14 +181,14 @@ When a call mixes inserts and updates, put inserts first, then updates, so bindi
 ```
 hero=I("page", { type: "frame", layout: "vertical", padding: "$space-8" })
 title=I(hero, { type: "text", content: "Welcome", fontSize: "$text3xl" })
-U(hero, { gap: "$space-4" })          // safe, `hero` is bound already
+U(hero, { gap: "$space-4" })          // safe — `hero` is bound already
 ```
 
 When you need to copy then tweak, do both, copy reads source props as of the start of the call:
 
 ```
 copy=C("ButtonPrimary", "form")
-U(copy, { backgroundColor: "$accent" })
+U(copy, { fill: "$accent" })
 ```
 
 When deleting and re-creating, delete first:
@@ -239,13 +261,13 @@ A login form, ~12 ops, in one call:
 
 ```
 page=I(document, { type: "frame", name: "LoginPage", layout: "vertical", justifyContent: "center", alignItems: "center", padding: "$space-8", width: "fill_container", height: "fill_container" })
-form=I(page, { type: "frame", name: "Form", layout: "vertical", gap: "$space-4", padding: "$space-6", width: 360, cornerRadius: 12, fill: [{ type: "color", color: "$surface" }] })
-title=I(form, { type: "text", content: "Sign in", fontSize: "$text2xl", fontWeight: 700 })
-sub=I(form, { type: "text", content: "Welcome back", fontSize: "$textBase", fill: [{ type: "color", color: "$textMuted" }] })
+form=I(page, { type: "frame", name: "Form", layout: "vertical", gap: "$space-4", padding: "$space-6", width: 360, cornerRadius: 12, fill: "$surface" })
+title=I(form, { type: "text", content: "Sign in", fontSize: "$text2xl", fontWeight: "700" })
+sub=I(form, { type: "text", content: "Welcome back", fontSize: "$textBase", fill: "$textMuted" })
 email=I(form, { type: "ref", ref: "Input", descendants: { label: { content: "Email" }, input: { placeholder: "you@example.com" } } })
 pwd=I(form, { type: "ref", ref: "Input", descendants: { label: { content: "Password" }, input: { type: "password" } } })
 submit=I(form, { type: "ref", ref: "ButtonPrimary", descendants: { label: { content: "Sign in" } } })
-forgot=I(form, { type: "text", content: "Forgot password?", fontSize: "$textSm", href: "#", textAlign: "center" })
+forgot=I(form, { type: "text", content: "Forgot password?", fontSize: "$textSm", href: "#", textGrowth: "fixed-width", width: "fill_container", textAlign: "center" })
 ```
 
-After the call, screenshot. If the form looks right, you're done. If not, iterate with `U` ops on the offending nodes.
+After the call, verify structurally with `snapshot_layout(parentId: form, maxDepth: 2)`. Screenshot once as the final sign-off. If something looks off, iterate with `U` ops on the offending nodes.

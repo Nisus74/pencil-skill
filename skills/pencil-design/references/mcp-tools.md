@@ -155,7 +155,9 @@ batch_get({ nodeIds: ["LoginPage"], readDepth: 4, resolveInstances: true, resolv
 
 **Purpose.** Read all document-level design tokens.
 
-**Reach for it.** Before you author tokens for a new doc (so you don't duplicate). Before adding a theme axis. Before binding a color you're not sure exists. As a sanity check after `set_variables`.
+**You must call this before any token work on an existing document.** Not optional — mandatory. If it returns a non-empty set, the user's tokens exist and may be customised. Treat them as authoritative; only bootstrap the variables that are absent from the result. This applies equally before `set_variables` calls and before `U("doc", { variables: {...} })` ops.
+
+Also reach for it: before adding a theme axis; before binding a color you're not sure exists; as a sanity check after `set_variables`.
 
 **Don't reach for it** for every single color usage, once you have the token list in mind, just bind by name (`"$primary"`).
 
@@ -307,7 +309,9 @@ set_variables({
 
 **Pitfalls.**
 
-- `replace: true` wipes the existing variable set and applies only what you pass. Almost never what you want, leave `replace: false` (the merge default) unless you're consciously resetting tokens.
+- `replace: false` does **not** protect existing variable values. If you pass `surface: { value: "#FAFAFA" }` and the doc already has `surface` set to a user-configured `#E63946`, the `#E63946` is silently overwritten. Call `get_variables()` first and only pass variables that are absent from the response.
+- `replace: true` wipes the entire existing variable set and applies only what you pass. Almost never what you want — leave `replace: false` (the merge default) unless you're consciously resetting tokens.
+- Theme-aware values require the document to declare matching theme axes first (`U("doc", { themes: { mode: ["light", "dark"] } })`). Set the axes, then call `set_variables`.
 - A theme-aware variable's `value` is an array; a flat variable's `value` is a scalar. Mixing the two shapes for the same variable across calls causes silent corruption.
 - Bare values are rejected. `{ accent: "#A3B59A" }` (no wrapper) errors with `Variable 'accent' does not have a valid definition`. Always wrap as `{ type: "color", value: "#A3B59A" }`.
 - Flattened-key themed values are rejected. `{ accent: { value: { "mode.light": "#FAFAFA", "mode.dark": "#0B1117" } } }` does not work. Use the array form.
@@ -483,24 +487,21 @@ The `search` → review → `replace` workflow:
 
 Setting up a brand-new `.pen`:
 
-1. `open_document()`, no args creates a new document. Returns the fresh doc context; `get_editor_state` will reflect the new active editor.
-2. `set_variables({ variables: { ... }, replace: false })`, declare the full token suite. Themed values like `{ value: "#FAFAFA", theme: { mode: "light" } }` auto-register the `mode` axis; no separate axis-declaration step is needed.
-3. First `batch_design`, page frame + skeleton (≤8 ops; see `batch-design-grammar.md` § Hello world for the minimum probe).
-4. `snapshot_layout({ parentId: "<page>", maxDepth: 2 })`, confirm structure.
-5. Region-by-region `batch_design` calls, fill in.
-6. Final `get_screenshot({ nodeId: "<page>" })`, sign-off.
+1. `open_document({ path: "new" })` — get a fresh doc id.
+2. `U(document, { themes: { mode: ["light", "dark"] } })` via `batch_design` — declare the theme axis first.
+3. `set_variables({ variables: { ... }, replace: false })` — declare the full token suite.
+4. First `batch_design` — page frame + skeleton (≤10 ops).
+5. `snapshot_layout({ parentId: "<page>", maxDepth: 2 })` — confirm structure.
+6. Region-by-region `batch_design` calls — fill in.
+7. Final `get_screenshot({ nodeId: "<page>" })` — sign-off.
 
 ### Library import smoke test
 
 Reach for this **only when the project already has a `.lib.pen` library**. Most projects don't, a library is something users create when they want shared components across several `.pen` files, and many designs are single-file. If `batch_get({ patterns: [{ reusable: true }] })` on the active doc finds no components, and no `.lib.pen` is referenced in the user's workspace, skip this section: build from primitives or extract a component when one becomes worth reusing.
 
-Pulling an existing `.lib.pen` into a doc and confirming components resolve.
-
-**Important:** there is currently no documented MCP path to add an `imports` entry. `U("document", ...)` errors with `Node 'document' not found`. `U(<frameId>, { imports: ... })` errors with `/imports unexpected property`. Step 1 must be done by direct JSON edit until the server exposes an import-management API:
-
-1. Add the import entry to the active `.pen` JSON directly. The shape: `"imports": { "ds": "./design/system.lib.pen" }` at the top level of the document.
-2. `batch_get({ filePath: "./design/system.lib.pen", patterns: [{ reusable: true }], readDepth: 2 })`, see what the library exposes.
-3. Insert a single `ref` to a known component on the active doc:
+1. `U(document, { imports: { "ds": "./design/system.lib.pen" } })` via `batch_design`.
+2. `batch_get({ filePath: "./design/system.lib.pen", patterns: [{ reusable: true }], readDepth: 2 })` — see what the library exposes.
+3. Insert a single `ref` to a known component:
 
    ```
    test=I(document, { type: "ref", ref: "ButtonPrimary", descendants: { label: { content: "Smoke" } } })

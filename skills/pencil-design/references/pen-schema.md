@@ -51,9 +51,9 @@ Position uses `x`, `y` for the top-left corner. **Children are positioned relati
 | `ellipse` | `innerRadius` (0=solid, 1=hollow), `startAngle` (degrees CCW from right), `sweepAngle` (positive=CCW, negative=CW, range -360..360). Donut: `innerRadius: 0.6`. 90° arc clockwise from 12 o'clock: `startAngle: 90, sweepAngle: -90`. |
 | `line` | Defined by its bounding rect. Use `stroke: { align: "center", ... }` on unconnected lines. |
 | `polygon` | `polygonCount` (sides), `cornerRadius`. |
-| `path` | SVG path geometry. `fillRule: "nonzero" \| "evenodd"`. Always set `viewBox: [x, y, w, h]`. |
-| `frame` | Rectangle that holds children. The auto-layout container. See Frame section below. |
-| `group` | Container with effects, no layout. Children are absolutely positioned. |
+| `path` | SVG path geometry. `fillRule: "nonzero" \| "evenodd"`. |
+| `frame` | Rectangle that holds children. The auto-layout container. |
+| `group` | Container with effects AND layout (supports `layout`, `gap`, `padding`, `justifyContent`, `alignItems`). Has `width`/`height` as `SizingBehavior` only. |
 
 ### Content
 
@@ -99,11 +99,11 @@ On a `frame`:
 
 ```jsonc
 {
-  "layout": "vertical",       // "none" | "vertical" | "horizontal". Frames default to "horizontal".
-  "gap": 16,                  // between children. Number or variable.
-  "padding": 16,              // number | [horizontal, vertical] | [top, right, bottom, left]. NO object form, NO individual paddingTop/paddingLeft etc.
-  "justifyContent": "start",  // "start" | "center" | "end" | "space_between" | "space_around" , underscores, not hyphens
-  "alignItems": "center"      // "start" | "center" | "end"
+  "layout": "vertical",          // "none" | "vertical" | "horizontal"
+  "gap": "$space-4",             // between children
+  "padding": [16, 24],           // number (all sides) | [horiz, vert] | [top, right, bottom, left]
+  "justifyContent": "start",     // start | center | end | space_between | space_around
+  "alignItems": "center"         // start | center | end   ← NO stretch or baseline
 }
 ```
 
@@ -117,24 +117,40 @@ On a `frame`:
 
 ## Graphics
 
-- **`fill`:** a colour string (or variable reference), a single fill object, or an array of fill objects painted bottom-to-top. **Plain colour string `"#RRGGBBAA"` or `"$variable"` is accepted as shorthand and preferred for the single-fill case.** Fill object types: `"color"` (**not** `"solid_color"`), `"gradient"`, `"image"`, `"mesh_gradient"`.
-- **`stroke`:** single stroke object. Properties: `thickness`, `align` (`"inside" | "center" | "outside"`), `join`, `cap`, `dashPattern`, plus one of `color` (colour string or variable) **or** `fill` (full `Fills` shape, colour, gradient, or image). Both `{ color, thickness }` and `{ fill, thickness }` shapes are accepted; use `color` for the common solid case and `fill` when you need a gradient or image stroke. Dashed example: `{ thickness: 1, color: "$border", align: "inside", dashPattern: [4, 2] }` (4 px dash, 2 px gap).
-- **`effect`:** array of effect objects. Types: `"blur"` (`radius`), `"background_blur"` (`radius`), `"shadow"` (`shadowType: "inner" | "outer"`, `offset`, `spread`, `blur`, `color`). There is no `"drop_shadow"` type, use `"shadow"` with `shadowType: "outer"`.
-- **`blendMode`:** `"normal"` | `"darken"` | `"multiply"` | `"linearBurn"` | `"colorBurn"` | `"light"` | `"screen"` | `"linearDodge"` | `"colorDodge"` | `"overlay"` | `"softLight"` | `"hardLight"` | `"difference"` | `"exclusion"` | `"hue"` | `"saturation"` | `"color"` | `"luminosity"`.
-- **`clip`:** boolean, visually clip overflow.
+- **`fill`:** bare `ColorOrVariable` string (most common: `"$primary"`, `"#1F6FEB"`), a single fill object, or an array of fill objects painted bottom-to-top. Structured types: `{ type: "color", color: ColorOrVariable }`, `{ type: "gradient", gradientType: "linear"|"radial"|"angular", ... }`, `{ type: "image", url: "...", mode: "fill"|"fit"|"stretch" }`, `{ type: "mesh_gradient", ... }`. **There is no `solid_color` type** — use the bare string or `type: "color"`.
+- **`stroke`:** single stroke object. Properties: `fill` (ColorOrVariable or fill object), `thickness` (NumberOrVariable or `{top, right, bottom, left}` object), `align` (`"inside" | "center" | "outside"`), `join` (`"miter" | "bevel" | "round"`), `cap` (`"none" | "round" | "square"`), `dashPattern` (number[]), `miterAngle`. **Verified live (2026-05):** use singular `fill` (not `fills`); `align` is valid (not `alignment`). Example: `"stroke": { "thickness": 1, "fill": "$border", "align": "inside" }`.
+- **`effect`:** array of effects. Order matters. Types: `blur`, `background_blur`, `shadow`.
+- **`blendMode`:** 15 modes (`multiply`, `screen`, `overlay`, etc.).
+- **`clip`:** boolean — visually clip overflow.
 - **`rotation`:** counter-clockwise, in degrees.
 - **`cornerRadius`:** single number or `[tl, tr, br, bl]` array, order starts top-left and goes clockwise.
 
-## Frame
+## Text node
 
-Extends Entity + Size + Layout + Graphics.
+Text nodes use `content` (not `text`) for their string value. **Text has no default color — always set `fill` or the node will be invisible.**
+
+`textGrowth` controls sizing:
+- `"auto"` (default) — grows to fit; `width`/`height` are ignored; never wraps.
+- `"fixed-width"` — `width` **must** be set; `height` grows to fit wrapped content.
+- `"fixed-width-height"` — both `width` and `height` **must** be set; may overflow.
+
+When the parent has flexbox layout, set `width: "fill_container"` + `textGrowth: "fixed-width"` for wrapping text that fills its container.
+
+## Text styling
 
 ```jsonc
 {
-  "type": "frame",
-  "clip": false,          // clip overflow. Default false.
-  "placeholder": true,    // marks frame as in-progress during generation. Remove when done.
-  "slot": false           // false | string[] of recommended reusable child component ids
+  "fontFamily": "$fontBody",
+  "fontSize": "$textBase",
+  "fontWeight": "700",
+  "letterSpacing": 0,
+  "fontStyle": "normal",        // "normal" | "italic"
+  "underline": false,
+  "lineHeight": 1.5,
+  "textAlign": "left",          // "left" | "center" | "right" | "justify"
+  "textAlignVertical": "top",
+  "strikethrough": false,
+  "href": null                  // link target
 }
 ```
 
@@ -269,7 +285,7 @@ Instantiate elsewhere with a `ref` node:
   "ref": "ButtonPrimary",
   "descendants": {
     "label": { "content": "Sign in" },
-    "iconWrap/icon": { "iconFontName": "log-in" }
+    "iconWrap/icon": { "iconName": "log-in" }
   }
 }
 ```
@@ -322,21 +338,13 @@ Reach for `script` when a layout depends on a runtime input (parameterised hero,
 
 ## Common gotchas
 
-- IDs with `/` are accepted on insert but cannot be referenced as a parent downstream, don't include `/` in your own ids. The `/` separator is only meaningful inside `descendants` path keys and `U(instance+"/childId", ...)` overrides.
-- Don't use `width: "100%"`, use `width: "fill_container"`.
-- Don't use padding object form `{ top: N }`, use a single number or array `[h, v]` / `[t, r, b, l]`.
-- Don't use `text:` or `value:` on text nodes, use `content:`.
-- Don't use `solid_color` in fill objects, use `"color"`.
-- Don't use `drop_shadow` in effects, use `"shadow"` with `shadowType: "outer"`.
-- Don't use CSS flexbox layout names, `layout` accepts only `"none"`, `"vertical"`, `"horizontal"`.
-- `justifyContent` underscored values are canonical (`"space_between"`); hyphenated CSS aliases also work but prefer canonical.
-- `alignItems` canonical values are `"start"`, `"center"`, `"end"`; CSS aliases `"flex_start"` / `"flex_end"` also work.
-- Don't set `x`/`y` on a child when the parent uses flexbox layout, they are silently ignored.
-- `fill_container` only works when the parent has a flexbox layout.
-- `fit_content` only works on nodes that themselves use flexbox layout.
-- A parent sized `fit_content` with all children sized `fill_container` is a circular dependency.
-- `U("document", ...)` in `batch_design` is not supported, `document` is an insert-only binding. Tokens go through `set_variables` (themes auto-register); imports require direct JSON edit.
-- A `ref` cannot itself be `reusable`. No meta-components.
-- Text nodes have no colour by default, always set `fill`, or the text renders invisible.
-- Setting `width`/`height` on a `text` node with `textGrowth: "auto"` silently does nothing, use `textGrowth: "fixed-width"` plus an explicit width to enable wrapping.
-- Variable names must not start with `$`, the `$` prefix is only for reference syntax in node properties.
+- IDs with `/` are rejected — the server uses `/` as a path separator in `descendants` keys.
+- Don't pass `width: "100%"` — use `width: "fill_container"` (bare string).
+- Don't insert into a parent created earlier in the *same* `batch_design` call without binding it (`foo=I(...)`); the server can't resolve a forward-reference.
+- Mixing `layout: "none"` with auto-layout `gap` does nothing — the layout has to be `"vertical"` or `"horizontal"` for `gap` and `alignItems` to apply.
+- A `ref` cannot itself be `reusable`. Don't try to make a meta-component.
+- **`x`/`y` are ignored in flex children.** Only set them when the parent has `layout: "none"`.
+- **`fill_container` requires a flex parent.** Setting it on a child of a `layout: "none"` parent has no effect.
+- **Circular dependency:** a `fit_content` frame whose every direct child is `fill_container` produces unpredictable sizing. At least one child must have a fixed size or `fit_content`.
+- **No `image` node type.** Images are fill objects (`fill: { type: "image", url: "..." }`) on `frame` or `rectangle` nodes. Use `G(nodeId, "ai", "prompt")` to generate AI images into an existing node.
+- **Text needs `fill`** — text nodes have no default color. An unfilled text node renders invisible with no error.

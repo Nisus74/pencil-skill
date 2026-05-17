@@ -1,0 +1,145 @@
+{
+  "skill_name": "pencil-design",
+  "evals": [
+    {
+      "id": 0,
+      "name": "login-screen-greenfield",
+      "prompt": "I need to design a login screen in pencil. It should have email + password inputs, a primary submit button, and a 'forgot password?' link. Walk me through what you'd do step by step before touching any tools.",
+      "expected_output": "Agent describes the seven-step workflow: detects host first, locates context (open .pen, design-system/ folder, selection), loads guidelines, plans, executes via batch_design, verifies via the verification ladder (structural-first: batch_design response → snapshot_layout → batch_get → get_screenshot reserved for visual-only questions or final sign-off), iterates. References design-system/ check and library import. Plans before executing. Does NOT prescribe screenshotting after every chunk. Treats dual-mode (light + dark) screenshotting as conditional on mode-specific color usage, not mandatory. Describes calling get_variables() as a mandatory pre-execution step before any batch_design call to check existing tokens.",
+      "files": []
+    },
+    {
+      "id": 1,
+      "name": "design-system-scaffold",
+      "prompt": "Set up a pencil design system in this project. The repo currently has no design-system/ folder.",
+      "expected_output": "Agent confirms before scaffolding; copies all 12 core templates from assets/design-system/ to design-system/ (README.md, design-system.md, tokens.md, components.md, layout.md, motion.md, elevation.md, iconography.md, patterns.md, states.md, voice.md, code-export.md); mentions the optional templates that are conditionally included (mobile.md, data-viz.md, brand.md, imagery.md, plus the new Phase 4 set: forms.md, accessibility.md, micro-interactions.md, empty-states.md, onboarding.md, navigation.md, search.md, file-architecture.md, visual-style.md) and the signals or opt-in that triggers each; mentions collision detection if a code-bearing design-system/ already exists; tells the user which fields to fill in first.",
+      "files": []
+    },
+    {
+      "id": 2,
+      "name": "import-library-and-use",
+      "prompt": "I have a design library at design/system.lib.pen with Button and Input components. Add a sign-up form to my open .pen file using those components. Explain the tools you'd call and why.",
+      "expected_output": "Agent verifies the document's imports field, adds an imports entry via U op on document root if missing, queries the library's reusable components, instantiates Button and Input via ref nodes (not from primitives), uses descendants for instance-level overrides. Verifies via the verification ladder: snapshot_layout or batch_get on the instantiated refs first to confirm structure and bindings, then a single get_screenshot scoped to the form/card subtree (via nodeId), never the page frame, only as final sign-off.",
+      "files": []
+    },
+    {
+      "id": 3,
+      "name": "edit-existing-card-verification-ladder",
+      "prompt": "I want to test how you verify edits. First, create a brand-new .pen scratch document with a single LoginCard frame containing: a 'Sign in' heading, an Email input, a Password input, a primary 'Sign in' button (blue fill), and a 'Forgot password?' link below the button. Once that's in place, perform this edit: change the Sign in button's fill to a brand green color, and add 8px of paddingTop to the link's container so it has more breathing room. After the edit, explain step by step exactly which MCP tools you called to verify the edit landed correctly, in what order, and why you chose each. Be precise about which nodeId you passed to each verification call.",
+      "expected_output": "Agent first creates the scratch design via batch_design (this phase is not graded). For the edit phase: identifies the specific node IDs to edit before the batch_design call, either by capturing them from prior construction response bindings (preferred) or via an explicit batch_get lookup. Performs the two-op edit in a single batch_design call. Verification follows the four-rung ladder: (1) acknowledges the batch_design response confirmed both ops landed; (2) calls snapshot_layout scoped to the LoginCard (parentId is the card, not the document root) to confirm the link's paddingTop is 8 and the button's geometry is unchanged; (3) calls batch_get on the button node to confirm fill resolved to the brand green variable (not a raw hex); (4) calls get_screenshot AT MOST ONCE, scoped to the LoginCard nodeId (NOT the document root or page frame), as a final visual sign-off. Total get_screenshot calls in the edit phase: exactly 1. Does NOT re-screenshot in dark mode (the change is structural + a variable-bound color, not mode-conditional). Does NOT screenshot the document root.",
+      "files": []
+    },
+    {
+      "id": 4,
+      "name": "multi-section-page-verification-cadence",
+      "prompt": "Build a marketing landing page in a new .pen document at 1440x900 with three regions: (1) a top hero section with a centered headline, subhead, and a primary CTA button; (2) a three-column features section below the hero, each column with an icon, a heading, and one paragraph of body text; (3) a footer with a copyright line and three text links. Use placeholder copy. Aim for clean spacing rhythm and consistent typography. Build it incrementally region by region and after each region tell me what you verified and how you verified it (which MCP tools, in what order, with which nodeId). At the end, give me a one-paragraph summary of the total verification calls you made across the whole build, broken down by tool type.",
+      "expected_output": "Agent builds the page in 3+ batch_design chunks (one per region, possibly more for dense regions). Verification across the whole build follows the four-rung ladder. Critical metric: total get_screenshot calls across the entire build is 1 or 2, NOT one per region. Most per-region verification is structural (snapshot_layout on the just-built region's parent frame, sometimes batch_get to confirm ref instantiation or property bindings). When get_screenshot is used, it is scoped to a specific nodeId (the region just built or the page root for final sign-off), never an unscoped call. The agent does NOT re-screenshot in dark mode. The closing paragraph reports the breakdown honestly; if the agent took more than 2 screenshots, it should say so rather than under-report. The pattern that distinguishes new-skill behavior from old-skill behavior is: structural-first verification per region, with screenshots reserved for the page-level final sign-off and any genuinely-visual question (e.g., did an AI image generate as expected). Old-skill behavior would screenshot after each region (3+ screenshots, typically full-page).",
+      "files": []
+    },
+    {
+      "id": 5,
+      "name": "preserve-existing-variables",
+      "prompt": "I have a .pen file open that already has design tokens configured. My brand uses a custom $primary (#E63946 red) and $surface (#F8F9FA near-white). I want you to add a login screen to this file. Walk me through exactly what you'd do before calling set_variables or batch_design, specifically how you'd make sure my existing token values aren't overwritten.",
+      "expected_output": "Agent MUST describe calling get_variables() first to read the existing token set before any batch_design or set_variables call. Agent MUST state it will only add tokens that are absent from the existing set, and will not re-declare $primary or $surface. Agent must NOT propose calling set_variables with a full default token suite (surface, primary, etc.) without first diffing against what get_variables() returns. Agent may describe the diff process: comparing returned keys against a default suite and only passing the missing ones. Does NOT call or propose replace: true. Optionally mentions that if get_variables() shows a full suite, bootstrapping can be skipped entirely and design can proceed directly to batch_design using the existing token names.",
+      "files": []
+    },
+    {
+      "id": 6,
+      "name": "clarify-intent-before-designing",
+      "prompt": "I want to design something for our app. Get started.",
+      "expected_output": "Agent recognises this is an open-ended request with no reference image, no description of who uses the product, and (assuming) no populated design-system/ folder. Before any batch_design call, the agent asks three quick clarifying questions per references/SKILL.md § Design intelligence (clarify-intent protocol): (1) Who uses this and what problem does it solve? (2) Atmosphere: any words, references, or brand direction? (3) Hard constraints (stack, responsive targets, dark-mode-only, mobile-first)? If the project has a populated design-system/, the agent skips the questions because those files already answer them. The agent does NOT dive into batch_design. The agent does NOT ask the questions twice in the same session.",
+      "files": []
+    },
+    {
+      "id": 7,
+      "name": "shadow-and-color-architecture",
+      "prompt": "Design a three-tier pricing card section (Free, Pro, Team). Highlight the Pro tier as the recommended option.",
+      "expected_output": "Per SKILL.md § Aesthetic defaults (Colour, Shadows): two-role colour architecture ($surface neutral + one accent; no third hue competing). The highlighted Pro tier carries: a coloured border using $accent, a layered shadow (≥ 2 layers: ambient e.g. 0 1px 2px rgba(0,0,0,0.04) + direct e.g. 0 8px 24px rgba(0,0,0,0.08)), and either a 'Most popular' badge OR a slight scale-up. Does NOT combine all four treatments (border + scale + badge + extra shadow + colour shift). Coloured border + badge is the canonical pair. Hover state increases contrast (lighter accent in dark mode, or darker accent in light mode), never decreases. Nested border-radius rule honoured: child corner radius ≤ parent (concentric). CTA copy is action-specific ('Start Pro trial', not 'Get started').",
+      "files": []
+    },
+    {
+      "id": 8,
+      "name": "form-design-discipline",
+      "prompt": "Design a sign-up form: name, email, password, confirm password, terms-of-service checkbox. Submit button at the bottom.",
+      "expected_output": "Per references/forms.md and assets/design-system/forms.md: every input has a visible <label>. Errors render inline next to the field (not in a banner at the top). Validation timing: on-blur for sync constraints (email format, password strength), on-submit for cross-field (password match) and async (email already taken). Submit button stays enabled until pressed (not disabled-while-invalid). Autocomplete attributes set per field ('email', 'new-password', 'name', etc.). Mobile font-size ≥ 16px to defeat iOS Safari zoom-on-focus. Hit zone for terms checkbox shares with its label (single click target). Spellcheck disabled on email and password fields. Submit-state choreography: spinner replaces label but width is preserved. On submit-with-errors: focus moves to first error, aria-live region announces error count.",
+      "files": []
+    },
+    {
+      "id": 9,
+      "name": "compound-component-design",
+      "prompt": "Design a Composer component for our chat product. It needs a header (with attachment toggle), a multi-line text input, and a footer (with a Send button and a character count).",
+      "expected_output": "Per references/composition-patterns.md: builds a compound component, not a single component with boolean props. Structure: Composer.Provider wraps Composer.Frame; Composer.Frame contains Composer.Header, Composer.Input, Composer.Footer as named slot children. Each sub-component is its own reusable. Slot names describe content (header, input, footer), not position (top, middle, bottom). Send button uses an explicit variant pattern (Button.Submit or Composer.SendButton) instead of <Button variant=\"primary\" disabled={!hasContent}>. Component status documented in context (status: 'ready' or 'draft'). Does NOT ship a single mega-Component with disabled, loading, hasAttachment, isError boolean props. The Composer is extracted to design-system.lib.pen because it has multiple non-trivial pieces and will be reused across surfaces.",
+      "files": []
+    },
+    {
+      "id": 10,
+      "name": "marketing-page-archetypes",
+      "prompt": "Build a marketing landing page for our SaaS product. Include hero, three feature blocks, three-tier pricing, testimonials, and a footer. Make it feel intentional, not templated.",
+      "expected_output": "Per references/layout-patterns.md: agent does NOT use the three-column equal-card grid for features (the most over-used SaaS marketing pattern). Instead picks alternating image-text rows OR bento grid OR single hero feature. Hero is asymmetric, split (form-right / image-left), full-bleed, or bento (not the centred-text-with-CTA default). Pricing has a highlighted middle tier with coloured border + 'Most popular' badge (one accent only; not all four treatments combined). Testimonials are a static avatar grid OR single hero quote OR logo wall (NOT an auto-rotating carousel). Footer architecture is consistent (sitemap OR minimal OR legal-only; not a kitchen-sink mix). Microcopy is verb-led and benefit-focused per references/microcopy.md ('Cut your build time by 40%' beats 'Faster builds'). CTAs use action-specific verbs ('Start your free trial', not 'Get started' or 'Continue').",
+      "files": []
+    },
+    {
+      "id": 11,
+      "name": "mobile-bottom-sheet-vs-modal",
+      "prompt": "Design the iOS app's compose flow: filter selection, attachments picker, and a destructive 'discard draft' confirmation.",
+      "expected_output": "Per references/mobile-patterns.md: agent picks bottom sheet for filter selection (non-blocking secondary action, drilldown that retains context). Picks bottom sheet for attachments picker (selection from a list, may stay open while user picks multiple). Picks modal (or full-screen sheet with destructive confirmation pattern) for the discard-draft confirmation because it's destructive and demands a deliberate choice. Sheet detents declared per use case (peek for filter, half for attachments, blocking modal for discard). Tab bar (if present in the surrounding home screen) ≤ 5 items per references/mobile-patterns.md § Tab bars. Safe areas respected: env(safe-area-inset-bottom) for the tab bar above the home indicator; env(safe-area-inset-top) for the header below the notch / dynamic island. Haptic feedback called out: selection haptic on filter pick, success haptic on attach, warning haptic on discard confirm.",
+      "files": []
+    },
+    {
+      "id": 12,
+      "name": "data-viz-dashboard",
+      "prompt": "Design a SaaS analytics dashboard with four tiles: (1) Monthly recurring revenue trend, (2) Conversion rate by traffic source, (3) Cohort retention heatmap, (4) Top 10 customers by MRR.",
+      "expected_output": "Per references/data-viz.md § The 25-chart selection matrix: (1) Line chart for MRR trend (one series over time). (2) Horizontal bar chart for conversion by source (compare across categories with long source names). (3) Heatmap for cohort retention (two-dimensional matrix). (4) Horizontal bar OR ranked table for top customers (compare ordered values). Uses colour-blind-safe palette: Okabe-Ito for categorical chart series ($chart1 through $chart8 in tokens), Viridis (perceptually uniform) for the heatmap. NEVER uses pie chart with > 5 slices. NEVER 3D charts. NEVER dual y-axes (split into small multiples instead). Sparklines used inline in the KPI cards above the main charts. State coding pairs colour with shape (up arrow ↑ + $success for growth; down arrow ↓ + $danger for decline) so colour-blind users can read it. Default chart styling: minimal axes, light gridlines on the value axis only, direct labels at line endpoints, tabular numerics on monetary values.",
+      "files": []
+    },
+    {
+      "id": 13,
+      "name": "microcopy-quality",
+      "prompt": "Write microcopy for these states in our project tracker: (a) error when the project name the user typed is already taken, (b) empty state when the user has no projects, (c) success after archiving a project, (d) loading state while fetching projects.",
+      "expected_output": "Per references/microcopy.md: (a) Error message guides the exit, doesn't blame the user. 'That name is taken. Try a different one.' or 'A project called <name> already exists. Pick a different name.' NOT 'Invalid name' or 'Error: project name already exists in the database.' (b) Empty state shows what's possible, not what's missing. 'Create your first project to get started.' NOT 'No projects yet.' or 'You don't have any projects.' Single primary CTA ('New project'); demotes any secondary action to a text link. (c) Success copy is calibrated to the stakes: archiving is routine, so a quiet check-mark indicator or non-blocking toast 'Project archived. <Undo>' suits. NOT 'Awesome! Project archived successfully!' (over-celebration). (d) Loading copy names the operation: 'Fetching your projects...' NOT 'Loading...' (generic) or 'Please wait...' (apologetic). All button labels use action-specific verbs (Create, Archive, Restore), never 'Continue', 'Submit', or 'OK'.",
+      "files": []
+    },
+    {
+      "id": 14,
+      "name": "reference-image-translation",
+      "prompt": "I'm sending you a screenshot of Linear's issue list. Translate the layout into our project. Don't copy verbatim; make it ours. Walk me through your process.",
+      "expected_output": "Per references/iteration-patterns.md § Reference-image translation protocol: agent (a) names the layout pattern out loud first ('three-column nav-list-detail layout, with command-palette-driven navigation in the chrome'). (b) Extracts the palette from the screenshot and identifies it as approximately Pure Slate dark + Indigo accent (Linear's actual palette per references/colour-palettes.md § Dark-mode-first variations). Maps the source values onto the project's existing tokens; doesn't lift the literal hex values. (c) Identifies the type pairing as Inter sans-serif throughout (Linear's chosen pairing); finds the project's equivalent in font-pairings.md or maps to whatever the project committed in tokens.md. (d) Names the design movement: Swiss / International + Dark-mode-first per style-catalogue.md. (e) Calls out what to deliberately change vs preserve: preserves the three-column structure, the command-palette pattern, the keyboard-first navigation; changes the colour palette to the project's brand (or notes that Linear's palette suits the project), substitutes the project's font pairing if different. (f) Recreates in .pen using project tokens (references $tokens, never literal hex or font names from the source). Documents the translation choices in the design's context.",
+      "files": []
+    },
+    {
+      "id": 15,
+      "name": "industry-aware-saas",
+      "prompt": "Design a dashboard for a developer-tools SaaS. The audience is professional engineers. Make it feel right for them.",
+      "expected_output": "Per references/industry-patterns.md § SaaS § Developer tools: agent uses developer-tool conventions. Style: Swiss / International + Terminal/Hacker (per style-catalogue.md). Palette: Cursor Dark or Linear Dark (Pure Slate dark + Tailwind Cyan or Indigo accent; dark mode default per references/colour-palettes.md § Dark-mode-first variations). Typography: Inter + JetBrains Mono OR Geist + Geist Mono (per font-pairings.md § Sans + Mono). Density: high information density; dense table rows, narrow chrome, monospace numerics where applicable. Keyboard-first: ⌘+K command palette mentioned and designed; keyboard shortcuts visible in tooltips and a dedicated reference accessible via '?'. Syntax-highlighted code blocks where applicable. Cites Linear, Vercel, Cursor, GitHub as exemplars. Does NOT use fintech conservatism (Banking Navy palette, formal microcopy, large white space). Does NOT use healthcare warmth (Patient Warm Teal palette, large body type, calming illustrations). Does NOT use e-commerce DTC editorial aesthetic (serif display fonts, photo-forward hero).",
+      "files": []
+    },
+    {
+      "id": 16,
+      "name": "iteration-rescue-too-busy",
+      "prompt": "Look at the design currently open in pencil. The user just told me it 'feels too busy and I can't tell where to look.' Rescue it.",
+      "expected_output": "Per references/iteration-patterns.md § Failure mode: too busy: agent diagnoses the busyness via inspection (calls batch_get or snapshot_layout to see the current node tree and visible properties; optionally one get_screenshot if the visual question is essential). Identifies what to remove from the rescue list, in order of effect: a hue (three accent colours becomes one), a typeface (a display font added for accents removed), whitespace added (section padding increased one step), a colour stop dropped (5-stop neutral ramp becomes 3), a shadow simplified (4-layer becomes 2), or decorative elements muted (borders, badges drop in saturation). Executes the simplification via set_variables (to drop an accent token) and/or batch_design (to remove decorative borders or simplify shadows). Verifies hierarchy improved with one screenshot at the end. Critical anti-pattern to avoid: does NOT add a hierarchy element to 'fix' busyness (the most common second-iteration failure). The diagnosis was 'too busy'; the fix subtracts.",
+      "files": []
+    },
+    {
+      "id": 17,
+      "name": "command-palette-pattern",
+      "prompt": "Add a cmd+K command palette to our app. Cover the visual design and the keyboard interactions.",
+      "expected_output": "Per references/modern-patterns.md § Modern UI affordances (Command palette / cmd+K): agent designs the canonical command-palette pattern. Trigger: ⌘+K on macOS, Ctrl+K on Windows/Linux (documented in accessibility.md § Keyboard shortcuts). Structure: modal overlay with backdrop dismiss; centred container ~600px wide; search input auto-focused at the top; grouped results below. Result groups in order: Recent commands (the user's last 5), Suggested commands (context-driven), then category groups (Navigate, Create, Search, Settings, Help). Each result row shows: icon (left), label (centre), keyboard shortcut hint (right). Keyboard navigation: ↑↓ to move between results, Enter to activate, Esc to close, ⌘+Enter (optional) to open in new tab/window. Selected result has a visible focus state (background + border per tokens). Empty results state (when query returns nothing) named per microcopy.md (e.g. 'No commands match \"foo\". Try a different search.'). Loading state for async results (e.g. live search across remote data) uses skeleton with row hints, not a spinner.",
+      "files": []
+    },
+    {
+      "id": 18,
+      "name": "file-architecture-cover-and-sections",
+      "prompt": "Set up a new .pen for our customer portal redesign. It will have multiple flows: auth, dashboard, billing, settings. Get the file architecture right from the start.",
+      "expected_output": "Per references/file-architecture.md and SKILL.md § Discipline rules § File architecture: agent creates a Cover frame at canvas origin (0, 0) as the first action. Cover contains: file owner (name + role), status (one of Discovery / In design / Design review / Engineering review / Ready for build / In build / QA / Shipped / Deprecated), version, last updated date, scope (in / out), links (brief, ticket, prototype, design-system). Cover's context reads 'File operating manual: owner, status, version, scope, links.' Section regions established as the frames are added: Source of Truth (row 1, after Cover), Build Ready (row 2), UX States (row 3), Responsive (row 4), Exploration (far-right region), Archive (bottom region). Uses find_empty_space_on_canvas between sections to honour the layout. Hierarchical naming applied to multi-screen flows: 'Customer / Auth / 01 / Email / Default / Desktop', 'Customer / Billing / 02 / EnterPayment / Default / Desktop', etc. Slashes allowed in name field; never in id. design-system.lib.pen added to imports. No Exploration frames placed in Source of Truth region.",
+      "files": []
+    },
+    {
+      "id": 19,
+      "name": "saas-completeness-pressure-test",
+      "prompt": "Design the dashboard for our SaaS analytics tool. Cover everything we'd need designed before engineering can start building.",
+      "expected_output": "Per references/industry-patterns.md § Completeness pressure tests § SaaS pressure test: agent does NOT design only the happy path. The full set must include: empty state per primary surface (first-use, no data yet), loading state per primary surface (skeleton with shape hints), error state per primary surface (chart load failed, query timed out, network offline; each with a retry affordance), no-permission state (user lacks access to a data source or surface), plan-restricted state (data limited by plan tier, trial expired, hit a usage cap). Covers at least one admin surface (user management OR billing OR integrations OR audit log). Includes notification or system-status state (recent activity, system alerts). Auth flows referenced (sign-in, sign-up, password reset, MFA, SSO, session-expired) even if not designed in this pass. The agent surfaces gaps explicitly if any required state is missing: 'I notice the design doesn't cover the no-permission state or the plan-restricted state. Should I add them?' Pass = full state coverage; fail = only the happy-path dashboard (a sales demo, not a SaaS design).",
+      "files": []
+    }
+  ]
+}

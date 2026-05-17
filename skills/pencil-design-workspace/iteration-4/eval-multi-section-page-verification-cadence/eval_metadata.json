@@ -1,0 +1,27 @@
+{
+  "eval_id": 4,
+  "eval_name": "multi-section-page-verification-cadence",
+  "prompt": "Build a marketing landing page in a new .pen document at 1440x900 with three regions: (1) a top hero section with a centered headline, subhead, and a primary CTA button; (2) a three-column features section below the hero, each column with an icon, a heading, and one paragraph of body text; (3) a footer with a copyright line and three text links. Use placeholder copy. Aim for clean spacing rhythm and consistent typography. Build it incrementally — region by region — and after each region tell me what you verified and how you verified it (which MCP tools, in what order, with which nodeId). At the end, give me a one-paragraph summary of the total verification calls you made across the whole build, broken down by tool type.",
+  "assertions": [
+    {
+      "id": "structural-verification-per-region",
+      "text": "Describes using snapshot_layout (not get_screenshot) as the primary per-region verification tool after each batch_design chunk"
+    },
+    {
+      "id": "total-screenshots-1-or-2",
+      "text": "Total stated get_screenshot calls across the entire build is 1 or 2 — NOT one per region (which would be 3+)"
+    },
+    {
+      "id": "screenshots-scoped-to-nodeId",
+      "text": "All get_screenshot calls are scoped to a specific nodeId (not an unscoped call or document root when a region nodeId would suffice)"
+    },
+    {
+      "id": "no-dark-mode-re-screenshot",
+      "text": "Does NOT describe re-screenshotting in dark mode as a routine final step"
+    },
+    {
+      "id": "honest-summary-paragraph",
+      "text": "The closing summary paragraph reports the actual breakdown of tool calls honestly — does not under-report or omit screenshot count"
+    }
+  ]
+}

@@ -1,0 +1,7 @@
+{
+  "eval_id": 17,
+  "eval_name": "command-palette-pattern",
+  "prompt": "Add a cmd+K command palette to our app. Cover the visual design and the keyboard interactions.",
+  "expected_output": "Per references/modern-patterns.md \u00a7 Modern UI affordances (Command palette / cmd+K): agent designs the canonical command-palette pattern. Trigger: \u2318+K on macOS, Ctrl+K on Windows/Linux (documented in accessibility.md \u00a7 Keyboard shortcuts). Structure: modal overlay with backdrop dismiss; centred container ~600px wide; search input auto-focused at the top; grouped results below. Result groups in order: Recent commands (the user's last 5), Suggested commands (context-driven), then category groups (Navigate, Create, Search, Settings, Help). Each result row shows: icon (left), label (centre), keyboard shortcut hint (right). Keyboard navigation: \u2191\u2193 to move between results, Enter to activate, Esc to close, \u2318+Enter (optional) to open in new tab/window. Selected result has a visible focus state (background + border per tokens). Empty results state (when query returns nothing) named per microcopy.md (e.g. 'No commands match \"foo\". Try a different search.'). Loading state for async results (e.g. live search across remote data) uses skeleton with row hints, not a spinner.",
+  "assertions": []
+}
