@@ -70,33 +70,19 @@ skills/pencil-design/              # The platform-agnostic core
     font-pairings.md               # 30+ typography pairings (menu); recipes point to Google Fonts/Vercel/GitHub/commercial foundries
     codex-tools.md                 # OpenAI Codex tool name mappings
   assets/
-    design-system/                 # 12 core + 13 optional scaffold templates: copy into any project
-      README.md                    # Index + how to use
-      design-system.md             # Top-level design system doc
-      tokens.md                    # Colour, spacing, type tokens
-      components.md                # Component catalogue + state table
-      layout.md                    # Grid, breakpoints, spacing
-      motion.md                    # Durations, easings, skeleton shimmer
-      elevation.md                 # Shadow scale + dark-mode treatment
-      iconography.md               # Stroke weight, sizes per context
-      patterns.md                  # Page-level templates (landing, dashboard, auth, ...)
-      states.md                    # Per-component state matrix + screen fault coverage
-      voice.md                     # Copy tone + empty/error copy rules
-      code-export.md               # Token export to CSS/Tailwind
-      mobile.md                    # Optional: native-mobile patterns
-      data-viz.md                  # Optional: chart palettes, default chart types
-      brand.md                     # Optional: logo lockups, OG / social imagery
-      imagery.md                   # Optional: photo / illustration style, AI-imagery rules
-      visual-style.md              # Optional: project's chosen style identity (style + palette + font picks from references catalogues)
-      forms.md                     # Optional: project's form conventions (validation timing, error display, save patterns by surface)
-      accessibility.md             # Optional: project's a11y standards (WCAG / APCA target, keyboard shortcuts, screen reader patterns)
-      micro-interactions.md        # Optional: per-interaction motion specs (button press, card hover, modal entrance, sheet drag, toast)
-      empty-states.md              # Optional: per-surface empty state catalogue (first-use / no-results / no-permission / post-action) with copy templates
-      onboarding.md                # Optional: first-run experience (sample-data vs blank slate, sequence, coach marks)
-      navigation.md                # Optional: primary nav (sidebar / top / hamburger / command-driven), workspace switcher, mobile tab bar
-      search.md                    # Optional: search shape (instant / submit / hybrid), suggestions, filters, URL state
-      file-architecture.md         # Optional: project's chosen .pen file structure, naming conventions, status taxonomy
-    examples/                      # 16 worked examples with real MCP tool sequences
+    design-system/                 # Optional design-system reference templates
+      README.md                    # Agent loading guide
+      CUSTOMISING.md               # Plain-English guide for non-technical editors
+      accessibility.md             # Project a11y standards (WCAG/APCA, keyboard, screen reader)
+      empty-states.md              # Per-surface empty state catalogue with copy templates
+      file-architecture.md         # Project .pen file structure and naming conventions
+      forms.md                     # Form conventions (validation, error display, save patterns)
+      micro-interactions.md        # Per-interaction motion specs
+      navigation.md                # Primary nav patterns, workspace switcher, mobile tab bar
+      onboarding.md                # First-run experience (sample-data vs blank slate)
+      search.md                    # Search shape (instant / submit / hybrid), filters, URL state
+      visual-style.md              # Project's chosen style identity (style + palette + font picks)
+    examples/                      # 15 worked examples with real MCP tool sequences
       example-login-screen.md      # Greenfield auth screen
       example-import-library.md    # Import .lib.pen library + instantiate components
       example-error-screen.md      # 404 + offline page pair

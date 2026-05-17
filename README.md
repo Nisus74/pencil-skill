@@ -18,8 +18,7 @@ Pencil.dev is a collaborative design tool for creating web and mobile interfaces
 - Guides the AI through a seven-step design workflow: detect host, orient, load guidelines, plan, execute, verify, report
 - Teaches all 13 Pencil MCP tools with worked invocations, cost cheatsheet, and composite recipes
 - Provides 2026 design depth: user flows, component and screen states, full accessibility coverage, and modern patterns (container queries, fluid type, AI-UI affordances)
-- Includes 25 scaffold templates (12 core + 13 optional) that users copy into their project: `tokens.md`, `components.md`, `layout.md`, `voice.md`, `navigation.md`, `forms.md`, and more
-- Ships 16 worked examples showing real MCP tool sequences from scratch
+- Ships 15 worked examples showing real MCP tool sequences from scratch
 - Includes per-platform tool-name mappings so the same skill works everywhere
 
 > **Status:** `0.8.0`, pre-release. Nothing is shipped until the owner cuts a release.
@@ -32,9 +31,9 @@ After installing this skill:
 
 - **Generate complete UI designs** from natural language ("design a dashboard") without manual tool hunting
 - **Speed up design iteration** by delegating pattern work to AI while you focus on unique decisions
-- **Maintain design consistency** across components and screens using the scaffold system
+- **Maintain design consistency** across components and screens
 - **Work cross-platform** with the same skill on Claude Code, Cursor, or Codex
-- **Customise for your team** by editing design system files that live with your code
+- **Customise the skill** for your team's workflow via folder copy or fork-and-install
 
 ---
 
@@ -143,13 +142,7 @@ The AI will handle opening files, reading your design system, generating compone
 
 ## Customising the skill
 
-There are two parts you can customise.
-
-The **design-system files** in [skills/pencil-design/assets/design-system/](skills/pencil-design/assets/design-system/) are starting points. The skill copies them into your project (typically at `docs/design/`), and you edit those copies to match your brand. They live with your code, so plugin updates don't touch them; plugin install is fine here. If you're not a developer or designer, [CUSTOMISING.md](skills/pencil-design/assets/design-system/CUSTOMISING.md) walks you through each file in plain English.
-
-The **skill content** (`SKILL.md`, the references, the worked examples) tells the AI how to work. To rewrite it for your team's workflow, pick folder copy or fork-and-install. Editing it inside a plugin install won't stick—the next update wipes it.
-
-For example: if you want the AI to use your brand's colour tokens, plugin install's enough. The AI copies `tokens.md` into your project, and you change the values there. To make the AI follow a different design workflow, you're editing `SKILL.md` itself, so pick folder copy or fork-and-install.
+The skill content (`SKILL.md`, the references, the worked examples) tells the AI how to work. To rewrite it for your team's workflow, use folder copy or fork-and-install. Editing files inside a plugin install directory won't stick — the next update overwrites them.
 
 ---
 
@@ -170,32 +163,46 @@ The substance of this project is platform-agnostic. Platform-specific files exis
 ```
 skills/pencil-design/
   SKILL.md                          # Core skill — YAML frontmatter + instructions
-  references/
+  references/                       # 50 reference files loaded on demand
     mcp-tools.md                    # Cookbook for all 13 MCP tools
+    batch-design-grammar.md         # batch_design op syntax reference
+    pen-schema.md                   # .pen file schema reference
+    pencil-cli.md                   # Full Pencil CLI reference + When CLI vs MCP table
     states.md                       # Component states + screen fault states
-    flows.md                        # Transitions between screens (modal, validation, back-stack)
+    flows.md                        # Screen transitions (modal, validation, back-stack)
     accessibility.md                # ARIA, focus, RTL, prefers-*, dynamic type
     modern-patterns.md              # Container queries, fluid type, AI-UI, perceived perf
-    pencil-cli.md                   # Full Pencil CLI reference + When CLI vs MCP table
-    pen-schema.md                   # .pen file schema reference
-    batch-design-grammar.md         # batch_design op syntax reference
-    (platform tool mappings)        # codex-tools.md, gemini-tools.md, copilot-tools.md
+    component-anatomy.md            # Reading component structure: slots, descendants, states
+    visual-hierarchy.md, layout-patterns.md, typography.md,
+    colour-palettes.md, font-pairings.md, data-viz.md, …  # Design-depth references
+    style-catalogue.md, industry-patterns.md, …           # Menu-style catalogues
+    amplify.md, pare.md, trim.md, soften.md, …            # Sub-command references
+    codex-tools.md                  # Codex tool name mappings
   assets/
-    design-system/                  # 25 scaffold templates (12 core + 13 optional)
+    design-system/                  # Optional design-system reference templates
       README.md                     # Agent loading guide
       CUSTOMISING.md                # Plain-English guide for non-technical editors
-      tokens.md, components.md, layout.md, patterns.md,
-      voice.md, navigation.md, forms.md, code-export.md, states.md, …
-    examples/                       # 16 worked examples with real MCP sequences
+      accessibility.md, empty-states.md, file-architecture.md,
+      forms.md, micro-interactions.md, navigation.md,
+      onboarding.md, search.md, visual-style.md
+    examples/                       # 15 worked examples with real MCP sequences
       example-login-screen.md
       example-dashboard.md
       example-marketing-page.md
       example-form-flow.md
-      (and 12 more)
+      (and 11 more)
+  evals/
+    evals.json
 
 AGENTS.md                           # Canonical project context (cross-platform)
-.claude-plugin/plugin.json          # Required by Claude Code's installer
-gemini-extension.json               # Required by Gemini CLI's installer
+tools/
+  skill-lint.py                     # OWASP agentic skills lint (CI + pre-commit)
+  test_skill_lint.py                # Lint unit tests
+.claude-plugin/
+  plugin.json                       # Claude Code plugin manifest
+  marketplace.json                  # Claude Code marketplace listing
+.cursor-plugin/plugin.json          # Cursor plugin manifest
+.codex-plugin/plugin.json           # Codex plugin manifest
 ```
 
 See [AGENTS.md](./AGENTS.md) for the full developer guide.

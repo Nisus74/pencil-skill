@@ -11,8 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Core skill:** Seven-step design workflow (detect host, orient, load guidelines, plan, execute, verify, report)
 - **MCP tool coverage:** All 13 Pencil MCP tools with worked invocations and composite recipes
 - **Design depth:** User flows, component and screen states, full accessibility coverage, modern patterns (container queries, fluid type, AI-UI affordances)
-- **25 scaffold templates:** 12 core + 13 optional files for design systems, design tokens, components, states, patterns, voice, motion, and more
-- **16 worked examples:** Real MCP tool sequences covering login screens, imports, forms, dashboards, marketing pages, mobile apps, and data visualisation
+- **15 worked examples:** Real MCP tool sequences covering login screens, imports, forms, dashboards, marketing pages, mobile apps, and data visualisation
 - **Cross-platform support:** Platform tool-name mappings for Claude Code, Cursor, Codex CLI, Gemini CLI, Copilot CLI
 
 ### Platform Manifests
@@ -31,10 +30,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Advanced references:** Cognitive load, heuristics scoring, delight, onboarding, extraction, industry patterns, data visualisation, style catalogue, colour palettes, font pairings, performance design, iteration patterns, iconography, microcopy, mobile patterns
 - **Platform mappings:** Codex tools, Copilot CLI tools, Gemini CLI tools
 
-### Design System Scaffolds
+### Design System Templates
 
-- **Core:** tokens, components, layout, motion, elevation, iconography, patterns, states, voice, code-export, brand, imagery, visual-style
-- **Optional:** forms, accessibility, micro-interactions, empty-states, onboarding, navigation, search, file-architecture, mobile, data-viz
+- **Optional reference templates:** `accessibility.md`, `empty-states.md`, `file-architecture.md`, `forms.md`, `micro-interactions.md`, `navigation.md`, `onboarding.md`, `search.md`, `visual-style.md`
 
 ### Documentation
 
