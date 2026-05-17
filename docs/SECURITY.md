@@ -49,14 +49,14 @@ This repo's controls against the [OWASP Agentic Skills Top 10](https://owasp.org
 |------|------|----------------------|
 | AST01 | Malicious skills | `tools/skill-lint.py` scans `SKILL.md` for shell-eval, exfiltration, and writes to identity/secret paths. Runs in pre-commit and CI. |
 | AST02 | Supply chain compromise | All GitHub Actions pinned to 40-char SHAs with version comments. `CODEOWNERS` requires maintainer review on every PR. Branch protection (manual repo setting) requires green Skill Lint and Secret Scan checks. |
-| AST03 | Over-privileged skills | `SKILL.md` frontmatter declares a `permissions:` block (`shell: none`, `network: none`, `filesystem: project-only`, explicit MCP allowlist). Lint enforces a default-deny baseline; deviations require a non-empty `allowlist-justification`. |
-| AST04 | Insecure metadata | Lint enforces required frontmatter fields, name-matches-directory, and substantive descriptions. Both platform manifests carry the same `description` and a mirrored `permissions` block; lint enforces consistency. |
+| AST03 | Over-privileged skills | `SKILL.md` frontmatter may declare a `permissions:` block for documentation. The lint function `check_permissions_block` enforces a default-deny baseline and requires `allowlist-justification` for elevated access; call it explicitly for skills that opt in to formal permission declarations. |
+| AST04 | Insecure metadata | Lint enforces required frontmatter fields, name-matches-directory, and substantive descriptions. All three platform manifests (`.claude-plugin/`, `.cursor-plugin/`, `.codex-plugin/`) must carry `name` and `description`; lint enforces this. |
 | AST05 | Unsafe deserialization | Frontmatter parsed via `yaml.safe_load`; lint rejects Python tags and non-mapping frontmatter. Manifests parsed via stdlib `json`. |
 | AST06 | Weak isolation | **N/A.** This repo ships documentation only; there is no runtime under our control. Isolation is the responsibility of the AI host. |
 | AST07 | Update drift | Same SHA-pin rule as AST02. Dependabot opens grouped weekly bumps (`github-actions`, `pip`) so pins stay current with reviewable diffs. |
 | AST08 | Poor scanning | The lint + pre-commit + CI is the scanning layer. PR template requires the contributor to confirm a green run. |
 | AST09 | No governance | `CODEOWNERS`, `SECURITY.md` (this file), `CHANGELOG.md`, semver, PR template gate, and branch protection (manual). |
-| AST10 | Cross-platform reuse | Lint runs against all four faces (`SKILL.md` frontmatter, `.claude-plugin/plugin.json`, `.cursor-plugin/plugin.json`, and `gemini-extension.json`), so a divergent compromise on one platform is caught. |
+| AST10 | Cross-platform reuse | Lint runs against all three platform manifests (`.claude-plugin/`, `.cursor-plugin/`, `.codex-plugin/`). `name` and `version` must be identical across manifests, so a stealth update on one platform is caught before it reaches CI. |
 
 ## Reporting a malicious skill update
 

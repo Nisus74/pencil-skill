@@ -1,10 +1,10 @@
 # `batch_design` op grammar
 
-`batch_design` takes a single `operations` string. Each line is one op. The server runs them top-to-bottom in order; later ops can reference ids bound earlier in the same call.
+`batch_design` takes a single `input` string. Each line is one op. The server runs them top-to-bottom in order; later ops can reference ids bound earlier in the same call.
 
 ## The five ops
 
-### `I` — Insert
+### `I`, Insert
 
 Create a child of an existing parent.
 
@@ -12,11 +12,14 @@ Create a child of an existing parent.
 foo=I("parent", { type: "frame", name: "Container", layout: "vertical", gap: "$space-4" })
 ```
 
-- `parent` is an existing node id (from `get_editor_state` / `batch_get`, or bound earlier in this call).
-- The `{ ... }` object is the new node's properties (no `id` — the server assigns one and returns it via the `foo=` binding).
+- `parent` is an existing node id (from `get_editor_state` / `batch_get`, or bound earlier in this call). Use the predefined `document` binding to insert top-level frames: `foo=I(document, { type: "frame", ... })`.
+- The `{ ... }` object is the new node's properties (no `id`, the server assigns one and returns it via the `foo=` binding).
 - `foo` is the binding name. Use it in subsequent ops as the parent id of children.
+- `layout` accepts only `"none"`, `"vertical"`, or `"horizontal"`. Default for frames is `"horizontal"`; default for groups is `"none"`. CSS flexbox words (`"flex"`, `"row"`, `"column"`, `"grid"`) are rejected and roll the call back.
+- **Placeholder discipline:** every new, copied, or modified frame must carry `placeholder: true` for the entire duration of work on it. Remove the flag per-frame with `U(id, { placeholder: false })` as each frame is complete (not at the end of the whole task). Multi-screen work: set placeholders on every frame up-front before any content goes in.
+- For `descendants` overrides inside a `ref` instance, the keys are slash-separated id paths, e.g. `descendants: { "button/icon": { iconFontName: "log-in" } }`. A descendant entry that includes `type` fully replaces that subtree; without `type`, it merges properties.
 
-### `C` — Copy
+### `C`, Copy
 
 Duplicate an existing node into a parent, with optional overrides.
 
@@ -28,7 +31,7 @@ btn2=C("PrimaryButton", "form", { x: 0, y: 80, descendants: { label: { content: 
 - Second arg: target parent id.
 - Third arg: overrides applied to the copy.
 
-### `R` — Replace
+### `R`, Replace
 
 Full property replacement on an existing node.
 
@@ -36,9 +39,9 @@ Full property replacement on an existing node.
 R("heroTitle", { type: "text", content: "Welcome back", fontSize: "$text2xl", fontWeight: "700" })
 ```
 
-- Wipes all current properties and applies the new object. Use sparingly — `U` is usually safer.
+- Wipes all current properties and applies the new object. Use sparingly, `U` is usually safer.
 
-### `U` — Update
+### `U`, Update
 
 Partial property merge on an existing node.
 
@@ -47,22 +50,24 @@ U("heroTitle", { fontSize: "$text3xl" })
 ```
 
 - Only the named properties change. Everything else stays.
+- **Updating instance descendants:** once an instance is created, override its descendants via slash-path: `U(card+"/title", { content: "Account Details" })`. The same pattern works for `R` (full replacement of the descendant). Do **not** Update the descendants of a node you just **Copied** (`C`), copy generates fresh ids for the descendants; the old paths are stale and the update fails to find them. Use the new bindings returned by the C call instead.
 
-### `G` — Generate (image)
+### `G`, Generate (image)
 
 Fill an existing image-bearing node with an AI-generated or stock image.
 
 ```
-G("hero/photo", "ai", "soft morning light through a kitchen window, photorealistic")
-G("avatar/photo", "unsplash", "smiling barista")
+G("heroBg", "ai", "soft morning light through a kitchen window, photorealistic")
+G("userAvatar", "unsplash", "smiling barista")
 ```
 
 - Mode `"ai"` calls the model image pipeline. `"unsplash"` pulls a stock photo by query.
-- Target node should already exist with type that accepts an image fill.
+- Target node must already exist and accept an image fill (frame or rectangle).
+- The node id must not contain `/`. Use actual node ids or bindings, not descendant paths.
 
 ## Two more ops you'll occasionally need
 
-### `D` — Delete
+### `D`, Delete
 
 ```
 D("legacyBanner")
@@ -70,7 +75,7 @@ D("legacyBanner")
 
 Removes the node and its descendants.
 
-### `M` — Move
+### `M`, Move
 
 ```
 M("loginButton", "form", 2)
@@ -92,7 +97,7 @@ submit=I(form, { type: "ref", ref: "ButtonPrimary", descendants: { label: { cont
 
 - Bindings are scoped to the current `batch_design` call only. They don't persist.
 - Don't reference a binding before it's been declared. Server reads top to bottom.
-- A returned binding's id can also be used after the call completes — the server reports the assigned id back in the response.
+- A returned binding's id can also be used after the call completes, the server reports the assigned id back in the response.
 
 ### The `document` predefined binding
 
@@ -133,7 +138,7 @@ These cause silent bugs or server errors if you get them wrong:
 
 ## Chunking: the ≤25-ops rule
 
-A single call should stay at or under 25 ops. Why:
+Visual work caps at **≤8 ops per `batch_design` call** so each call advances visible state by an amount the user can take in with one screenshot. Non-visual sweeps (renames, `context` backfills, metadata-only updates) may go up to ≤25 ops, no further. Why:
 
 - Larger calls have higher tail-latency.
 - Ordering bugs are harder to spot in a 60-line block.
@@ -141,10 +146,21 @@ A single call should stay at or under 25 ops. Why:
 
 For big screens, plan the order:
 
-1. **Skeleton call:** page frame + main columns + sidebar + footer. Maybe 5-10 ops.
-2. **Verify structurally** with `snapshot_layout(parentId: "<page>", maxDepth: 2)` — the geometry numbers tell you whether the skeleton landed without paying for a screenshot.
-3. **Region calls:** one per substantial region (hero, form, list). Each ≤25 ops.
+1. **Skeleton call:** page frame + main columns + sidebar + footer. Maybe 5-8 ops.
+2. **Verify structurally** with `snapshot_layout(parentId: "<page>", maxDepth: 2)`, the geometry numbers tell you whether the skeleton landed without paying for a screenshot.
+3. **Region calls:** one per substantial region (hero, form, list). Each ≤8 ops if visual, up to ≤25 ops for a non-visual sweep.
 4. **Polish call:** final tweaks, after the main structure is solid.
+
+## Hello world: the minimum first-chunk call
+
+When you start work against the Pencil MCP for the first time in a session, or after a Pencil version update, or when a `batch_design` call rolls back with a confusing message and you want to confirm the basics are still working, run this two-op probe first:
+
+```
+page=I(document, { type: "frame", name: "SmokeTest", layout: "vertical", padding: 16, gap: 8, width: 1440, height: 900, placeholder: true })
+hello=I(page, { type: "text", content: "Hello", fontSize: 24, fill: "#0F172A" })
+```
+
+In two ops it confirms: the `document` predefined binding works as a parent for inserts; `layout: "vertical"` is accepted (catches `"flex"` / `"row"` typos); `padding: 16` scalar form is accepted (catches `{ top: 16 }` object form); `text` nodes use `content` (catches `text:` / `value:` typos); `placeholder: true` is accepted on a new frame; raw hex `fill` is accepted on a text node (catches the "text has no colour by default" gotcha). If this call rolls back, the rest of the workflow will too; if it succeeds, the shape choices that matter most are confirmed before the real skeleton call. Delete with `D("<pageId>")` once you've verified.
 
 ## Common errors and their fixes
 
@@ -168,7 +184,7 @@ title=I(hero, { type: "text", content: "Welcome", fontSize: "$text3xl" })
 U(hero, { gap: "$space-4" })          // safe — `hero` is bound already
 ```
 
-When you need to copy then tweak, do both — copy reads source props as of the start of the call:
+When you need to copy then tweak, do both, copy reads source props as of the start of the call:
 
 ```
 copy=C("ButtonPrimary", "form")
@@ -182,6 +198,63 @@ D("oldHero")
 hero=I("page", { ...new shape... })
 ```
 
+## Commonly built patterns: exact anatomy
+
+Some frequently-built components are commonly built wrong, especially when the agent has absorbed a generic "bar chart" mental model from the Web App guidelines. These worked shapes override the generic defaults.
+
+### KPI sparkline (mini trend line inside a metric card)
+
+A sparkline is **not** a bar chart. Its bars are 3–4 px wide, not `fill_container`. A 60 px wide sparkline area with 12 bars at 3 px + 2 px gap uses the full width and reads as a trend indicator. A sparkline built with `fill_container` on the bars will make each bar 40–60 px wide (filling the parent) and look like a loading skeleton.
+
+```
+sparklineArea=I(kpiCard, {
+  type: "frame", name: "Sparkline",
+  context: "Mini trend, last 12 days. Each bar height encodes relative volume.",
+  layout: "horizontal", alignItems: "flex_end", gap: 2,
+  width: 60, height: 32
+})
+// Build each bar with an explicit pixel width, never fill_container.
+// Heights vary to show the trend; vary them when building real data.
+bar1=I(sparklineArea, { type: "frame", name: "Bar1", width: 3, height: 8,  fill: "$accent", cornerRadius: 1 })
+bar2=I(sparklineArea, { type: "frame", name: "Bar2", width: 3, height: 12, fill: "$accent", cornerRadius: 1 })
+bar3=I(sparklineArea, { type: "frame", name: "Bar3", width: 3, height: 10, fill: "$accent", cornerRadius: 1 })
+bar4=I(sparklineArea, { type: "frame", name: "Bar4", width: 3, height: 20, fill: "$accent", cornerRadius: 1 })
+bar5=I(sparklineArea, { type: "frame", name: "Bar5", width: 3, height: 16, fill: "$accent", cornerRadius: 1 })
+bar6=I(sparklineArea, { type: "frame", name: "Bar6", width: 3, height: 24, fill: "$accent", cornerRadius: 1 })
+bar7=I(sparklineArea, { type: "frame", name: "Bar7", width: 3, height: 18, fill: "$accent", cornerRadius: 1 })
+bar8=I(sparklineArea, { type: "frame", name: "Bar8", width: 3, height: 28, fill: "$accent", cornerRadius: 1 })
+bar9=I(sparklineArea, { type: "frame", name: "Bar9", width: 3, height: 22, fill: "$accent", cornerRadius: 1 })
+bar10=I(sparklineArea, { type: "frame", name: "Bar10", width: 3, height: 32, fill: "$accent", cornerRadius: 1 })
+```
+
+Key rules:
+- Parent: `layout: "horizontal"`, `alignItems: "flex_end"` (bars grow upward from the bottom), `gap: 2`, explicit `width`/`height` in px.
+- Each bar: explicit `width: 3` (never `fill_container`), explicit height in px representing relative magnitude, `fill: "$accent"` (no gradients unless the user's direction explicitly calls for them), `cornerRadius: 1`.
+- Vary heights across bars to show trend shape. Do not use equal heights, that's a loading bar.
+
+### KPI metric card
+
+```
+kpiCard=I(statsRow, {
+  type: "frame", name: "KPICard_TotalCalls",
+  context: "Total API calls over selected period. Populated from /v1/stats/summary. Click navigates to Requests view.",
+  layout: "vertical", gap: 8, padding: [16, 16, 12, 16],
+  width: "fill_container", height: "fit_content",
+  fill: "$surface",
+  stroke: { color: "$border", thickness: 1 },
+  cornerRadius: 8
+})
+label=I(kpiCard, { type: "text", name: "MetricLabel", content: "Total API calls", fontSize: "$textSm", fill: "$textMuted" })
+valueRow=I(kpiCard, { type: "frame", name: "ValueRow", layout: "horizontal", alignItems: "center", justifyContent: "space_between", width: "fill_container" })
+value=I(valueRow, { type: "text", name: "MetricValue", content: "24.7M", fontSize: "$text2xl", fontWeight: 600, fill: "$textPrimary", fontFamily: "Geist Mono" })
+delta=I(valueRow, { type: "text", name: "DeltaBadge", content: "+18%", fontSize: "$textXs", fill: "$success" })
+// Sparkline goes in kpiCard, not valueRow
+spark=I(kpiCard, { type: "frame", name: "Sparkline", layout: "horizontal", alignItems: "flex_end", gap: 2, width: 60, height: 24 })
+```
+
+For data-dense product surfaces: no shadow on the card. Use `stroke: { color: "$border", thickness: 1 }`. Remove any `effect: [{ type: "shadow", ... }]` if present (the type is `"shadow"`, not `"drop_shadow"`). The hairline border is the elevation signal; a shadow claims hierarchy the data card doesn't need.
+
+Server-accepted aliases: `alignItems: "flex_end"` works, and `alignItems: "end"` (the canonical schema spec value) works too. Same pattern with `stroke: { color }` and `stroke: { fill }`, both are accepted.
 ## A complete small example
 
 A login form, ~12 ops, in one call:

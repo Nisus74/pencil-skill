@@ -16,7 +16,7 @@ labels: bug
 
 ## Environment
 
-- **AI coding tool:** <!-- Claude Code / Codex / Gemini CLI / Copilot CLI / Cursor -->
+- **AI coding tool:** <!-- Claude Code / Cursor / Codex -->
 - **Tool version:** <!-- e.g., Claude Code 2.5.1 -->
 - **Model:** <!-- e.g., claude-sonnet-4-6 -->
 - **pencil-dev-skill version:** <!-- check plugin.json -->

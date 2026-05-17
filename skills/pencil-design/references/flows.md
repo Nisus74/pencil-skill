@@ -4,9 +4,9 @@ How users move between screens and how state behaves across that movement. AI-ge
 
 **What this file owns:** modal-vs-page-vs-sheet decisions, form validation timing, multi-step flows and wizards, the back-stack model, confirmations and undo, optimistic UI, real-time/presence flows, deep links, and "plausible content" — what real-shape data looks like in mocks.
 
-**What this file does NOT own:** the *layout* of any single page — that's [`patterns.md`](../assets/design-system/patterns.md) (auth flow, onboarding, settings, dashboard, list+detail). The *motion* of a transition (durations, easings) — that's [`motion.md`](../assets/design-system/motion.md). The *copy* in error/confirmation states — that's [`voice.md`](../assets/design-system/voice.md). The *mobile-specific* sheet/back-gesture conventions — that's [`mobile.md`](../assets/design-system/mobile.md).
+**What this file does NOT own:** the *layout* of any single page (auth flow, onboarding, settings, dashboard, list+detail). The *motion* of a transition (durations, easings). The *copy* in error/confirmation states. The *mobile-specific* sheet/back-gesture conventions.
 
-When you see signup, onboarding, or auth in this file, the *layout* of those pages is in `patterns.md`. This file covers what happens *between* the steps.
+This file covers what happens *between* steps — the transitions, validation events, and state changes. Layout, motion, and copy are handled in project-level documentation or the project's own design guidelines.
 
 ## When to load this file
 
@@ -56,7 +56,7 @@ Two extra patterns worth knowing:
 
 **Errors decay or persist?** Persist until the user edits the offending field. As soon as they re-enter the field and start changing it, clear the error. Don't auto-decay errors on a timer — that hides information the user needs.
 
-For the copy of error messages, see [`voice.md`](../assets/design-system/voice.md) § Error messages (the *what happened. what to do.* template).
+For copy, follow the *what happened. what to do.* template: name the problem concisely, then state the resolution action.
 
 ## Multi-step forms / wizards
 
@@ -84,7 +84,7 @@ Decisions:
 
 **Save-progress vs reset-on-leave.** Default: save progress so the user can return and pick up. Don't ask the user *"Save your progress?"* on leave — silently persist. The exception: flows with sensitive intermediate data (payment forms, KYC steps) should explicitly clear on leave.
 
-**Confirmation step (final step).** Anatomy differs from form steps — it's a summary, not an input. See [`patterns.md`](../assets/design-system/patterns.md) § Onboarding flow for the layout. The confirmation step's CTA uses a specific verb tied to the outcome: *"Create account"*, *"Place order"*, *"Submit application"*. Not *"Submit"*. Not *"Confirm"* alone.
+**Confirmation step (final step).** Anatomy differs from form steps — it's a summary, not an input. The structural pattern is: break the card shape used in earlier steps, show a resolution icon (not a form field), and use a single CTA. The confirmation step's CTA uses a specific verb tied to the outcome: *"Create account"*, *"Place order"*, *"Submit application"*. Not *"Submit"*. Not *"Confirm"* alone.
 
 **Skip non-essential steps.** Every step that isn't strictly required should have a Skip option. A flow that forces seven decisions before first use loses users. Be honest with yourself about which steps actually block and which are aspirational.
 
@@ -186,7 +186,7 @@ Use for: routine deletions (a comment, a row, an item), anything reversible. Les
 
 **Typed confirmation.** For the most consequential actions (deleting an org, dropping production data), require typing a string: *"Type 'delete acme' to confirm."* Reserve for the top tier.
 
-For copy specifics — verbs, naming the destroyed thing, length — see [`voice.md`](../assets/design-system/voice.md) § Confirmations & destructive actions.
+Copy rule: name the thing being destroyed specifically ("Delete the Acme workspace" not "Delete this item"), use present-tense actionable verbs ("Delete permanently" not "Proceed"), and keep destructive CTAs short.
 
 ## Optimistic UI
 
@@ -236,7 +236,7 @@ Place the avatar pile in the page chrome (top-right by convention), not inline. 
 
 **Activity timeline.** For products with significant edit history, a "what changed" view is its own page or sidebar — not a notification stream. Group by author, by time, by document section. Don't bombard the user with every keystroke.
 
-For motion timing of presence affordances, see [`motion.md`](../assets/design-system/motion.md) § Common applications.
+Motion rule for presence affordances: join/leave transitions should be fast (150–200ms) and unobtrusive — a fade or a brief slide. Don't animate cursor movements in real-time; sample at 100–200ms intervals or the UI becomes visually noisy.
 
 ## Plausible content
 
@@ -316,7 +316,7 @@ A back-stack and validation flow walkthrough. Three screens; user comes from set
 - Each `Edit` button on `Settings_Profile` has `context`: *"Opens `Settings_Profile_Edit` as a modal on web, full-page on mobile. URL gains `?edit=<field>`."*
 - The modal's `context` documents validation timing: *"Sync validation on Save click. Async server check during the loading state. Server failure renders inline error under the input."*
 
-For the layout shapes, see [`patterns.md`](../assets/design-system/patterns.md) § Settings page. For the motion of modal open/close and the post-save row pulse, see [`motion.md`](../assets/design-system/motion.md). For the toast copy, see [`voice.md`](../assets/design-system/voice.md).
+Layout: profile rows in a form-stack layout; each row shows label + current value + Edit button in a horizontal row. Motion: modal open/close at 200ms ease-out; post-save row pulse is a brief background-colour flash (150ms) then back to default. Toast copy: "Changes saved." — no emoji, no exclamation, present tense.
 
 ## Anti-patterns
 
@@ -333,10 +333,6 @@ These read as flow-blind designs and should be fixed in passing whenever you see
 
 ## See also
 
-- [`patterns.md`](../assets/design-system/patterns.md) — the *layout* of pages this file's flows happen across (auth, onboarding, settings, dashboard, list+detail).
-- [`motion.md`](../assets/design-system/motion.md) — durations and easings for transitions described here.
-- [`voice.md`](../assets/design-system/voice.md) — error messages, confirmation copy, microcopy lengths.
-- [`mobile.md`](../assets/design-system/mobile.md) — sheet vs modal on mobile, back gesture, keyboard handling.
 - [`states.md`](states.md) — the component states this file's flows transition between (loading, error, success).
 - [`accessibility.md`](accessibility.md) — focus management across flows, modal focus traps, keyboard navigation.
 - [`mcp-tools.md`](mcp-tools.md) — `find_empty_space_on_canvas` for placing the sibling frames a multi-step flow needs.

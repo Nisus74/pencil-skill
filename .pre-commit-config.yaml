@@ -25,7 +25,7 @@ repos:
         language: system
         pass_filenames: false
         always_run: true
-        files: '^(skills/.*/SKILL\.md|\.claude-plugin/plugin\.json|gemini-extension\.json|\.github/workflows/.*\.ya?ml)$'
+        files: '^(skills/.*/SKILL\.md|\.claude-plugin/plugin\.json|\.cursor-plugin/plugin\.json|\.codex-plugin/plugin\.json|\.github/workflows/.*\.ya?ml)$'
 
       - id: skill-lint-tests
         name: OWASP AST lint unit tests

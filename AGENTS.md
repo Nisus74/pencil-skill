@@ -1,8 +1,8 @@
 # pencil-dev-skill: Project Context
 
 This is the canonical project-context file. All AI coding tools (Claude Code, OpenAI Codex,
-Google Gemini CLI, GitHub Copilot CLI, Cursor, etc.) should read this file for project
-context. Platform-specific files (`CLAUDE.md`) are thin pointers to this file.
+Cursor, etc.) should read this file for project context. Platform-specific files (`CLAUDE.md`)
+are thin pointers to this file.
 
 ---
 
@@ -69,8 +69,6 @@ skills/pencil-design/              # The platform-agnostic core
     colour-palettes.md             # 40+ palette recipes (menu) tagged by industry/mood; recipes point to Tailwind/Radix/IBM Carbon/Material 3/Apple HIG
     font-pairings.md               # 30+ typography pairings (menu); recipes point to Google Fonts/Vercel/GitHub/commercial foundries
     codex-tools.md                 # OpenAI Codex tool name mappings
-    gemini-tools.md                # Google Gemini CLI tool name mappings
-    copilot-tools.md               # GitHub Copilot CLI tool name mappings
   assets/
     design-system/                 # 12 core + 13 optional scaffold templates: copy into any project
       README.md                    # Index + how to use
@@ -101,7 +99,6 @@ skills/pencil-design/              # The platform-agnostic core
     examples/                      # 16 worked examples with real MCP tool sequences
       example-login-screen.md      # Greenfield auth screen
       example-import-library.md    # Import .lib.pen library + instantiate components
-      example-scaffold-system.md   # Bootstrap a full design-system scaffold
       example-error-screen.md      # 404 + offline page pair
       example-form-flow.md         # Multi-step signup with email verification
       example-component-deep-dive.md # Full read→understand→instantiate cycle
@@ -118,6 +115,7 @@ skills/pencil-design/              # The platform-agnostic core
 
 # Platform install adapters (required by each platform's installer)
 .claude-plugin/plugin.json         # Claude Code plugin manifest
+.claude-plugin/marketplace.json    # Claude Code marketplace listing (single-plugin marketplace)
 .cursor-plugin/plugin.json         # Cursor plugin manifest (Cursor 2.5+)
 .codex-plugin/plugin.json          # OpenAI Codex plugin manifest
 gemini-extension.json              # Gemini CLI extension manifest
@@ -125,6 +123,7 @@ gemini-extension.json              # Gemini CLI extension manifest
 # Project context files
 AGENTS.md                          # This file — canonical, platform-agnostic
 CLAUDE.md                          # Thin pointer to AGENTS.md (for Claude Code)
+HARNESSES.md                       # Cross-platform skill capability matrix (frontmatter, directories, substitution)
 
 # Public-facing
 README.md
@@ -138,7 +137,7 @@ LICENSE
 # Quality tooling
 tools/
   skill-lint.py                    # OWASP Agentic Skills Top 10 lint (CI + pre-commit)
-  test_skill_lint.py               # 36 unit tests for skill-lint
+  test_skill_lint.py               # 40 unit tests for skill-lint
   requirements.txt                 # pip deps for Dependabot
 
 # Documentation
@@ -178,19 +177,20 @@ All platforms also accept a `SKILL.md` in their respective skills directory; fol
 
 ## Deployment and customisation
 
-The full per-platform install instructions live in [README.md](./README.md#installing). At a glance:
+The full per-platform install instructions live in [README.md](./README.md#install). At a glance:
 
 - **Plugin install** is the right default. Users editing only the design-system scaffolds are unaffected by `/plugin update`, because the skill copies those scaffolds out into the user's project (e.g. `docs/design/`).
 - **Folder copy** suits users who want to own the skill files from day one. They edit anything, fetch updates by re-downloading and merging by hand.
-- **Fork and install** suits users who want both: full edit access and an automatic update path. Install your fork as a plugin; rebase against upstream when you want changes.
+- **Fork + install** suits users who want both: full edit access and an automatic update path. Install your fork as a plugin; rebase against upstream when you want changes.
 
-Don't edit files inside a plugin install directory (e.g. `~/.claude/plugins/.../skills/pencil-design/`); the next `/plugin update` will overwrite them. The README spells this out for each path.
+Don't edit files inside a plugin install directory (e.g. `~/.claude/plugins/.../skills/pencil-design/`); the next `/plugin update` will overwrite them.
 
 ---
 
 ## Plugin System Rules
 
 - The Claude Code plugin manifest MUST live at `.claude-plugin/plugin.json`
+- The Claude Code marketplace listing MUST live at `.claude-plugin/marketplace.json`. This makes the repo installable via `/plugin marketplace add github:Nisus74/pencil-skill` followed by `/plugin install pencil-dev-skill`
 - The Cursor plugin manifest MUST live at `.cursor-plugin/plugin.json` (Cursor 2.5+)
 - The Codex plugin manifest MUST live at `.codex-plugin/plugin.json`
 - `gemini-extension.json` MUST live at the repo root (Gemini CLI requirement)
@@ -259,11 +259,13 @@ The OWASP AST compliance map lives in [docs/SECURITY.md](./docs/SECURITY.md).
 
 Follow semantic versioning. Bump the `version` field in four places, keeping them in sync: `.claude-plugin/plugin.json`, `.cursor-plugin/plugin.json`, `.codex-plugin/plugin.json`, and the `skills/pencil-design/SKILL.md` frontmatter. (`gemini-extension.json` does not declare a version field.)
 
-- **PATCH** (`0.1.x`): Content fixes, typos, clarifications
-- **MINOR** (`0.x.0`): New capability documented, new trigger phrases added
+When a release is authorised, bump the `version` field in four places, keeping them in sync: `.claude-plugin/plugin.json`, `.claude-plugin/marketplace.json` (inside the `plugins[]` entry), `.cursor-plugin/plugin.json`, and `.codex-plugin/plugin.json`. Follow semantic versioning:
+
+- **PATCH** (`0.x.y`): Content fixes, typos, clarifications
+- **MINOR** (`0.y.0`): New capability documented, new trigger phrases added
 - **MAJOR** (`x.0.0`): Breaking restructuring of the skill workflow
 
-After bumping, add an entry to `docs/CHANGELOG.md`.
+After bumping, replace the `[Unreleased]` heading in `docs/CHANGELOG.md` with the new version and date.
 
 ---
 
@@ -299,3 +301,4 @@ codex plugin install github:Nisus74/pencil-skill
 
 - GitHub repo: https://github.com/Nisus74/pencil-skill
 - pencil.dev: https://pencil.dev
+- [HARNESSES.md](./HARNESSES.md): cross-platform skill capability matrix (frontmatter support, directory conventions, substitution syntax) — consult when adding a new platform manifest or auditing existing ones

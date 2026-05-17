@@ -4,19 +4,11 @@ A worked walkthrough of the seven-step workflow for the prompt:
 
 > *"Design a signup flow with email + password, then email verification, then a welcome confirmation page."*
 
-Assume: Pencil desktop running, no `.pen` open, repo has a `design-system/` folder with `tokens.md`, `voice.md`, `patterns.md`, `states.md`, and a `design/system.lib.pen` library that includes `Input`, `ButtonPrimary`, `LinkText`.
-
-This example exercises:
-
-- Three sibling top-level frames at desktop breakpoint (1440×900), one per step.
-- Validation states via `descendants` overrides on the `Input` ref (the focused-with-error edge case).
-- `find_empty_space_on_canvas` to place the three frames neatly side-by-side.
-- A confirmation step with a different lockup than steps 1–2.
-- Cross-references: [`references/flows.md`](../../references/flows.md) for back-stack, validation timing, and confirmation anatomy; [`assets/design-system/patterns.md`](../design-system/patterns.md) § Auth flow / § Onboarding flow for the layout shapes; [`assets/design-system/voice.md`](../design-system/voice.md) for copy.
+Assume: Pencil desktop running, no `.pen` open, the project has a `design/system.lib.pen` library that includes `Input`, `ButtonPrimary`, `LinkText`, `Checkbox`.
 
 ---
 
-## Step 1 — Detect host
+## Step 1: Detect host
 
 ```
 get_editor_state({ include_schema: false })
@@ -24,23 +16,15 @@ get_editor_state({ include_schema: false })
 
 Result: succeeds. No active document.
 
-## Step 2 — Locate context
+## Step 2: Understand aesthetic direction
 
-- No `.pen` open.
-- No selection.
-- `design-system/` exists with the relevant files.
+No explicit direction given. This is a signup conversion flow, so the design should feel like a utility auth screen, not a marketing page. Load `references/flows.md` before planning — it owns validation timing, back-stack model, and multi-step confirmation anatomy.
 
-## Step 3 — Load guidelines + inventory components
+Announced direction: *"utility auth card: centred form, hairline border, no shadow, dot stepper (not numbered), specific CTAs. The welcome page breaks the card pattern to signal completion."*
 
-Read `design-system/README.md`, then:
+## Step 3: Load guidelines + inventory components
 
-- `design-system/patterns.md` — § Auth flow gives the centered-card shape; § Onboarding flow gives the wizard shape with progress indicator (the welcome step rhymes with the onboarding-confirmation page).
-- `design-system/voice.md` — § Error messages (the *what happened. what to do.* shape) and § Buttons & CTAs (specific verbs).
-- `design-system/states.md` — confirms `Input` requires error and loading variants.
-
-The skill's [`references/flows.md`](../../references/flows.md) is the playbook for validation timing, back-stack across the three screens, and confirmation-step anatomy. [`references/states.md`](../../references/states.md) covers the focus-with-error edge case I'll need on the password field.
-
-Call `get_guidelines()` to confirm the live category list, then load `Web App`.
+Call `get_guidelines()`, then load `Web App`.
 
 Inventory the library:
 
@@ -48,92 +32,88 @@ Inventory the library:
 batch_get({ filePath: "./design/system.lib.pen", patterns: [{ reusable: true }], readDepth: 2 })
 ```
 
-Library contains `Input`, `ButtonPrimary`, `ButtonSecondary`, `LinkText`. The `Input` component declares `default`, `hover`, `focus`, `error`, and `success` variants — confirmed by inspecting its `descendants`.
+Components: `Input`, `ButtonPrimary`, `ButtonSecondary`, `LinkText`, `Checkbox`. The `Input` component declares `default`, `hover`, `focus`, `error`, and `success` variants.
 
-## Step 4 — Plan (told to user)
+## Step 4: Plan
 
-> *"I'll create three sibling top-level frames at desktop breakpoint (1440×900): `Signup_Step1_Email`, `Signup_Step2_Verify`, and `Signup_Step3_Welcome`. Step 1 is the auth-card shape from your patterns — email + password + ToS checkbox + Continue button, with a stepper showing 1-of-3 at the top. I'll show the email field's error state on the canvas (focused with a 'looks already taken' message) so the design covers validation. Step 2 is a slimmer card with a 6-digit verification code input (six narrow boxes), the user's email, and a Resend link. Step 3 is a different lockup — closer to your onboarding confirmation pattern: large checkmark icon, *'You're in.'* headline, *'Go to dashboard'* CTA. All three pages share a stepper at the top. Components: `Input` (instances of the email and password from your library), `ButtonPrimary`, `LinkText` for *'Resend'* and *'Already have an account?'*. Theme-aware via your existing variables."*
+> *"I'll create three sibling top-level frames at 1440×900: `Signup_Step1_Email`, `Signup_Step2_Verify`, `Signup_Step3_Welcome`. Step 1 is a centred auth card with email + password fields, a dot stepper showing 1-of-3, and the email field in error state on the canvas. Step 2 is a slimmer card with a 6-digit code input. Step 3 breaks the card shape entirely: icon, title, single CTA, no card wrapper. Direction: utility auth register — hairline borders, no shadows, dot steppers not numbered."*
 
-## Step 4.5 — Open the document
-
-Since no `.pen` is open:
+## Step 4.5: Open document
 
 ```
 open_document({ path: "new" })
 ```
 
-Note the document root id — call it `doc`. Declare the `mode` theme axis up front, then add the library import:
+Note the document root id; call it `doc`. Declare the mode axis and library import:
 
 ```
 U("doc", { themes: { mode: ["light", "dark"] } })
 U("doc", { imports: { "ds": "./design/system.lib.pen" } })
 ```
 
-## Step 4.7 — Place the three frames
+## Step 4.7: Place the three frames
 
-Three frames side-by-side need ~3 × 1440 + gaps = 4400+ pixels of horizontal canvas. Pick anchors:
+Three frames at 1440px need ~4400px of horizontal canvas. Pick anchor coordinates:
 
 ```
 find_empty_space_on_canvas({ width: 1440, height: 900, padding: 80, direction: "right" })
 ```
 
-Returns `(x1, y1)`. The other two frames will be at `(x1 + 1520, y1)` and `(x1 + 3040, y1)` — 1440 wide each plus a 80px gutter between, since the frames represent sequential steps the engineer can scrub.
+Returns `(x1, y1)`. The other two frames go at `(x1 + 1520, y1)` and `(x1 + 3040, y1)`: 1440px each with an 80px gutter between, so the engineer can scrub the sequence left-to-right.
 
-## Step 5a — First batch_design (Step 1: Email + Password)
+## Step 5a: First batch_design (Step 1: email + password)
 
 ```
-page1=I("doc", { type: "frame", name: "Signup_Step1_Email", layout: "vertical", justifyContent: "center", alignItems: "center", x: <x1>, y: <y1>, width: 1440, height: 900, padding: "$space-8", fill: [{ type: "solid_color", color: "$surface" }] })
-stepper=I(page1, { type: "frame", name: "Stepper", layout: "horizontal", gap: "$space-2", padding: "$space-4", alignItems: "center" })
-step1Dot=I(stepper, { type: "ellipse", name: "Step1Dot", width: 8, height: 8, fill: [{ type: "solid_color", color: "$primary" }] })
-step1Bar=I(stepper, { type: "rectangle", name: "Step1Bar", width: 32, height: 2, fill: [{ type: "solid_color", color: "$primary" }] })
-step2Dot=I(stepper, { type: "ellipse", name: "Step2Dot", width: 8, height: 8, fill: [{ type: "solid_color", color: "$border" }] })
-step2Bar=I(stepper, { type: "rectangle", name: "Step2Bar", width: 32, height: 2, fill: [{ type: "solid_color", color: "$border" }] })
-step3Dot=I(stepper, { type: "ellipse", name: "Step3Dot", width: 8, height: 8, fill: [{ type: "solid_color", color: "$border" }] })
-card=I(page1, { type: "frame", name: "AuthCard", layout: "vertical", gap: "$space-4", padding: "$space-8", width: 400, cornerRadius: "$radiusLg", fill: [{ type: "solid_color", color: "$surfaceMuted" }], stroke: { thickness: 1, fill: "$border" } })
-title=I(card, { type: "text", name: "Title", text: "Create your account", fontSize: "$text2xl", fontWeight: 700 })
-sub=I(card, { type: "text", name: "Subtitle", text: "Step 1 of 3 — your details.", fontSize: "$textBase", fill: [{ type: "solid_color", color: "$textMuted" }] })
-email=I(card, { type: "ref", ref: "Input", descendants: { label: { text: "Email" }, input: { placeholder: "you@example.com", value: "alex@startup.io" }, error: { text: "That email is already registered. Try signing in instead." } }, theme: { state: "error" } })
-pwd=I(card, { type: "ref", ref: "Input", descendants: { label: { text: "Password" }, input: { type: "password", placeholder: "8+ characters" }, helperText: { text: "Mix letters, numbers, and a symbol." } } })
+page1=I("doc", { type: "frame", name: "Signup_Step1_Email", layout: "vertical", justifyContent: "center", alignItems: "center", x: <x1>, y: <y1>, width: 1440, height: 900, padding: "$space-8", fill: [{ type: "color", color: "$surface" }] })
+stepper=I(page1, { type: "frame", name: "Stepper", layout: "horizontal", gap: "$space-2", padding: "$space-4", alignItems: "center", width: "fit_content" })
+step1Dot=I(stepper, { type: "ellipse", name: "Step1Dot", width: 8, height: 8, fill: [{ type: "color", color: "$primary" }] })
+step1Bar=I(stepper, { type: "rectangle", name: "Step1Bar", width: 32, height: 2, fill: [{ type: "color", color: "$primary" }] })
+step2Dot=I(stepper, { type: "ellipse", name: "Step2Dot", width: 8, height: 8, fill: [{ type: "color", color: "$border" }] })
+step2Bar=I(stepper, { type: "rectangle", name: "Step2Bar", width: 32, height: 2, fill: [{ type: "color", color: "$border" }] })
+step3Dot=I(stepper, { type: "ellipse", name: "Step3Dot", width: 8, height: 8, fill: [{ type: "color", color: "$border" }] })
+card=I(page1, { type: "frame", name: "AuthCard", layout: "vertical", gap: "$space-4", padding: "$space-8", width: 400, cornerRadius: "$radiusLg", fill: [{ type: "color", color: "$surfaceMuted" }], stroke: { thickness: 1, fill: "$border" } })
+title=I(card, { type: "text", name: "Title", content: "Create your account", fontSize: "$text2xl", fontWeight: 700 })
+sub=I(card, { type: "text", name: "Subtitle", content: "Step 1 of 3: your details.", fontSize: "$textBase", fill: [{ type: "color", color: "$textMuted" }] })
+email=I(card, { type: "ref", ref: "Input", descendants: { label: { content: "Email" }, input: { placeholder: "you@example.com", value: "alex@startup.io" }, error: { content: "That email is already registered. Try signing in instead." } }, theme: { state: "error" } })
+pwd=I(card, { type: "ref", ref: "Input", descendants: { label: { content: "Password" }, input: { type: "password", placeholder: "8+ characters" }, helperText: { content: "Mix letters, numbers, and a symbol." } } })
 tos=I(card, { type: "frame", name: "ToS", layout: "horizontal", gap: "$space-2", alignItems: "start" })
-tosCheckbox=I(tos, { type: "ref", ref: "Checkbox", descendants: { label: { text: "I agree to the Terms and Privacy Policy." } } })
-continue=I(card, { type: "ref", ref: "ButtonPrimary", descendants: { label: { text: "Continue" } } })
-signinLink=I(card, { type: "ref", ref: "LinkText", descendants: { label: { text: "Already have an account? Sign in" } } })
+tosCheckbox=I(tos, { type: "ref", ref: "Checkbox", descendants: { label: { content: "I agree to the Terms and Privacy Policy." } } })
+continue=I(card, { type: "ref", ref: "ButtonPrimary", descendants: { label: { content: "Continue" } } })
+signinLink=I(card, { type: "ref", ref: "LinkText", descendants: { label: { content: "Already have an account? Sign in" } } })
 ```
 
-15 ops. Note:
+15 ops.
 
-- The `email` field is shown in its **error state** — the SKILL.md aesthetic-defaults discipline (and `references/states.md`'s "screenshot the worst state" guidance) says the error-paired-with-focus is what the design needs to verify, not a clean default.
-- The error message uses the `voice.md` two-part template (*what happened. what to do.*).
-- The `Continue` button's verb is specific (`Continue`, not `Submit`).
-- The TOS checkbox text starts with *"I agree"* — clear consent language.
-
-## Step 6a — Verify structure (Step 1)
+## Step 6a: Screenshot and verify structure (Step 1)
 
 ```
 snapshot_layout({ parentId: "page1", maxDepth: 3 })
+get_screenshot({ nodeId: "page1" })
 ```
 
-Check: stepper is centered above the card. Card width 400, internal gap 16. Email field's error state has the inline message visible (not collapsed). Password field has helper text. Total card height fits within 900-pixel viewport with vertical centering.
+Narrate:
 
-If the stepper is off-center (often: it's left-anchored because the parent's `justifyContent` only applies on the main axis), fix structurally:
+> *"Step 1 is on canvas. Direction match: centred auth card with dot stepper above, hairline border visible, no shadow. Non-obvious decision: dots, not numbers. Numbers suggest a menu the user can jump between; dots read as a one-way tunnel. On a signup flow, users don't navigate backwards by choice. The generic default is a numbered pill stepper (1, 2, 3 with circles), which reads as a wizard menu. The dot-plus-bar shape reads as progress. The email field is showing error state correctly with inline message. No AI-default drift to fix."*
 
-```
-U("stepper", { width: "fit_content" })   // stepper hugs its content; parent's alignItems: center now centers it horizontally
-```
-
-## Step 5b — Second batch_design (Step 2: Verify code)
+If the stepper is off-centre, fix structurally:
 
 ```
-page2=I("doc", { type: "frame", name: "Signup_Step2_Verify", layout: "vertical", justifyContent: "center", alignItems: "center", x: <x1 + 1520>, y: <y1>, width: 1440, height: 900, padding: "$space-8", fill: [{ type: "solid_color", color: "$surface" }] })
-stepper2=I(page2, { type: "frame", name: "Stepper", layout: "horizontal", gap: "$space-2", padding: "$space-4", alignItems: "center", width: "fit_content" })
-s2dot1=I(stepper2, { type: "ellipse", name: "Step1Dot", width: 8, height: 8, fill: [{ type: "solid_color", color: "$primary" }] })
-s2bar1=I(stepper2, { type: "rectangle", name: "Step1Bar", width: 32, height: 2, fill: [{ type: "solid_color", color: "$primary" }] })
-s2dot2=I(stepper2, { type: "ellipse", name: "Step2Dot", width: 8, height: 8, fill: [{ type: "solid_color", color: "$primary" }] })
-s2bar2=I(stepper2, { type: "rectangle", name: "Step2Bar", width: 32, height: 2, fill: [{ type: "solid_color", color: "$border" }] })
-s2dot3=I(stepper2, { type: "ellipse", name: "Step3Dot", width: 8, height: 8, fill: [{ type: "solid_color", color: "$border" }] })
-card2=I(page2, { type: "frame", name: "AuthCard", layout: "vertical", gap: "$space-4", padding: "$space-8", width: 400, cornerRadius: "$radiusLg", fill: [{ type: "solid_color", color: "$surfaceMuted" }], stroke: { thickness: 1, fill: "$border" } })
-title2=I(card2, { type: "text", name: "Title", text: "Check your email", fontSize: "$text2xl", fontWeight: 700 })
-sub2=I(card2, { type: "text", name: "Subtitle", text: "We sent a 6-digit code to alex@startup.io.", fontSize: "$textBase", fill: [{ type: "solid_color", color: "$textMuted" }] })
+U("stepper", { alignSelf: "center" })
+```
+
+## Step 5b: Second batch_design (Step 2: verify code)
+
+```
+page2=I("doc", { type: "frame", name: "Signup_Step2_Verify", layout: "vertical", justifyContent: "center", alignItems: "center", x: <x1 + 1520>, y: <y1>, width: 1440, height: 900, padding: "$space-8", fill: [{ type: "color", color: "$surface" }] })
+stepper2=I(page2, { type: "frame", name: "Stepper", layout: "horizontal", gap: "$space-2", padding: "$space-4", alignItems: "center", width: "fit_content", alignSelf: "center" })
+s2dot1=I(stepper2, { type: "ellipse", name: "Step1Dot", width: 8, height: 8, fill: [{ type: "color", color: "$primary" }] })
+s2bar1=I(stepper2, { type: "rectangle", name: "Step1Bar", width: 32, height: 2, fill: [{ type: "color", color: "$primary" }] })
+s2dot2=I(stepper2, { type: "ellipse", name: "Step2Dot", width: 8, height: 8, fill: [{ type: "color", color: "$primary" }] })
+s2bar2=I(stepper2, { type: "rectangle", name: "Step2Bar", width: 32, height: 2, fill: [{ type: "color", color: "$border" }] })
+s2dot3=I(stepper2, { type: "ellipse", name: "Step3Dot", width: 8, height: 8, fill: [{ type: "color", color: "$border" }] })
+card2=I(page2, { type: "frame", name: "AuthCard", layout: "vertical", gap: "$space-4", padding: "$space-8", width: 400, cornerRadius: "$radiusLg", fill: [{ type: "color", color: "$surfaceMuted" }], stroke: { thickness: 1, fill: "$border" } })
+title2=I(card2, { type: "text", name: "Title", content: "Check your email", fontSize: "$text2xl", fontWeight: 700 })
+sub2=I(card2, { type: "text", name: "Subtitle", content: "We sent a 6-digit code to alex@startup.io.", fontSize: "$textBase", fill: [{ type: "color", color: "$textMuted" }] })
 codeRow=I(card2, { type: "frame", name: "CodeRow", layout: "horizontal", gap: "$space-2", justifyContent: "center" })
 d1=I(codeRow, { type: "frame", name: "Digit1", width: 48, height: 56, cornerRadius: "$radiusMd", stroke: { thickness: 1, fill: "$border" } })
 d2=I(codeRow, { type: "frame", name: "Digit2", width: 48, height: 56, cornerRadius: "$radiusMd", stroke: { thickness: 1, fill: "$border" } })
@@ -141,46 +121,46 @@ d3=I(codeRow, { type: "frame", name: "Digit3", width: 48, height: 56, cornerRadi
 d4=I(codeRow, { type: "frame", name: "Digit4", width: 48, height: 56, cornerRadius: "$radiusMd", stroke: { thickness: 1, fill: "$border" } })
 d5=I(codeRow, { type: "frame", name: "Digit5", width: 48, height: 56, cornerRadius: "$radiusMd", stroke: { thickness: 1, fill: "$border" } })
 d6=I(codeRow, { type: "frame", name: "Digit6", width: 48, height: 56, cornerRadius: "$radiusMd", stroke: { thickness: 1, fill: "$border" } })
-verify=I(card2, { type: "ref", ref: "ButtonPrimary", descendants: { label: { text: "Verify email" } } })
-resend=I(card2, { type: "ref", ref: "LinkText", descendants: { label: { text: "Resend code" } } })
+verify=I(card2, { type: "ref", ref: "ButtonPrimary", descendants: { label: { content: "Verify email" } } })
+resend=I(card2, { type: "ref", ref: "LinkText", descendants: { label: { content: "Resend code" } } })
 ```
 
-19 ops. The 6-digit code input is custom — six small frames in a horizontal row. The component library doesn't have a `CodeInput` yet; this is a candidate to surface for the library at the end of the task.
-
-## Step 6b — Verify structure (Step 2)
+19 ops. The 6-digit code input is custom: the library doesn't have a `CodeInput` yet. Surface this at the end as a library candidate.
 
 ```
-snapshot_layout({ parentId: "page2", maxDepth: 3 })
+get_screenshot({ nodeId: "page2" })
 ```
 
-Check: code row is centered, six 48×56 cells with 8px gaps total ~56px height + 5×8px = 328px wide. Card holds together at 400px width.
+Narrate:
 
-## Step 5c — Third batch_design (Step 3: Welcome)
+> *"Step 2 on canvas. The email address ('alex@startup.io') appears in the subtitle, making the verification step concrete and personal. Non-obvious decision: the user's specific email in the subtitle, not the generic 'Check your inbox'. Users who check multiple accounts on the same device need to know which inbox to look at. The code cells are 48×56px, taller than wide, so they read as digit slots not general inputs."*
 
-The confirmation page is structurally different. Larger icon, no stepper indicator (or a fully-completed stepper for visual closure), single primary action.
+## Step 5c: Third batch_design (Step 3: welcome)
 
-```
-page3=I("doc", { type: "frame", name: "Signup_Step3_Welcome", layout: "vertical", justifyContent: "center", alignItems: "center", x: <x1 + 3040>, y: <y1>, width: 1440, height: 900, padding: "$space-8", fill: [{ type: "solid_color", color: "$surface" }] })
-welcomeBlock=I(page3, { type: "frame", name: "WelcomeBlock", layout: "vertical", justifyContent: "center", alignItems: "center", gap: "$space-5", padding: "$space-8", width: 480 })
-checkIcon=I(welcomeBlock, { type: "icon_font", name: "CheckIcon", iconName: "check-circle", iconLibrary: "lucide", fontSize: 64, fill: [{ type: "solid_color", color: "$success" }] })
-welcomeTitle=I(welcomeBlock, { type: "text", name: "Title", text: "You're in.", fontSize: "$text3xl", fontWeight: 700, textAlign: "center" })
-welcomeSub=I(welcomeBlock, { type: "text", name: "Subtitle", text: "We've set up your workspace. Head over and create your first project.", fontSize: "$textBase", textAlign: "center", fill: [{ type: "solid_color", color: "$textMuted" }] })
-goCta=I(welcomeBlock, { type: "ref", ref: "ButtonPrimary", descendants: { label: { text: "Go to dashboard" } } })
-```
-
-6 ops. Confirmation copy is concise — *"You're in."* is the lead, the subtitle is one sentence, the CTA is a specific verb (*"Go to dashboard"*). No filler hero copy, no fabricated metrics, no AI clichés.
-
-## Step 6c — Verify structure (Step 3)
+The confirmation page is structurally different. No card wrapper, larger icon, single action.
 
 ```
-snapshot_layout({ parentId: "page3", maxDepth: 2 })
+page3=I("doc", { type: "frame", name: "Signup_Step3_Welcome", layout: "vertical", justifyContent: "center", alignItems: "center", x: <x1 + 3040>, y: <y1>, width: 1440, height: 900, padding: "$space-8", fill: [{ type: "color", color: "$surface" }] })
+welcomeBlock=I(page3, { type: "frame", name: "WelcomeBlock", layout: "vertical", justifyContent: "center", alignItems: "center", gap: "$space-5", padding: "$space-8", width: 480, fill: "transparent" })
+checkIcon=I(welcomeBlock, { type: "icon_font", name: "CheckIcon", iconFontName: "circle-check", iconFontFamily: "lucide", width: 64, height: 64, fill: [{ type: "color", color: "$success" }] })
+welcomeTitle=I(welcomeBlock, { type: "text", name: "Title", content: "You're in.", fontSize: "$text3xl", fontWeight: 700, textAlign: "center" })
+welcomeSub=I(welcomeBlock, { type: "text", name: "Subtitle", content: "We've set up your workspace. Head over and create your first project.", fontSize: "$textBase", textAlign: "center", fill: [{ type: "color", color: "$textMuted" }] })
+goCta=I(welcomeBlock, { type: "ref", ref: "ButtonPrimary", descendants: { label: { content: "Go to dashboard" } } })
 ```
 
-Check: welcome block centered, icon-title-subtitle-CTA in vertical rhythm with `$space-5` (24px) gaps. CTA width matches its content (the `ButtonPrimary` component's default sizing).
+6 ops.
 
-## Step 7 — Final visual sign-off
+```
+get_screenshot({ nodeId: "page3" })
+```
 
-Three pages, three screenshots. Each scoped to its page, never the doc root:
+Narrate:
+
+> *"Step 3 on canvas. Three non-obvious decisions. First: no card wrapper on WelcomeBlock. A card shape would make this read as another form step; the bare vertical layout says the form is over. Second: the icon is `$success` (green), not `$primary` (brand colour). `$primary` is an interactive affordance colour; using it on a static confirmation icon makes it read like a button. `$success` marks achieved state. Third: title is `$text3xl` not `$text2xl`. The welcome moment earns a larger heading — form steps use utility scale, the resolution moment uses slightly more."*
+
+## Step 7: Final visual sign-off
+
+Three pages, three screenshots:
 
 ```
 get_screenshot({ nodeId: "page1" })
@@ -190,30 +170,31 @@ get_screenshot({ nodeId: "page3" })
 
 Verify per page:
 
-- **Page 1.** Stepper renders (1-of-3 highlighted). Email field shows error-state styling — red border, alert-circle icon, the error message *"That email is already registered. Try signing in instead."* below the input. Password field renders cleanly with helper text. Continue button uses `$primary`. ToS checkbox legible. Sign-in link at bottom.
-- **Page 2.** Stepper shows 2-of-3. Email reference (*"alex@startup.io"*) is visible in the subtitle. Six code-input cells render with consistent borders. Verify button uses `$primary`. Resend link is present.
-- **Page 3.** Different lockup — larger icon (`check-circle` in `$success`), `$text3xl` headline, single subtitle, single primary CTA. Reads as completion, not as another form step.
+- **Page 1.** Dot stepper renders with 1-of-3 highlighted. Email field shows error-state styling with inline message. Password field has helper text. Continue button correct. ToS checkbox legible.
+- **Page 2.** Stepper shows 2-of-3 complete. Email address visible in subtitle. Six code cells at 48×56px with consistent borders.
+- **Page 3.** No card frame visible. Icon-title-subtitle-CTA centred on plain surface. Check icon in `$success`. Title at `$text3xl`. Single CTA "Go to dashboard".
 
-Three screenshots total — one per page.
-
-## Step 8 — Surface candidates and notes
+## Step 8: Surface candidates and notes
 
 Two notes for the user:
 
-1. **`CodeInput` is a candidate library component.** The six-digit code row in Step 2 is six manual frames — fine for a one-off, but a real product uses this on email verify, 2FA, and probably a few other flows. Surface it: *"The 6-digit code input on Step 2 is currently composed from primitives. Want me to promote it to your `.lib.pen` as `CodeInput` so other auth flows can use it?"*
-2. **Validation timing decisions belong in `flows.md`.** Document the intended timing in the email field's `context`: *"Async unique-email check fires on blur with 400ms debounce. Error decays when user re-edits the field. Submit-time also catches server-side conflicts."* The engineer reads this and ships matching behavior.
+1. **`CodeInput` is a library candidate.** The six-digit code row is six manual frames. It will appear again in 2FA and other verification flows. Surface it: *"The 6-digit code input on Step 2 is currently built from primitives. Want me to promote it to your `.lib.pen` as `CodeInput`?"*
+2. **Validation timing belongs in context.** Document the email field's intended async behaviour in the node's `context` property: *"Unique-email check fires on blur with 400ms debounce. Error decays when user re-edits the field."* The engineer reads this and ships matching behaviour.
 
 ## Final report to user
 
-> *"Done. Three sibling pages — `Signup_Step1_Email`, `Signup_Step2_Verify`, `Signup_Step3_Welcome` — placed side-by-side in empty canvas at desktop dimensions. Step 1 shows an auth-card with email (error state visible — *'already registered'*) and password fields, ToS checkbox, Continue CTA, and a stepper at top showing 1-of-3 progress. Step 2 is a slimmer verification card with 6 code-input cells, Verify CTA, and a Resend link. Step 3 is the welcome confirmation — larger check icon, *'You're in.'* headline, single CTA. All bound to your existing `tokens.md` variables and `mode` theme axis. Verified structurally with `snapshot_layout` per page, then one screenshot per page for sign-off. Two notes: the 6-digit `CodeInput` is a library candidate, and the email field's async-validation timing is documented in its `context` for the engineer."*
+> *"Done. Three sibling pages at 1440×900 placed side by side. Step 1 is an auth card with email in error state, password, ToS checkbox, Continue CTA, and a dot stepper showing 1-of-3. Step 2 is a verification card with 6 code cells and a Resend link. Step 3 breaks the card pattern: icon, 'You're in.', subtitle, single CTA. No card wrapper on Step 3; that structural break signals completion. All bound to token variables and mode axis. `CodeInput` and validation timing are flagged for follow-up."*
+
+---
 
 ## What this example demonstrates
 
-- **Three sibling top-level frames** placed side-by-side with `find_empty_space_on_canvas` — the canonical pattern for visualizing a multi-step flow.
-- **Showing error state on the canvas**, not the default state — per `references/states.md` "screenshot the worst state" rule.
-- **Specific verbs everywhere** (*Continue*, *Verify email*, *Resend code*, *Go to dashboard*) — never generic *Submit* / *OK* / *Confirm*.
-- **A confirmation step with a different lockup** than the form steps — the welcome page rhymes with the onboarding-confirmation in `patterns.md`, not the auth-card.
-- **Surfacing library candidates** without promoting unilaterally.
-- **Cross-referencing the right files**: `flows.md` for validation timing and back-stack, `patterns.md` for the auth-card and confirmation lockups, `voice.md` for copy, `states.md` for the error-with-focus edge case. Don't restate them; link.
+- **The completion page breaks the form card pattern.** Pages 1 and 2 use the auth-card shape. Page 3 does not. The structural break at page 3 signals that the flow is complete. A card on the welcome page would look like another step.
 
-For the back-stack model across the three steps, see [`references/flows.md`](../../references/flows.md) § Back-stack & navigation model. For the auth-card layout shape, see [`assets/design-system/patterns.md`](../design-system/patterns.md) § Auth flow. For the worst-state-screenshot guidance, see [`references/states.md`](../../references/states.md) § Verification.
+- **Dot stepper, not a numbered stepper.** Numbers suggest a choosable menu; dots read as a one-way sequence. On a signup flow, the user isn't navigating, they're progressing. The dot-plus-bar shape encodes that distinction.
+
+- **Error state on the canvas, not the default state.** Showing the email field's error state on page 1 forces the design to answer: what does error handling look like? A default-only design leaves that question for the engineer. See `references/states.md` for the "screenshot the worst state" rule.
+
+- **Icon colour: `$success` not `$primary`.** On the welcome page, `$primary` is an interactive affordance colour. Using it on a static confirmation icon makes it read as a button. `$success` marks achieved state without claiming interactivity.
+
+- **Specific verbs everywhere.** "Continue", "Verify email", "Resend code", "Go to dashboard"; never "Submit", "OK", "Confirm". Each verb names what happens next.

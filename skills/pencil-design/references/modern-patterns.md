@@ -248,7 +248,7 @@ Several patterns where the perceived speed of an interaction matters more than t
 
 **Skeleton screens.**
 
-Restated from [`states.md`](states.md): a placeholder shape that approximates the loading content's dimensions, with a 1.4s shimmer per [`motion.md`](../assets/design-system/motion.md). The pattern is a 2026 default — don't ship a centered spinner for initial-page loads on any product surface that isn't trivially fast.
+Restated from [`states.md`](states.md): a placeholder shape that approximates the loading content's dimensions, with a 1.4s shimmer animation. The pattern is a 2026 default — don't ship a centred spinner for initial-page loads on any product surface that isn't trivially fast.
 
 **Optimistic UI.**
 
@@ -264,7 +264,7 @@ For images that take a few hundred ms to load, a low-quality preview placeholder
 
 In Pencil, document the LQIP intent on image nodes: *"Uses LQIP — blurred preview shown until full image loads."* The engineer ships the runtime.
 
-For `imagery.md` specifics — preferred treatment, aspect ratios, AI-imagery rules — see [`imagery.md`](../assets/design-system/imagery.md) (if scaffolded).
+Document imagery treatment decisions in the project's image guidelines or as `context` on image node placeholders in the design.
 
 **Staggered content reveal.**
 
@@ -304,11 +304,11 @@ A dark mode that's literally `invert(100%)` of the light mode reads cheap. Real 
 - Use higher contrast for fine details. Hairline borders that read as 1px in light mode often need to be slightly stronger in dark mode.
 - Use slightly warmer surfaces. Pure dark gray is cold; a slight blue or warm undertone (not chosen randomly — chosen per brand) adds depth.
 
-For shadow alternatives in dark mode (since shadows don't read as well), see [`elevation.md`](../assets/design-system/elevation.md). The pattern is to substitute a 1px border or a subtle inner glow for what would be a drop shadow in light mode.
+For shadow alternatives in dark mode: substitute a 1px border or a subtle inner glow for what would be a drop shadow in light mode. Shadows are created by light; in a dark-mode surface they don't read.
 
 **Brand color anchors.**
 
-A brand element (logo, accent button) often needs adjustment between modes. The brand isn't necessarily one color — it's *a feeling* the brand wants to evoke. In dark mode that might require a different hue or saturation than the literal Pantone. Document explicitly in [`brand.md`](../assets/design-system/brand.md) (if scaffolded) or `tokens.md`.
+A brand element (logo, accent button) often needs adjustment between modes. The brand isn't necessarily one color — it's a feeling the brand wants to evoke. In dark mode that might require a different hue or saturation than the literal Pantone. Document the dark-mode anchor explicitly in your token suite so future editors don't guess.
 
 ## Real-time / presence
 
@@ -358,9 +358,4 @@ Patterns the model reaches for unprompted that read as already-aged:
 - [`states.md`](states.md) — skeleton screens, loading taxonomy, optimistic-pending visuals.
 - [`flows.md`](flows.md) — full real-time, optimistic UI, validation timing detail.
 - [`accessibility.md`](accessibility.md) — `prefers-*`, RTL, dynamic type, HCM.
-- [`motion.md`](../assets/design-system/motion.md) — durations, easings, skeleton shimmer.
-- [`tokens.md`](../assets/design-system/tokens.md) — fluid type token shape, brand color decisions.
-- [`elevation.md`](../assets/design-system/elevation.md) — depth without leaning on background blur.
-- [`imagery.md`](../assets/design-system/imagery.md) (if present) — LQIP rules, AI imagery treatment.
-- [`brand.md`](../assets/design-system/brand.md) (if present) — brand color anchors per mode.
-- [`data-viz.md`](../assets/design-system/data-viz.md) (if present) — chart color choices that work across modes.
+- [`chart-anatomy.md`](chart-anatomy.md) — chart build anatomy including data-viz colour guidance.
