@@ -2,7 +2,7 @@
 
 Teach your AI coding tool to design in [pencil.dev](https://pencil.dev). Works with Claude Code, Cursor, and Codex.
 
-[![version](https://img.shields.io/badge/version-0.8.0_pre--release-orange)](https://github.com/Nisus74/pencil-skill/commits/main) [![license](https://img.shields.io/badge/license-MIT-green)](./LICENSE)
+[![version](https://img.shields.io/badge/version-0.8.0_pre-release-orange)](https://github.com/Nisus74/pencil-skill/commits/main) [![license](https://img.shields.io/badge/license-MIT-green)](./LICENSE)
 
 > **Unofficial community plugin.** This project is not affiliated with or endorsed by the Pencil.dev team. For the Pencil editor, MCP server, and official documentation, visit [pencil.dev](https://pencil.dev). Issues with this skill belong in [this repo](https://github.com/Nisus74/pencil-skill); issues with the Pencil editor or MCP server belong with the Pencil.dev team.
 
@@ -26,11 +26,27 @@ Pencil.dev is a collaborative design tool for creating web and mobile interfaces
 
 ---
 
+## What you'll be able to do
+
+After installing this skill:
+
+- **Generate complete UI designs** from natural language ("design a dashboard") without manual tool hunting
+- **Speed up design iteration** by delegating pattern work to AI while you focus on unique decisions
+- **Maintain design consistency** across components and screens using the scaffold system
+- **Work cross-platform** with the same skill on Claude Code, Cursor, or Codex
+- **Customise for your team** by editing design system files that live with your code
+
+---
+
 ## Prerequisites
 
-1. One of: [Claude Code](https://claude.ai/code), [Cursor](https://cursor.com), or [OpenAI Codex](https://openai.com/codex)
-2. The Pencil MCP server configured in that tool
-3. A pencil.dev project with `.pen` files
+You'll need three things:
+
+1. **An AI coding tool:** [Claude Code](https://claude.ai/code), [Cursor](https://cursor.com), or [OpenAI Codex](https://openai.com/codex)
+2. **Pencil MCP server:** Configure it in your tool ([how to set up Pencil](https://pencil.dev/docs/setup))
+3. **A Pencil.dev workspace:** Create one free at [pencil.dev](https://pencil.dev) (no credit card required)
+
+> **New to Pencil.dev?** It's a browser-based design tool. You don't install it; you open it in your browser and create `.pen` files there. This skill helps your AI tool work with those files.
 
 ---
 
@@ -99,7 +115,7 @@ Available for Claude Code and Cursor.
 
 For Codex and Copilot CLI, use folder copy. The end result is the same; you just don't get an automatic update path.
 
-## Install Methods Comparison
+### Install Methods Comparison
 
 | | One command | Edit freely | Auto-updates |
 |---|---|---|---|
@@ -108,18 +124,6 @@ For Codex and Copilot CLI, use folder copy. The end result is the same; you just
 | **Fork + install** | yes (after forking) | yes | yes (after rebasing) |
 
 > **Note:** Don't edit files inside a plugin install directory. The next update overwrites them. To customise the skill itself, use folder copy or fork + install.
-
----
-
-## Customising the skill
-
-There's two parts you can customise.
-
-The **design-system files** in [skills/pencil-design/assets/design-system/](skills/pencil-design/assets/design-system/) are starting points. The skill copies them into your project (typically at `docs/design/`), and you edit those copies to match your brand. They live with your code, so plugin updates don't touch them; plugin install is fine here. If you're not a developer or designer, [CUSTOMISING.md](skills/pencil-design/assets/design-system/CUSTOMISING.md) walks you through each file in plain English.
-
-The **skill content** (`SKILL.md`, the references, the worked examples) tells the AI how to work. To rewrite it for your team's workflow, pick folder copy or fork-and-install. Editing it inside a plugin install won't stick—the next update wipes it.
-
-For example: if you want the AI to use your brand's colour tokens, plugin install's enough. The AI copies `tokens.md` into your project, and you change the values there. To make the AI follow a different design workflow, you're editing `SKILL.md` itself, so pick folder copy or fork-and-install.
 
 ---
 
@@ -133,18 +137,35 @@ Once installed, the skill activates automatically when you describe a pencil.dev
 - *"Use the pencil MCP to update the button colour"*
 - *"Edit the pencil design and change the header"*
 
+The AI will handle opening files, reading your design system, generating components, and even taking screenshots to verify the work.
+
 ---
 
-## Customising
+## Customising the skill
 
-**Design-system files** live in [skills/pencil-design/assets/design-system/](skills/pencil-design/assets/design-system/). The skill copies them into your project (typically `docs/design/`), and you edit those copies to match your brand. Plugin updates never touch them, so plugin install is fine here.
+There are two parts you can customise.
+
+The **design-system files** in [skills/pencil-design/assets/design-system/](skills/pencil-design/assets/design-system/) are starting points. The skill copies them into your project (typically at `docs/design/`), and you edit those copies to match your brand. They live with your code, so plugin updates don't touch them; plugin install is fine here. If you're not a developer or designer, [CUSTOMISING.md](skills/pencil-design/assets/design-system/CUSTOMISING.md) walks you through each file in plain English.
+
+The **skill content** (`SKILL.md`, the references, the worked examples) tells the AI how to work. To rewrite it for your team's workflow, pick folder copy or fork-and-install. Editing it inside a plugin install won't stick—the next update wipes it.
+
+For example: if you want the AI to use your brand's colour tokens, plugin install's enough. The AI copies `tokens.md` into your project, and you change the values there. To make the AI follow a different design workflow, you're editing `SKILL.md` itself, so pick folder copy or fork-and-install.
+
+---
+
+## Getting help
+
+**Questions?** Open a [GitHub issue](https://github.com/Nisus74/pencil-skill/issues/new) or check the [Q&A discussions](https://github.com/Nisus74/pencil-skill/discussions).
+
+**Bug report?** Include the exact prompt you used, what you expected, and what happened instead. Screenshots help.
+
+**Want to contribute?** Read [docs/CONTRIBUTING.md](./docs/CONTRIBUTING.md) for the full guide. Short version: fork, branch from `main`, make your change, run the pre-commit checks, open a PR with before/after examples.
 
 ---
 
 ## Repository Layout
 
-The substance of this project is platform-agnostic. Platform-specific files exist
-only as install adapters:
+The substance of this project is platform-agnostic. Platform-specific files exist only as install adapters:
 
 ```
 skills/pencil-design/
@@ -178,14 +199,6 @@ gemini-extension.json               # Required by Gemini CLI's installer
 ```
 
 See [AGENTS.md](./AGENTS.md) for the full developer guide.
-
----
-
-## Contributing
-
-Read [docs/CONTRIBUTING.md](./docs/CONTRIBUTING.md) for the full guide.
-
-Short version: fork, branch from `main`, make your change, run the pre-commit checks, open a PR with before/after examples.
 
 ---
 
