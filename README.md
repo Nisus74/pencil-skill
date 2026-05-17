@@ -2,7 +2,7 @@
 
 Teach your AI coding tool to design in [pencil.dev](https://pencil.dev). Works with Claude Code, Cursor, and Codex.
 
-[![version](https://img.shields.io/badge/version-0.8.0_pre-release-orange)](https://github.com/Nisus74/pencil-skill/commits/main) [![license](https://img.shields.io/badge/license-MIT-green)](./LICENSE)
+[![version](https://img.shields.io/badge/version-0.8.0_pre--release-orange)](https://github.com/Nisus74/pencil-skill/commits/main) [![license](https://img.shields.io/badge/license-MIT-green)](./LICENSE)
 
 > **Unofficial community plugin.** This project is not affiliated with or endorsed by the Pencil.dev team. For the Pencil editor, MCP server, and official documentation, visit [pencil.dev](https://pencil.dev). Issues with this skill belong in [this repo](https://github.com/Nisus74/pencil-skill); issues with the Pencil editor or MCP server belong with the Pencil.dev team.
 
