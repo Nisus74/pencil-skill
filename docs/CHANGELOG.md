@@ -12,10 +12,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Cursor manifest enforcement in `tools/skill-lint.py`. The cross-manifest consistency check (AST10) now validates `.cursor-plugin/plugin.json` when present. Three new unit tests in `tools/test_skill_lint.py` cover matching, divergent, and missing-permissions cases.
 - Three install paths in the `README.md`: plugin install (the one-liner), folder copy, and fork-and-install. Per-tool target directories listed for each. A new Customising section explains which path supports which kind of edit.
 - `AGENTS.md` Platform Support table now shows plugin install and folder-copy targets per platform, with a short Deployment and customisation section underneath.
+- `.claude-plugin/marketplace.json` marketplace manifest. Claude Code requires a marketplace file for its `/plugin marketplace add` and `/plugin install` two-step flow; without it the single-command install in the README failed on first run. Fixes #6.
 
 ### Changed
 
 - Cursor's plugin schema doesn't document a `permissions` field. The manifest carries one anyway so `tools/skill-lint.py` can enforce consistency across all three platforms; Cursor ignores the unknown field.
+- Claude Code install instructions in README.md and AGENTS.md now reflect the two-command flow: `/plugin marketplace add Nisus74/pencil-skill` then `/plugin install pencil-dev-skill@pencil-skill`. The old single-command form no longer works. Fixes #6.
 
 ## [1.4.0] - 2026-05-03
 

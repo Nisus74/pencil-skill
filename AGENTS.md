@@ -119,7 +119,7 @@ docs/
 
 | Platform | Plugin install | Folder-copy target |
 |----------|---------------|-------------------|
-| Claude Code | `/plugin install github:Nisus74/pencil-skill` (manifest at `.claude-plugin/plugin.json`) | `~/.claude/skills/` or `.claude/skills/` |
+| Claude Code | `/plugin marketplace add Nisus74/pencil-skill` then `/plugin install pencil-dev-skill@pencil-skill` (manifests at `.claude-plugin/marketplace.json` + `plugin.json`) | `~/.claude/skills/` or `.claude/skills/` |
 | Google Gemini CLI | `gemini-extension.json` at repo root | `~/.gemini/skills/` or `.gemini/skills/` (alias `.agents/skills/`) |
 | Cursor (2.5+) | `/add-plugin` pointing at `github.com/Nisus74/pencil-skill` (manifest at `.cursor-plugin/plugin.json`) | `.cursor/skills/` (Cursor also reads `AGENTS.md` from project root) |
 | OpenAI Codex | (no plugin manifest) | `~/.codex/skills/` |
@@ -144,6 +144,7 @@ Don't edit files inside a plugin install directory (e.g. `~/.claude/plugins/.../
 ## Plugin System Rules
 
 - The Claude Code plugin manifest MUST live at `.claude-plugin/plugin.json`
+- The Claude Code plugin marketplace MUST live at `.claude-plugin/marketplace.json` (required for `/plugin marketplace add` to work)
 - The Cursor plugin manifest MUST live at `.cursor-plugin/plugin.json` (Cursor 2.5+)
 - `gemini-extension.json` MUST live at the repo root (Gemini CLI requirement)
 - All three platform manifests MUST carry a `permissions` block matching SKILL.md (enforced by `tools/skill-lint.py`)
@@ -151,6 +152,15 @@ Don't edit files inside a plugin install directory (e.g. `~/.claude/plugins/.../
 - Each skill is a subdirectory under `skills/` containing one `SKILL.md`
 - The YAML frontmatter `description` field controls when the skill activates, so edit it carefully
 - Skills may have a `references/` subdirectory for supplementary docs loaded on demand
+
+---
+
+## Claude Code Plugin Documentation
+
+When building or distributing this skill as a Claude Code plugin:
+
+- [Plugins Reference](https://code.claude.com/docs/en/plugins-reference): Plugin system concepts, manifests, versioning, and constraints
+- [Plugin Marketplaces](https://code.claude.com/docs/en/plugin-marketplaces): How marketplace discovery, installation, and the update cycle work; required for the `/plugin marketplace add` + `/plugin install` flow
 
 ---
 

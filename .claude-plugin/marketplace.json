@@ -1,0 +1,11 @@
+{
+  "name": "pencil-skill",
+  "owner": { "name": "Travis Polland" },
+  "plugins": [
+    {
+      "name": "pencil-dev-skill",
+      "source": "./",
+      "description": "Teaches AI coding tools to design, edit, and validate pencil.dev UIs via the Pencil MCP server"
+    }
+  ]
+}

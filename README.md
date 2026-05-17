@@ -57,7 +57,8 @@ Most people want the plugin install. If you plan to rewrite the skill's instruct
 **Claude Code:**
 
 ```bash
-/plugin install github:Nisus74/pencil-skill
+/plugin marketplace add Nisus74/pencil-skill
+/plugin install pencil-dev-skill@pencil-skill
 ```
 
 **Google Gemini CLI:** add this to your Gemini config:
@@ -115,7 +116,7 @@ Available wherever plugin install is available: Claude Code, Gemini CLI, and Cur
 
 1. Fork [Nisus74/pencil-skill](https://github.com/Nisus74/pencil-skill) on GitHub.
 2. Install your fork as a plugin:
-   - Claude Code: `/plugin install github:<your-handle>/pencil-skill`
+   - Claude Code: `/plugin marketplace add <your-handle>/pencil-skill` then `/plugin install pencil-dev-skill@pencil-skill`
    - Gemini CLI: change `repo` in your extension config to `<your-handle>/pencil-skill`
    - Cursor: `/add-plugin` and point to `github.com/<your-handle>/pencil-skill`
 3. Edit your fork. Commit and push; the next plugin update pulls your changes in.
