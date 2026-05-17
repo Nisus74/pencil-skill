@@ -1,7 +1,0 @@
-{
-  "eval_id": 6,
-  "eval_name": "clarify-intent-before-designing",
-  "prompt": "I want to design something for our app. Get started.",
-  "expected_output": "Agent recognises this is an open-ended request with no reference image, no description of who uses the product, and (assuming) no populated design-system/ folder. Before any batch_design call, the agent asks three quick clarifying questions per references/SKILL.md \u00a7 Design intelligence (clarify-intent protocol): (1) Who uses this and what problem does it solve? (2) Atmosphere: any words, references, or brand direction? (3) Hard constraints (stack, responsive targets, dark-mode-only, mobile-first)? If the project has a populated design-system/, the agent skips the questions because those files already answer them. The agent does NOT dive into batch_design. The agent does NOT ask the questions twice in the same session.",
-  "assertions": []
-}

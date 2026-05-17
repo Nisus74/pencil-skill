@@ -1,7 +1,0 @@
-{
-  "eval_id": 12,
-  "eval_name": "data-viz-dashboard",
-  "prompt": "Design a SaaS analytics dashboard with four tiles: (1) Monthly recurring revenue trend, (2) Conversion rate by traffic source, (3) Cohort retention heatmap, (4) Top 10 customers by MRR.",
-  "expected_output": "Per references/data-viz.md \u00a7 The 25-chart selection matrix: (1) Line chart for MRR trend (one series over time). (2) Horizontal bar chart for conversion by source (compare across categories with long source names). (3) Heatmap for cohort retention (two-dimensional matrix). (4) Horizontal bar OR ranked table for top customers (compare ordered values). Uses colour-blind-safe palette: Okabe-Ito for categorical chart series ($chart1 through $chart8 in tokens), Viridis (perceptually uniform) for the heatmap. NEVER uses pie chart with > 5 slices. NEVER 3D charts. NEVER dual y-axes (split into small multiples instead). Sparklines used inline in the KPI cards above the main charts. State coding pairs colour with shape (up arrow \u2191 + $success for growth; down arrow \u2193 + $danger for decline) so colour-blind users can read it. Default chart styling: minimal axes, light gridlines on the value axis only, direct labels at line endpoints, tabular numerics on monetary values.",
-  "assertions": []
-}

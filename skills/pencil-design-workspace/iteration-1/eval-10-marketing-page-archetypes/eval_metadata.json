@@ -1,7 +1,0 @@
-{
-  "eval_id": 10,
-  "eval_name": "marketing-page-archetypes",
-  "prompt": "Build a marketing landing page for our SaaS product. Include hero, three feature blocks, three-tier pricing, testimonials, and a footer. Make it feel intentional, not templated.",
-  "expected_output": "Per references/layout-patterns.md: agent does NOT use the three-column equal-card grid for features (the most over-used SaaS marketing pattern). Instead picks alternating image-text rows OR bento grid OR single hero feature. Hero is asymmetric, split (form-right / image-left), full-bleed, or bento (not the centred-text-with-CTA default). Pricing has a highlighted middle tier with coloured border + 'Most popular' badge (one accent only; not all four treatments combined). Testimonials are a static avatar grid OR single hero quote OR logo wall (NOT an auto-rotating carousel). Footer architecture is consistent (sitemap OR minimal OR legal-only; not a kitchen-sink mix). Microcopy is verb-led and benefit-focused per references/microcopy.md ('Cut your build time by 40%' beats 'Faster builds'). CTAs use action-specific verbs ('Start your free trial', not 'Get started' or 'Continue').",
-  "assertions": []
-}

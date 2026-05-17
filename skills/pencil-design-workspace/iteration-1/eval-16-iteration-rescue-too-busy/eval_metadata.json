@@ -1,7 +1,0 @@
-{
-  "eval_id": 16,
-  "eval_name": "iteration-rescue-too-busy",
-  "prompt": "Look at the design currently open in pencil. The user just told me it 'feels too busy and I can't tell where to look.' Rescue it.",
-  "expected_output": "Per references/iteration-patterns.md \u00a7 Failure mode: too busy: agent diagnoses the busyness via inspection (calls batch_get or snapshot_layout to see the current node tree and visible properties; optionally one get_screenshot if the visual question is essential). Identifies what to remove from the rescue list, in order of effect: a hue (three accent colours becomes one), a typeface (a display font added for accents removed), whitespace added (section padding increased one step), a colour stop dropped (5-stop neutral ramp becomes 3), a shadow simplified (4-layer becomes 2), or decorative elements muted (borders, badges drop in saturation). Executes the simplification via set_variables (to drop an accent token) and/or batch_design (to remove decorative borders or simplify shadows). Verifies hierarchy improved with one screenshot at the end. Critical anti-pattern to avoid: does NOT add a hierarchy element to 'fix' busyness (the most common second-iteration failure). The diagnosis was 'too busy'; the fix subtracts.",
-  "assertions": []
-}

@@ -1,7 +1,0 @@
-{
-  "eval_id": 1,
-  "eval_name": "design-system-scaffold",
-  "prompt": "Set up a pencil design system in this project. The repo currently has no design-system/ folder.",
-  "expected_output": "Agent confirms before scaffolding; copies all 12 core templates from assets/design-system/ to design-system/ (README.md, design-system.md, tokens.md, components.md, layout.md, motion.md, elevation.md, iconography.md, patterns.md, states.md, voice.md, code-export.md); mentions the optional templates that are conditionally included (mobile.md, data-viz.md, brand.md, imagery.md, plus the new Phase 4 set: forms.md, accessibility.md, micro-interactions.md, empty-states.md, onboarding.md, navigation.md, search.md, file-architecture.md, visual-style.md) and the signals or opt-in that triggers each; mentions collision detection if a code-bearing design-system/ already exists; tells the user which fields to fill in first.",
-  "assertions": []
-}

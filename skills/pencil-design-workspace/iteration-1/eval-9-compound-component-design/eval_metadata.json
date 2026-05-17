@@ -1,7 +1,0 @@
-{
-  "eval_id": 9,
-  "eval_name": "compound-component-design",
-  "prompt": "Design a Composer component for our chat product. It needs a header (with attachment toggle), a multi-line text input, and a footer (with a Send button and a character count).",
-  "expected_output": "Per references/composition-patterns.md: builds a compound component, not a single component with boolean props. Structure: Composer.Provider wraps Composer.Frame; Composer.Frame contains Composer.Header, Composer.Input, Composer.Footer as named slot children. Each sub-component is its own reusable. Slot names describe content (header, input, footer), not position (top, middle, bottom). Send button uses an explicit variant pattern (Button.Submit or Composer.SendButton) instead of <Button variant=\"primary\" disabled={!hasContent}>. Component status documented in context (status: 'ready' or 'draft'). Does NOT ship a single mega-Component with disabled, loading, hasAttachment, isError boolean props. The Composer is extracted to design-system.lib.pen because it has multiple non-trivial pieces and will be reused across surfaces.",
-  "assertions": []
-}

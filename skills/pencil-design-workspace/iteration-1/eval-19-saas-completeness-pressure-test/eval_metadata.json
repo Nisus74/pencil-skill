@@ -1,7 +1,0 @@
-{
-  "eval_id": 19,
-  "eval_name": "saas-completeness-pressure-test",
-  "prompt": "Design the dashboard for our SaaS analytics tool. Cover everything we'd need designed before engineering can start building.",
-  "expected_output": "Per references/industry-patterns.md \u00a7 Completeness pressure tests \u00a7 SaaS pressure test: agent does NOT design only the happy path. The full set must include: empty state per primary surface (first-use, no data yet), loading state per primary surface (skeleton with shape hints), error state per primary surface (chart load failed, query timed out, network offline; each with a retry affordance), no-permission state (user lacks access to a data source or surface), plan-restricted state (data limited by plan tier, trial expired, hit a usage cap). Covers at least one admin surface (user management OR billing OR integrations OR audit log). Includes notification or system-status state (recent activity, system alerts). Auth flows referenced (sign-in, sign-up, password reset, MFA, SSO, session-expired) even if not designed in this pass. The agent surfaces gaps explicitly if any required state is missing: 'I notice the design doesn't cover the no-permission state or the plan-restricted state. Should I add them?' Pass = full state coverage; fail = only the happy-path dashboard (a sales demo, not a SaaS design).",
-  "assertions": []
-}

@@ -1,7 +1,0 @@
-{
-  "eval_id": 8,
-  "eval_name": "form-design-discipline",
-  "prompt": "Design a sign-up form: name, email, password, confirm password, terms-of-service checkbox. Submit button at the bottom.",
-  "expected_output": "Per references/forms.md and assets/design-system/forms.md: every input has a visible <label>. Errors render inline next to the field (not in a banner at the top). Validation timing: on-blur for sync constraints (email format, password strength), on-submit for cross-field (password match) and async (email already taken). Submit button stays enabled until pressed (not disabled-while-invalid). Autocomplete attributes set per field ('email', 'new-password', 'name', etc.). Mobile font-size \u2265 16px to defeat iOS Safari zoom-on-focus. Hit zone for terms checkbox shares with its label (single click target). Spellcheck disabled on email and password fields. Submit-state choreography: spinner replaces label but width is preserved. On submit-with-errors: focus moves to first error, aria-live region announces error count.",
-  "assertions": []
-}

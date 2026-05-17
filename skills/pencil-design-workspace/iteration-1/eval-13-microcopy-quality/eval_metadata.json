@@ -1,7 +1,0 @@
-{
-  "eval_id": 13,
-  "eval_name": "microcopy-quality",
-  "prompt": "Write microcopy for these states in our project tracker: (a) error when the project name the user typed is already taken, (b) empty state when the user has no projects, (c) success after archiving a project, (d) loading state while fetching projects.",
-  "expected_output": "Per references/microcopy.md: (a) Error message guides the exit, doesn't blame the user. 'That name is taken. Try a different one.' or 'A project called <name> already exists. Pick a different name.' NOT 'Invalid name' or 'Error: project name already exists in the database.' (b) Empty state shows what's possible, not what's missing. 'Create your first project to get started.' NOT 'No projects yet.' or 'You don't have any projects.' Single primary CTA ('New project'); demotes any secondary action to a text link. (c) Success copy is calibrated to the stakes: archiving is routine, so a quiet check-mark indicator or non-blocking toast 'Project archived. <Undo>' suits. NOT 'Awesome! Project archived successfully!' (over-celebration). (d) Loading copy names the operation: 'Fetching your projects...' NOT 'Loading...' (generic) or 'Please wait...' (apologetic). All button labels use action-specific verbs (Create, Archive, Restore), never 'Continue', 'Submit', or 'OK'.",
-  "assertions": []
-}

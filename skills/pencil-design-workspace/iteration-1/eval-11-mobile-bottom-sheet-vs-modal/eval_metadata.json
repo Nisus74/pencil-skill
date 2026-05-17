@@ -1,7 +1,0 @@
-{
-  "eval_id": 11,
-  "eval_name": "mobile-bottom-sheet-vs-modal",
-  "prompt": "Design the iOS app's compose flow: filter selection, attachments picker, and a destructive 'discard draft' confirmation.",
-  "expected_output": "Per references/mobile-patterns.md: agent picks bottom sheet for filter selection (non-blocking secondary action, drilldown that retains context). Picks bottom sheet for attachments picker (selection from a list, may stay open while user picks multiple). Picks modal (or full-screen sheet with destructive confirmation pattern) for the discard-draft confirmation because it's destructive and demands a deliberate choice. Sheet detents declared per use case (peek for filter, half for attachments, blocking modal for discard). Tab bar (if present in the surrounding home screen) \u2264 5 items per references/mobile-patterns.md \u00a7 Tab bars. Safe areas respected: env(safe-area-inset-bottom) for the tab bar above the home indicator; env(safe-area-inset-top) for the header below the notch / dynamic island. Haptic feedback called out: selection haptic on filter pick, success haptic on attach, warning haptic on discard confirm.",
-  "assertions": []
-}
