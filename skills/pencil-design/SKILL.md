@@ -4,7 +4,7 @@ description: Use this skill for any pencil.dev work — designing UI in a .pen f
 license: MIT
 compatibility: Any AI coding tool with the Pencil MCP server configured (Claude Code, Codex, Gemini CLI, Copilot CLI, Cursor). Headless workflows (CI, batch generation, scripted exports) are supported via the `@pencil.dev/cli` package, which the agent uses when explicitly directed; see `references/pencil-cli.md` for the When CLI vs MCP decision table and the no-auto-fall-back policy.
 metadata:
-  version: "1.11.0"
+  version: "0.8.0"
 permissions:
   mcp:
     - pencil:get_editor_state
