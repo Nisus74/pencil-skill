@@ -13,6 +13,8 @@ Teach your AI coding tool to design in [pencil.dev](https://pencil.dev). Works w
 
 ## What it does
 
+Pencil.dev is a collaborative design tool for creating web and mobile interfaces via the Pencil MCP server. This skill teaches AI coding tools how to work with `.pen` design files.
+
 - Guides the AI through a seven-step design workflow: detect host, orient, load guidelines, plan, execute, verify, report
 - Teaches all 13 Pencil MCP tools with worked invocations, cost cheatsheet, and composite recipes
 - Provides 2026 design depth: user flows, component and screen states, full accessibility coverage, and modern patterns (container queries, fluid type, AI-UI affordances)
@@ -20,7 +22,7 @@ Teach your AI coding tool to design in [pencil.dev](https://pencil.dev). Works w
 - Ships 16 worked examples showing real MCP tool sequences from scratch
 - Includes per-platform tool-name mappings so the same skill works everywhere
 
-> **Status:** `v1.11.0`, production-ready.
+> **Status:** `0.8.0`, pre-release. Nothing is shipped until the owner cuts a release.
 
 ---
 

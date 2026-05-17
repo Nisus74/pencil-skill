@@ -6,13 +6,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-Plugin version holds at `0.8.0` pre-release; nothing is shipped until the owner cuts a release explicitly. Four themes accumulating since the last tagged release: **plugin installability** (Cursor 2.5 marketplace support plus a Claude Code marketplace listing), **aesthetic sharpening** (a brand-vs-product register plus structural bans and the two-tier AI slop test), **reference depth phase 1** (five new topical references plus a cross-platform HARNESSES.md), and **reference depth phase 2** (eight more topical references covering layout, motion, interaction states, cognitive load, heuristics scoring, delight, onboarding, and extraction).
+### Summary
+
+Four themes accumulating in the unreleased work:
+1. **Plugin installability:** Cursor 2.5 marketplace support plus Claude Code marketplace listing
+2. **Aesthetic sharpening:** Brand-vs-product register plus structural bans and two-tier AI slop test
+3. **Reference depth phase 1:** Five new topical references plus cross-platform HARNESSES.md
+4. **Reference depth phase 2:** Eight more topical references covering layout, motion, interaction states, cognitive load, heuristics scoring, delight, onboarding, and extraction
 
 ### Added
 
-- `.claude-plugin/marketplace.json`. Single-plugin marketplace listing so the repo can be installed via `/plugin marketplace add github:Nisus74/pencil-skill` followed by `/plugin install pencil-dev-skill`, alongside the existing direct-install path.
-- `.cursor-plugin/plugin.json`. Cursor 2.5 (released 2026-02-17) shipped a real plugin marketplace and manifest format, so Cursor users now get one-line install parity with Claude Code and Gemini CLI. The manifest mirrors the Claude one: same `name`, `version`, and `permissions` block.
-- Cursor manifest enforcement in `tools/skill-lint.py`. The cross-manifest consistency check (AST10) now validates `.cursor-plugin/plugin.json` when present. Three new unit tests in `tools/test_skill_lint.py` cover matching, divergent, and missing-permissions cases.
+- `.claude-plugin/marketplace.json`: Single-plugin marketplace listing so the repo can be installed via `/plugin marketplace add github:Nisus74/pencil-skill` followed by `/plugin install pencil-dev-skill`, alongside the existing direct-install path.
+- `.cursor-plugin/plugin.json`: Cursor 2.5 (released 2026-02-17) shipped a real plugin marketplace and manifest format, so Cursor users now get one-line install parity with Claude Code and Gemini CLI. The manifest mirrors the Claude one: same `name`, `version`, and `permissions` block.
+- Cursor manifest enforcement in `tools/skill-lint.py`: The cross-manifest consistency check (AST10) now validates `.cursor-plugin/plugin.json` when present. Three new unit tests in `tools/test_skill_lint.py` cover matching, divergent, and missing-permissions cases.
 - Three install paths in the `README.md`: plugin install (the one-liner), folder copy, and fork-and-install. Per-tool target directories listed for each. A new Customising section explains which path supports which kind of edit.
 - `AGENTS.md` Platform Support table now shows plugin install and folder-copy targets per platform, with a short Deployment and customisation section underneath.
 - **Register concept** in `skills/pencil-design/SKILL.md` Aesthetic foundation. Every Pencil task is now classified as **brand** (design *is* the product) or **product** (design *serves* the product), and the register shapes which defaults the skill reaches for. Identified at the start of step 2 in the workflow.
@@ -46,7 +52,7 @@ Plugin version holds at `0.8.0` pre-release; nothing is shipped until the owner 
 - `skills/pencil-design/SKILL.md` Reference index gains entries for all eight phase-2 references with **Load when …** triggers explicit in each.
 - `AGENTS.md` Repository Structure tree adds the eight phase-2 reference files.
 
-## [2.1.0] - 2026-05-10
+## [v2.1.0] - 2026-05-10
 
 Minor release: **opinionated design-system scaffolds**. The 16 markdown templates that get copied into user projects (`assets/design-system/*.md`) are no longer generic placeholders. Each file now leads with concrete decisions, references the shipped archetype library, and includes "what generic looks like" anti-examples to short-circuit AI defaults.
 
@@ -69,7 +75,7 @@ Minor release: **opinionated design-system scaffolds**. The 16 markdown template
 - These files are scaffold templates copied into user projects on first scaffold. Existing projects that already have a `design-system/` folder won't see automatic updates; users can re-scaffold individual files or pull the new content selectively.
 - The structure of each file is preserved so existing edits remain meaningful. The new content lives in additional sections (*Archetype variants*, *What generic looks like*) rather than replacing existing sections.
 
-## [2.0.0] - 2026-05-10
+## [v2.0.0] - 2026-05-10
 
 Major release: **taste-first rework**. The skill no longer outsources aesthetic direction to the user's instinct. It now leads with explicit aesthetic commitment, ships an opinionated archetype library to use as defaults when the user is silent, and runs a single distinctiveness pass after compose to catch generic output before declaring done.
 

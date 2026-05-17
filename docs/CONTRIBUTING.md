@@ -84,7 +84,7 @@ Open a [feature request](https://github.com/Nisus74/pencil-skill/issues/new?temp
 - Document tool sequencing where it matters. For example: call `get_editor_state` before `batch_design`.
 - Keep instructions platform-agnostic. Use generic verbs ("read", "write", "search") rather than tool names where possible. When tool names are necessary, default to Claude Code names and rely on tool-mapping reference files for other platforms.
 
-If you use Claude Code, the `superpowers:writing-skills` skill provides guidance for authoring high-quality SKILL.md content. It's optional and not a dependency of this project.
+Claude Code users can optionally use the built-in `superpowers:writing-skills` skill for guidance on authoring high-quality SKILL.md content. This is a Claude Code feature, not a dependency of this project.
 
 ---
 
@@ -106,7 +106,7 @@ The full OWASP AST risk-to-control mapping lives in [SECURITY.md](./SECURITY.md)
 
 ## Versioning
 
-The plugin is currently pre-release and holds at `0.8.0` across all four manifests. **Don't bump the version in a PR without explicit owner approval.** Add your changes under `[Unreleased]` in `docs/CHANGELOG.md` and let the owner decide when to cut a tagged release.
+The plugin holds at `0.8.0` pre-release. **Don't bump the version in a PR without explicit owner approval.** Add your changes under `[Unreleased]` in `docs/CHANGELOG.md` and let the owner decide when to cut a tagged release.
 
 When a release is authorised, bump the `version` field in all four manifests, keeping them in sync:
 

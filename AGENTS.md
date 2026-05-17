@@ -169,7 +169,7 @@ docs/
 | Google Gemini CLI | `gemini-extension.json` at repo root | `~/.gemini/skills/` or `.gemini/skills/` (alias `.agents/skills/`) |
 | Cursor (2.5+) | `/add-plugin` pointing at `github.com/Nisus74/pencil-skill` (manifest at `.cursor-plugin/plugin.json`) | `.cursor/skills/` (Cursor also reads `AGENTS.md` from project root) |
 | OpenAI Codex | `codex plugin install github:Nisus74/pencil-skill` (manifest at `.codex-plugin/plugin.json`) | `~/.codex/skills/` |
-| GitHub Copilot CLI | (no plugin manifest) | `~/.copilot/skills/` (alias `~/.agents/skills/`) or project `.github/skills/` |
+| Copilot CLI | (no plugin manifest) | `~/.copilot/skills/` (alias `~/.agents/skills/`) or project `.github/skills/` |
 
 All platforms also accept a `SKILL.md` in their respective skills directory; folder copy works universally.
 
@@ -259,7 +259,7 @@ The OWASP AST compliance map lives in [docs/SECURITY.md](./docs/SECURITY.md).
 
 Follow semantic versioning. Bump the `version` field in four places, keeping them in sync: `.claude-plugin/plugin.json`, `.cursor-plugin/plugin.json`, `.codex-plugin/plugin.json`, and the `skills/pencil-design/SKILL.md` frontmatter. (`gemini-extension.json` does not declare a version field.)
 
-When a release is authorised, bump the `version` field in four places, keeping them in sync: `.claude-plugin/plugin.json`, `.claude-plugin/marketplace.json` (inside the `plugins[]` entry), `.cursor-plugin/plugin.json`, and `.codex-plugin/plugin.json`. Follow semantic versioning:
+When the project owner authorises a release, bump the `version` field in four places, keeping them in sync: `.claude-plugin/plugin.json`, `.claude-plugin/marketplace.json` (inside the `plugins[]` entry), `.cursor-plugin/plugin.json`, and `.codex-plugin/plugin.json`. Follow semantic versioning:
 
 - **PATCH** (`0.x.y`): Content fixes, typos, clarifications
 - **MINOR** (`0.y.0`): New capability documented, new trigger phrases added
