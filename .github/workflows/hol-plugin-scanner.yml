@@ -1,0 +1,23 @@
+name: HOL Plugin Scanner
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  scan:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd  # v6.0.2
+      - uses: hashgraph-online/ai-plugin-scanner-action@23f79a591b176a75e4030ebd00091a16acb53ecd  # v1.2.341
+        with:
+          plugin_dir: "."
+          fail_on_severity: high
+          install_source: pypi
+          install_cisco: "false"
+          submission_enabled: "false"
+          write_step_summary: "true"
