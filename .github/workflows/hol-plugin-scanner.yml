@@ -21,3 +21,8 @@ jobs:
           install_cisco: "false"
           submission_enabled: "false"
           write_step_summary: "true"
+          format: json
+          output: hol-scan.json
+      - name: Show findings (debug)
+        if: always()
+        run: cat hol-scan.json
