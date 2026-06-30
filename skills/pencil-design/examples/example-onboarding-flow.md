@@ -14,7 +14,7 @@ This example shows the agent designing a multi-step onboarding flow with progres
 get_editor_state();
 ```
 
-The agent reads `assets/design-system/visual-style.md`, `tokens.md`, `forms.md` (project's form patterns), `onboarding.md` (project commits guided onboarding with sample-data option), and `voice.md` (microcopy tone). Loads `references/flows.md` § Onboarding flows, § Multi-step forms / wizards, and `references/states.md` § Onboarding states.
+The agent reads `design-system/visual-style.md`, `tokens.md`, `forms.md` (project's form patterns), `onboarding.md` (project commits guided onboarding with sample-data option), and `voice.md` (microcopy tone). Loads `references/flows.md` § Onboarding flows, § Multi-step forms / wizards, and `references/states.md` § Onboarding states.
 
 ## Step 2: Plan the screens
 
@@ -92,7 +92,7 @@ batch_design({
 });
 ```
 
-Validation per `assets/design-system/forms.md` § Validation timing: on-blur for sync constraints (length ≥ 1, max 50 chars). On Continue: validate, focus first error if any, advance if clean.
+Validation per `design-system/forms.md` § Validation timing: on-blur for sync constraints (length ≥ 1, max 50 chars). On Continue: validate, focus first error if any, advance if clean.
 
 ## Step 6: Build step 2 (role)
 
@@ -158,11 +158,11 @@ batch_design({
 });
 ```
 
-Per `assets/design-system/onboarding.md` § With sample data vs blank slate: most products benefit from offering both. Sample data leans toward Recommended for first-time users.
+Per `design-system/onboarding.md` § With sample data vs blank slate: most products benefit from offering both. Sample data leans toward Recommended for first-time users.
 
 ## Step 8: Skip and back affordances
 
-Per `assets/design-system/onboarding.md` § Skip and exit affordances:
+Per `design-system/onboarding.md` § Skip and exit affordances:
 
 - **Back**: disabled on step 1; enabled from step 2 onwards. Clicking Back returns to the previous step with values preserved.
 - **Skip**: text link 'Skip' bottom-right of the footer. Available on every step except where skipping breaks the flow (e.g. workspace name might be required).
@@ -170,7 +170,7 @@ Per `assets/design-system/onboarding.md` § Skip and exit affordances:
 
 ## Step 9: Persist progress
 
-Per `assets/design-system/onboarding.md` § Save-progress on exit: silently persist progress; resume on next launch. Don't ask 'Save your progress?' on exit.
+Per `design-system/onboarding.md` § Save-progress on exit: silently persist progress; resume on next launch. Don't ask 'Save your progress?' on exit.
 
 The design's `context` documents the persistence: *'Workspace name auto-saves on blur to local storage. Progress restored if user closes and reopens.'*
 
@@ -229,14 +229,14 @@ Confirm:
 - Back disabled on step 1; enabled later.
 - Validation errors show inline; focus moves to first error on submit.
 
-Walk through the flow as a new user. Note any friction (per `assets/design-system/onboarding.md` § Verification checklist).
+Walk through the flow as a new user. Note any friction (per `design-system/onboarding.md` § Verification checklist).
 
 ## See also
 
 - `references/flows.md` § Onboarding flows, § Multi-step forms / wizards.
 - `references/states.md` § Onboarding states.
 - `references/microcopy.md` § Empty state copy (also applies to onboarding prompts).
-- `assets/design-system/onboarding.md`: project's onboarding commitments.
-- `assets/design-system/forms.md`: validation timing, error display.
-- `assets/design-system/voice.md`: tone for welcome, encouragement, skip copy.
-- `assets/examples/example-form-flow.md`: multi-step signup with email verification (overlaps onboarding pattern).
+- `design-system/onboarding.md`: project's onboarding commitments.
+- `design-system/forms.md`: validation timing, error display.
+- `design-system/voice.md`: tone for welcome, encouragement, skip copy.
+- `examples/example-form-flow.md`: multi-step signup with email verification (overlaps onboarding pattern).

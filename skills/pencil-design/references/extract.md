@@ -40,7 +40,7 @@ Component candidates:
 ### Patterns
 The largest unit; not always extracted into the design system but worth documenting. A pattern is a composition of components in a particular arrangement: a settings page anatomy, a confirmation modal shape, an empty state template.
 
-Patterns often live in design-system docs (e.g. `assets/design-system/patterns.md` if the project has it) rather than as `.pen` library entries. Code-side, they may map to layout components or templates.
+Patterns often live in design-system docs (e.g. `design-system/patterns.md` if the project has it) rather than as `.pen` library entries. Code-side, they may map to layout components or templates.
 
 ## The extraction workflow
 

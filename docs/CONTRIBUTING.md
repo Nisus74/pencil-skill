@@ -100,7 +100,7 @@ If you have a legitimate reason to deviate from a check, suppress it with a non-
 
 Empty justifications are themselves errors.
 
-The full OWASP AST risk-to-control mapping lives in [SECURITY.md](./SECURITY.md).
+The full OWASP AST risk-to-control mapping lives in [SECURITY.md](../SECURITY.md).
 
 ---
 

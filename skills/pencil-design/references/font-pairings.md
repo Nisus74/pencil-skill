@@ -1,16 +1,16 @@
 # Font pairings
 
-A library of 30+ typography *recipe pairings* the agent picks from when starting greenfield. Each entry names the fonts (and their source: Google Fonts, Vercel Geist, GitHub Mona Sans, or commercial foundries) and the weights to ship. The agent picks once, commits the choice to `assets/design-system/tokens.md` and the `.pen` file's `variables`, then references font tokens (`$fontBody`, `$fontMono`) in every subsequent design.
+A library of 30+ typography *recipe pairings* the agent picks from when starting greenfield. Each entry names the fonts (and their source: Google Fonts, Vercel Geist, GitHub Mona Sans, or commercial foundries) and the weights to ship. The agent picks once, commits the choice to `design-system/tokens.md` and the `.pen` file's `variables`, then references font tokens (`$fontBody`, `$fontMono`) in every subsequent design.
 
 **What this file owns:** named font-pairing recipes with mood, industry fit, anti-pattern, real-world exemplar, weights to ship, and licensing/source notes.
 
-**What this file does NOT own:** the project's *committed* type scale. That lives in `assets/design-system/tokens.md` (project-owned, version-controlled) and in the `.pen` file's `variables` section (the live design's typography). Typography rules (tabular numerics, text-wrap balance, optical sizing) are in `SKILL.md` § Aesthetic defaults: Typography. Letter-spacing and tracking discipline is in [`iteration-patterns.md`](iteration-patterns.md) § Failure mode: doesn't feel premium.
+**What this file does NOT own:** the project's *committed* type scale. That lives in `design-system/tokens.md` (project-owned, version-controlled) and in the `.pen` file's `variables` section (the live design's typography). Typography rules (tabular numerics, text-wrap balance, optical sizing) are in `SKILL.md` § Aesthetic defaults: Typography. Letter-spacing and tracking discipline is in [`iteration-patterns.md`](iteration-patterns.md) § Failure mode: doesn't feel premium.
 
 ## When to load this file
 
 - The agent is starting a greenfield design and the project has no committed type pairing yet.
 - The user names a typeface ('use Söhne', 'something like Linear's type') or a mood ('editorial', 'developer-tool feel').
-- The agent is following [`example-style-selection.md`](../assets/examples/example-style-selection.md) (Phase 4) and needs to pick the font half of the style + palette + font triple.
+- The agent is following [`example-style-selection.md`](../examples/example-style-selection.md) (Phase 4) and needs to pick the font half of the style + palette + font triple.
 - The user wants alternatives to a specific font that's commercial-only.
 
 ## How this catalogue works (architecture)
@@ -19,7 +19,7 @@ Three layers; the catalogue sits at the top.
 
 1. **This file (`references/font-pairings.md`)** is a *menu of starting recipes*. Each recipe names a font pairing with weights and sources. The recipes don't hold the project's typography; they're the starting point.
 2. **The source services** ship the actual font files. Google Fonts (https://fonts.google.com), Vercel Geist (https://vercel.com/font), GitHub Mona Sans (https://github.com/mona-sans), and the commercial foundries listed per recipe.
-3. **`assets/design-system/tokens.md`** records the project's *committed* type scale. The agent records the chosen pairing here as semantic tokens (`$fontDisplay`, `$fontBody`, `$fontMono`, plus weight, size, and line-height scales). This file is project-owned; the user can edit it.
+3. **`design-system/tokens.md`** records the project's *committed* type scale. The agent records the chosen pairing here as semantic tokens (`$fontDisplay`, `$fontBody`, `$fontMono`, plus weight, size, and line-height scales). This file is project-owned; the user can edit it.
 4. **The `.pen` file's `variables` section** is the live design's typography. The agent calls `set_variables` MCP to populate the variables from the project's `tokens.md`. Designs reference `$fontBody`, `$fontMono`, never literal font names.
 
 The rule: **the agent reads this catalogue once at the start of a project, then never again.** Subsequent designs reference the project's variables. If the user wants to change typography, they edit `tokens.md` and the `.pen` variables; this catalogue stays untouched.
@@ -30,9 +30,9 @@ The rule: **the agent reads this catalogue once at the start of a project, then 
 2. Cross-check with the chosen style from [`style-catalogue.md`](style-catalogue.md). A Brutalist project doesn't get Editorial Serif; a Swiss / International project doesn't get Memphis-style display fonts.
 3. Pick a pairing from the matching family below.
 4. Lift the font URLs from the source service (Google Fonts CDN or self-host) into the project's HTML head.
-5. Populate `assets/design-system/tokens.md` with the chosen pairing as semantic tokens (`$fontDisplay`, `$fontBody`, `$fontMono`) plus the weight scale.
+5. Populate `design-system/tokens.md` with the chosen pairing as semantic tokens (`$fontDisplay`, `$fontBody`, `$fontMono`) plus the weight scale.
 6. Call `set_variables` MCP to mirror the type tokens into the `.pen` file's `variables` section.
-7. Record the chosen pairing recipe name in `assets/design-system/visual-style.md`.
+7. Record the chosen pairing recipe name in `design-system/visual-style.md`.
 8. From this point onward, design with `$fontBody`, `$fontMono`, etc. Never hard-code font names in `batch_design`.
 
 ## Pairing entries
@@ -177,14 +177,14 @@ A chosen pairing maps to the project's `tokens.md` type scale and the document's
    - `$fontWeightMedium`: 500
    - `$fontWeightSemiBold`: 600
    - `$fontWeightBold`: 700
-3. Agent records the chosen pairing in `assets/design-system/visual-style.md`: *'Type pairing: Inter + JetBrains Mono. Source: Google Fonts. Weights: 400, 500, 600, 700 for Inter; 400, 500 for JetBrains Mono.'*
-4. Agent records the type scale in `assets/design-system/tokens.md`: text size scale with line-heights and weight defaults per scale step.
+3. Agent records the chosen pairing in `design-system/visual-style.md`: *'Type pairing: Inter + JetBrains Mono. Source: Google Fonts. Weights: 400, 500, 600, 700 for Inter; 400, 500 for JetBrains Mono.'*
+4. Agent records the type scale in `design-system/tokens.md`: text size scale with line-heights and weight defaults per scale step.
 
-For the worked example, see [`example-style-selection.md`](../assets/examples/example-style-selection.md) (Phase 4).
+For the worked example, see [`example-style-selection.md`](../examples/example-style-selection.md) (Phase 4).
 
 ## Anti-patterns
 
-- **Hard-coding font names from this catalogue into `batch_design`.** This file is a menu of recipes, not a source of values. Font names belong in `assets/design-system/tokens.md` and the `.pen` file's `variables` (as `$fontBody`, `$fontMono`, `$fontDisplay`). Designs reference tokens.
+- **Hard-coding font names from this catalogue into `batch_design`.** This file is a menu of recipes, not a source of values. Font names belong in `design-system/tokens.md` and the `.pen` file's `variables` (as `$fontBody`, `$fontMono`, `$fontDisplay`). Designs reference tokens.
 - **Three or more typefaces in one design.** A serif heading + sans body + display accent + mono code is on the edge. A fifth typeface tips into chaos. Stick to a maximum of three (heading + body + mono).
 - **Display fonts at body sizes.** Display fonts have wide x-heights, dramatic curves, and tight defaults. They're exhausting to read at 16px. Restrict display fonts to headings.
 - **Mono fonts at body sizes.** Same problem in the opposite direction. Mono is slow to read. Restrict to code blocks, IDs, and tabular numerics.
@@ -213,5 +213,5 @@ For the worked example, see [`example-style-selection.md`](../assets/examples/ex
 - [`industry-patterns.md`](industry-patterns.md): per-industry typography recommendations.
 - [`performance-design.md`](performance-design.md) § Font loading: preload, subset, self-host guidance.
 - [`accessibility.md`](accessibility.md): dynamic type, font-size baselines, readability.
-- [`assets/design-system/tokens.md`](../assets/design-system/tokens.md): where the chosen pairing gets recorded as project type tokens.
-- [`example-style-selection.md`](../assets/examples/example-style-selection.md): worked sequence of catalogue → MCP variable population → starter components (Phase 4).
+- [`design-system/tokens.md`](../design-system/tokens.md): where the chosen pairing gets recorded as project type tokens.
+- [`example-style-selection.md`](../examples/example-style-selection.md): worked sequence of catalogue → MCP variable population → starter components (Phase 4).

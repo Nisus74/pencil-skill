@@ -4,7 +4,7 @@ The first version of any design is rarely the right one. This file gives the age
 
 **What this file owns:** the common failure modes (too busy, too sparse, too generic, doesn't feel premium, hierarchy unclear, breakpoints don't hold), the rescue recipes for each, the four-question self-critique gate, the reference-image translation protocol, and the three-iteration limit before stopping to ask the user.
 
-**What this file does NOT own:** the visual hierarchy levers themselves. That's [`visual-hierarchy.md`](visual-hierarchy.md). The token system the rescues lean on. That's [`assets/design-system/tokens.md`](../assets/design-system/tokens.md). The verification ladder this file's three-iteration limit hooks into. That's `SKILL.md` § Verification.
+**What this file does NOT own:** the visual hierarchy levers themselves. That's [`visual-hierarchy.md`](visual-hierarchy.md). The token system the rescues lean on. That's [`design-system/tokens.md`](../design-system/tokens.md). The verification ladder this file's three-iteration limit hooks into. That's `SKILL.md` § Verification.
 
 ## When to load this file
 
@@ -186,6 +186,6 @@ These read as iteration-blind designs and should be fixed in passing:
 - [`layout-patterns.md`](layout-patterns.md): the named layout patterns the reference-image translation protocol maps onto.
 - [`file-architecture.md`](file-architecture.md): the Exploration section where iterations live before promotion.
 - [`modern-patterns.md`](modern-patterns.md): container queries and animation timing the breakpoint and premium-feel rescues lean on.
-- [`assets/design-system/tokens.md`](../assets/design-system/tokens.md): the type, colour, and spacing scales the rescues operate on.
+- [`design-system/tokens.md`](../design-system/tokens.md): the type, colour, and spacing scales the rescues operate on.
 - `SKILL.md` § Self-critique gate: the same four-question gate, summarised.
 - `SKILL.md` § Verification ladder: where the three-iteration limit lives.

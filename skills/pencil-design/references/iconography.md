@@ -4,7 +4,7 @@ Icons are the smallest typography in the product. They sit beside labels, inside
 
 **What this file owns:** stroke weight per context, size relative to text, icon-only versus paired-with-text decisions, semantic icon conventions, decorative-versus-meaningful distinction, family consistency, custom-icon discipline, and the Pencil node types that carry icons into `.pen`.
 
-**What this file does NOT own:** the project's chosen icon family (Phosphor, Lucide, Material Symbols, Heroicons, Tabler, SF Symbols). That commitment lives in [`assets/design-system/iconography.md`](../assets/design-system/iconography.md). Component-internal icon placement (button-internal, input-internal, list-row trailing) is in [`assets/design-system/components.md`](../assets/design-system/components.md). ARIA patterns for icon accessibility are detailed in [`accessibility.md`](accessibility.md). Optical sizing relative to text is cross-referenced in [`visual-hierarchy.md`](visual-hierarchy.md).
+**What this file does NOT own:** the project's chosen icon family (Phosphor, Lucide, Material Symbols, Heroicons, Tabler, SF Symbols). That commitment lives in [`design-system/iconography.md`](../design-system/iconography.md). Component-internal icon placement (button-internal, input-internal, list-row trailing) is in [`design-system/components.md`](../design-system/components.md). ARIA patterns for icon accessibility are detailed in [`accessibility.md`](accessibility.md). Optical sizing relative to text is cross-referenced in [`visual-hierarchy.md`](visual-hierarchy.md).
 
 ## When to load this file
 
@@ -102,7 +102,7 @@ Pencil represents icons via two node types:
 - **`icon_font`**: an icon from a font-based icon set (Lucide, Material Symbols, Phosphor, Feather). Prefer this for any standard-library icon. Properties: `name` (the icon's identifier in its family, e.g. `chevron-right`), `weight` (when the family supports multiple weights, e.g. Phosphor's `thin` / `light` / `regular` / `bold` / `fill` / `duotone`), `size` (in px). The chosen family is documented at the project level so the renderer resolves the name correctly.
 - **`icon_image`**: an icon from a custom SVG or raster source. Reserve for brand marks, custom illustrations, and anything outside the chosen library.
 
-Document the chosen library in the project's [`assets/design-system/iconography.md`](../assets/design-system/iconography.md) so every agent that touches the file picks from the same set. Include the family name, the default size, the default weight, and any size-to-weight rules ("16px renders thin; 20px and up renders regular").
+Document the chosen library in the project's [`design-system/iconography.md`](../design-system/iconography.md) so every agent that touches the file picks from the same set. Include the family name, the default size, the default weight, and any size-to-weight rules ("16px renders thin; 20px and up renders regular").
 
 In `.pen`, an inline status icon beside text typically reads:
 
@@ -149,7 +149,7 @@ These read as icon-blind designs and should be fixed in passing:
 
 - [`accessibility.md`](accessibility.md): `aria-hidden`, `aria-label`, semantic icon patterns, RTL flip for directional icons.
 - [`visual-hierarchy.md`](visual-hierarchy.md): icon size relative to text, optical weight, micro-whitespace between icon and label.
-- [`assets/design-system/iconography.md`](../assets/design-system/iconography.md): the project's chosen icon family, default size, default weight.
-- [`assets/design-system/components.md`](../assets/design-system/components.md): component-internal icon placement (button-internal, input chrome, list-row trailing).
+- [`design-system/iconography.md`](../design-system/iconography.md): the project's chosen icon family, default size, default weight.
+- [`design-system/components.md`](../design-system/components.md): component-internal icon placement (button-internal, input chrome, list-row trailing).
 - [`forms.md`](forms.md): form-field leading/trailing icons, validation icons, error icon pairing.
 - [`pen-schema.md`](pen-schema.md): the `icon_font` and `icon_image` node types in the `.pen` schema.

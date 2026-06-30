@@ -115,7 +115,7 @@ The compound version has zero ambiguity about what renders. The boolean version 
 }
 ```
 
-See [`component-anatomy.md`](component-anatomy.md) for slot path syntax and the worked deep-dive in [`assets/examples/example-component-deep-dive.md`](../assets/examples/example-component-deep-dive.md).
+See [`component-anatomy.md`](component-anatomy.md) for slot path syntax and the worked deep-dive in [`examples/example-component-deep-dive.md`](../examples/example-component-deep-dive.md).
 
 ## Generic provider / state / actions / meta
 
@@ -274,7 +274,7 @@ When extracting:
 4. Add it to `design-system/components.md` with a one-paragraph "when to use this".
 5. Replace inline uses with `ref` instantiations, instance-overriding via `descendants` where they differ.
 
-For the Pencil ops to do all of this, see [`assets/examples/example-import-library.md`](../assets/examples/example-import-library.md).
+For the Pencil ops to do all of this, see [`examples/example-import-library.md`](../examples/example-import-library.md).
 
 ## Anti-patterns
 
@@ -331,6 +331,6 @@ Fix what fails. Don't ship a component without status; don't ship boolean prop e
 - [`states.md`](states.md): required state coverage per component type.
 - [`pen-schema.md`](pen-schema.md): `reusable`, `slot`, `ref`, `descendants` schema.
 - [`forms.md`](forms.md): Form / Field / Input / Submit as a worked example of the compound pattern.
-- [`assets/design-system/components.md`](../assets/design-system/components.md): project-level component catalogue.
-- [`assets/examples/example-component-deep-dive.md`](../assets/examples/example-component-deep-dive.md): full read→understand→instantiate cycle.
-- [`assets/examples/example-import-library.md`](../assets/examples/example-import-library.md): adding a `.lib.pen` to a document.
+- [`design-system/components.md`](../design-system/components.md): project-level component catalogue.
+- [`examples/example-component-deep-dive.md`](../examples/example-component-deep-dive.md): full read→understand→instantiate cycle.
+- [`examples/example-import-library.md`](../examples/example-import-library.md): adding a `.lib.pen` to a document.

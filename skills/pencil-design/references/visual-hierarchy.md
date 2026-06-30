@@ -4,7 +4,7 @@ What makes a design *land*. The pattern of which elements lead, which support, w
 
 **What this file owns:** the six levers (size, weight, colour, position, spacing, motion), primary/secondary/tertiary order, eye-flow patterns (F / Z / Gutenberg / centre), reading order discipline, whitespace as a tool, composition principles (rule of thirds, golden ratio, optical centre, visual weight balance), symmetry vs asymmetry strategy, density calibration.
 
-**What this file does NOT own:** specific layout archetypes (hero variations, feature sections, dashboard layouts). That's `layout-patterns.md` (when scaffolded). The token system that backs the type and colour hierarchies. That's [`assets/design-system/tokens.md`](../assets/design-system/tokens.md). The mechanics of an element gaining contrast on hover. That's [`interactions.md`](interactions.md).
+**What this file does NOT own:** specific layout archetypes (hero variations, feature sections, dashboard layouts). That's `layout-patterns.md` (when scaffolded). The token system that backs the type and colour hierarchies. That's [`design-system/tokens.md`](../design-system/tokens.md). The mechanics of an element gaining contrast on hover. That's [`interactions.md`](interactions.md).
 
 ## When to load this file
 
@@ -185,6 +185,6 @@ Fix what fails. Don't ship a design with broken hierarchy and call it "balanced.
 - SKILL.md § Aesthetic defaults § Self-critique gate. The 4-question gate that catches hierarchy bugs.
 - [`interactions.md`](interactions.md). Interactions increase contrast (hover/focus carry *more* contrast than rest).
 - [`modern-patterns.md`](modern-patterns.md). Modern hierarchy patterns (bento grids, asymmetric layouts, command palette as anchor).
-- [`assets/design-system/layout.md`](../assets/design-system/layout.md). Project's spacing scale, grid, breakpoints.
-- [`assets/design-system/tokens.md`](../assets/design-system/tokens.md). Type scale, colour tokens.
-- [`assets/design-system/components.md`](../assets/design-system/components.md). Visual treatment of primary / secondary / tertiary actions.
+- [`design-system/layout.md`](../design-system/layout.md). Project's spacing scale, grid, breakpoints.
+- [`design-system/tokens.md`](../design-system/tokens.md). Type scale, colour tokens.
+- [`design-system/components.md`](../design-system/components.md). Visual treatment of primary / secondary / tertiary actions.

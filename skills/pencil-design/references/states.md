@@ -140,7 +140,7 @@ Settings have their own state vocabulary distinct from generic forms. The domina
 
 The conflict state is rare but critical for collaborative or multi-device products. Without it, the last save wins silently and the user's history quietly disappears. The conflict banner forces a conscious choice.
 
-Per `assets/design-system/patterns.md` § Settings page (when populated), each settings section in the project commits to one save pattern (autosave or explicit). The states above apply to whichever pattern was chosen.
+Per `design-system/patterns.md` § Settings page (when populated), each settings section in the project commits to one save pattern (autosave or explicit). The states above apply to whichever pattern was chosen.
 
 ## Screen-level fault states
 
@@ -185,7 +185,7 @@ OfflinePage
 
 Each instantiates the same `ErrorBlock` component via `ref` with `descendants` overrides for title / description / icon / CTA. The component lives in your `.lib.pen` once and gets a one-off variant per page. Don't duplicate the lockup.
 
-For a worked example see [`assets/examples/example-error-screen.md`](../assets/examples/example-error-screen.md).
+For a worked example see [`examples/example-error-screen.md`](../examples/example-error-screen.md).
 
 ## Offline & connectivity
 
@@ -225,4 +225,4 @@ These read as state-blind designs and should be fixed in passing whenever you se
 ## See also
 
 - [`accessibility.md`](accessibility.md) — focus states, disabled-contrast minimums, error-not-color-alone rule.
-- [`assets/examples/example-error-screen.md`](../assets/examples/example-error-screen.md) — worked walkthrough of a 404 + offline pair.
+- [`examples/example-error-screen.md`](../examples/example-error-screen.md) — worked walkthrough of a 404 + offline pair.

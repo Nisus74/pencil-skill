@@ -4,13 +4,13 @@ The words on the buttons matter more than the colours behind them. A 'Continue' 
 
 **What this file owns:** the shapes of microcopy across UI surfaces (headlines, CTAs, errors, empty states, success messages, confirmations, system status, loading copy), the voice and tone framework, and the localisation considerations.
 
-**What this file does NOT own:** marketing copy or long-form content. That's the project's content team. The visual treatment of the copy (typography, colour, hierarchy) is in [`visual-hierarchy.md`](visual-hierarchy.md) and [`assets/design-system/tokens.md`](../assets/design-system/tokens.md). Where the copy lives in components (default text vs slot fill) is in [`composition-patterns.md`](composition-patterns.md).
+**What this file does NOT own:** marketing copy or long-form content. That's the project's content team. The visual treatment of the copy (typography, colour, hierarchy) is in [`visual-hierarchy.md`](visual-hierarchy.md) and [`design-system/tokens.md`](../design-system/tokens.md). Where the copy lives in components (default text vs slot fill) is in [`composition-patterns.md`](composition-patterns.md).
 
 ## When to load this file
 
 - The agent is writing button labels, error messages, empty state text, headlines, or any UI copy.
 - The user reports the copy 'sounds robotic' or 'doesn't match the brand'.
-- The project has a populated `assets/design-system/voice.md` and the agent needs to align with it (this file is the principles; voice.md is the project's commitments).
+- The project has a populated `design-system/voice.md` and the agent needs to align with it (this file is the principles; voice.md is the project's commitments).
 - The design includes states (error, empty, loading, success) and the placeholder copy needs replacing.
 
 ## Voice & tone framework
@@ -25,7 +25,7 @@ Three axes to calibrate per project:
 
 Most B2B SaaS lives at the centre of all three: friendly, serious, calm. Consumer apps tend toward casual, playful, and energetic. Pick a position and hold it across surfaces. Voice that drifts (formal in error, casual in success) reads as inconsistent.
 
-For the project's specific voice commitments, see `assets/design-system/voice.md`: the project's calibration of these principles.
+For the project's specific voice commitments, see `design-system/voice.md`: the project's calibration of these principles.
 
 ## Headlines
 
@@ -124,7 +124,7 @@ Microcopy that's hard to translate is harder to maintain. Three considerations t
 - **Leave room for longer translations.** German compound nouns can be 30% to 50% longer than English; Russian sentences run longer too. Button widths sized to fit the English label exactly will break in German. Leave breathing room.
 - **Don't bake plurals into single strings.** A copy template like 'You have {count} items' breaks in languages with multiple plural forms (Russian, Polish, Arabic). Use the platform's pluralisation system (ICU MessageFormat, i18next plurals) and write the copy with all forms in mind.
 
-For the project's specific localisation strategy, see `assets/design-system/voice.md` § Localisation (when populated).
+For the project's specific localisation strategy, see `design-system/voice.md` § Localisation (when populated).
 
 ## Pencil expression
 
@@ -135,7 +135,7 @@ Microcopy lives in two places in `.pen`:
 
 Document the copy shape in the component's `context`: *'Slot expects an action-specific verb + noun, e.g. 'Save changes', 'Send invitation'. Avoid generic verbs (Continue, Submit).'* The next agent reading the component knows the constraint.
 
-For copy that crosses many components (error message templates, empty state lockups), define a small set of reusable copy patterns in `assets/design-system/voice.md` (when the project has one) and reference them by name in component `context`.
+For copy that crosses many components (error message templates, empty state lockups), define a small set of reusable copy patterns in `design-system/voice.md` (when the project has one) and reference them by name in component `context`.
 
 ## Anti-patterns
 
@@ -164,7 +164,7 @@ These read as copy-blind designs and should be fixed in passing:
 
 ## See also
 
-- `assets/design-system/voice.md`: the project's specific voice commitments (when populated). This file is the principles; voice.md is the project's calibration.
+- `design-system/voice.md`: the project's specific voice commitments (when populated). This file is the principles; voice.md is the project's calibration.
 - [`states.md`](states.md): empty state taxonomy and screen-level fault state copy.
 - [`flows.md`](flows.md): confirmation patterns (modal vs toast), plausible content guidance.
 - [`forms.md`](forms.md): form-specific error display and validation copy.

@@ -6,7 +6,7 @@ This file gives the agent the vocabulary to design like the platform expects: sa
 
 **What this file owns:** safe-area handling (notch, home indicator, dynamic island), bottom sheets vs modals, sheet detents, pull-to-refresh, swipe gestures, haptic feedback, tab bars, native iOS / Android conventions, floating action buttons, keyboard avoidance for inputs.
 
-**What this file does NOT own:** the project's mobile breakpoint commitments (those live in [`assets/design-system/mobile.md`](../assets/design-system/mobile.md)). State taxonomies for loading and error live in [`states.md`](states.md). Navigation patterns and back-stack model are in [`flows.md`](flows.md). Hit targets and focus management are in [`interactions.md`](interactions.md). ARIA, screen reader, and dynamic type are in [`accessibility.md`](accessibility.md).
+**What this file does NOT own:** the project's mobile breakpoint commitments (those live in [`design-system/mobile.md`](../design-system/mobile.md)). State taxonomies for loading and error live in [`states.md`](states.md). Navigation patterns and back-stack model are in [`flows.md`](flows.md). Hit targets and focus management are in [`interactions.md`](interactions.md). ARIA, screen reader, and dynamic type are in [`accessibility.md`](accessibility.md).
 
 ## When to load this file
 
@@ -218,7 +218,7 @@ For native iOS and Android, the platform's `KeyboardAvoidingView` (React Native)
 
 Mobile design in `.pen` files is structured the same way as desktop, with extra discipline at three points:
 
-- **Breakpoint commitment.** The project's mobile breakpoint (typically `≤768px` or `≤640px`, set in [`assets/design-system/mobile.md`](../assets/design-system/mobile.md)) is the line at which layouts collapse from split to stacked. Don't drift from the project's chosen value.
+- **Breakpoint commitment.** The project's mobile breakpoint (typically `≤768px` or `≤640px`, set in [`design-system/mobile.md`](../design-system/mobile.md)) is the line at which layouts collapse from split to stacked. Don't drift from the project's chosen value.
 - **Safe-area frame.** The outermost frame of any mobile screen carries `context: "Safe-area aware. Top inset: status bar + notch / dynamic island. Bottom inset: home indicator. viewport-fit=cover assumed."`. The engineer reads this and wires `env(safe-area-inset-*)` correctly.
 - **Gesture markers in `context`.** Whenever the screen or component supports a swipe, pull, or long-press, name the gesture in the `context`. Examples: *"Swipe-to-archive enabled. Right-swipe reveals Archive action."*; *"Pull-to-refresh enabled at top. Triggers re-fetch of inbox."*; *"Long-press shows context menu with Mark Read / Flag / Move."*. The agent reads these markers later when iterating; the engineer reads them when implementing.
 - **Sheet components with detents.** A `BottomSheet` reusable carries its supported detents in `context`: *"Detents: peek (180pt), half, full. Default: half. Drag handle visible. Dismissable by swipe-down."*. Variants per detent (`BottomSheet_Peek`, `BottomSheet_Half`, `BottomSheet_Full`) make the design intent visible at a glance.
@@ -258,5 +258,5 @@ These read as desktop-blind designs and should be fixed in passing:
 - [`accessibility.md`](accessibility.md): ARIA on mobile, screen reader (VoiceOver / TalkBack) conventions, Dynamic Type behaviour.
 - [`forms.md`](forms.md): mobile input attributes, font-size minimums, keyboard discipline.
 - [`composition-patterns.md`](composition-patterns.md): slot design for `BottomSheet`, `TabBar`, and `MobileScreen` reusables.
-- [`assets/design-system/mobile.md`](../assets/design-system/mobile.md): the project's mobile breakpoint commitments, touch-target sizes, and platform-specific tokens.
-- [`assets/design-system/motion.md`](../assets/design-system/motion.md): sheet present / dismiss timing, swipe-action commit thresholds, haptic-paired animation curves.
+- [`design-system/mobile.md`](../design-system/mobile.md): the project's mobile breakpoint commitments, touch-target sizes, and platform-specific tokens.
+- [`design-system/motion.md`](../design-system/motion.md): sheet present / dismiss timing, swipe-action commit thresholds, haptic-paired animation curves.

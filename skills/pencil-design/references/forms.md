@@ -4,7 +4,7 @@ Forms are where the most discipline pays off. The user is *interacting* with wha
 
 **What this file owns:** submit behaviour, label patterns, validation timing, error display, input attributes, submit-state choreography, mobile input quirks, hit-zone discipline, multi-step-form mechanics, unsaved-changes warnings, placeholder conventions.
 
-**What this file does NOT own:** the screen-level orchestration of a multi-step flow (page vs modal, back-stack model). That's [`flows.md`](flows.md). The visual design of inputs (border treatment, focus ring) lives in [`assets/design-system/components.md`](../assets/design-system/components.md). State transitions (loading, error, success at the field level) are in [`states.md`](states.md). Microcopy for errors / empty / success is in `microcopy.md` (when present in your project).
+**What this file does NOT own:** the screen-level orchestration of a multi-step flow (page vs modal, back-stack model). That's [`flows.md`](flows.md). The visual design of inputs (border treatment, focus ring) lives in [`design-system/components.md`](../design-system/components.md). State transitions (loading, error, success at the field level) are in [`states.md`](states.md). Microcopy for errors / empty / success is in `microcopy.md` (when present in your project).
 
 ## When to load this file
 
@@ -214,5 +214,5 @@ Fix what fails. Don't note any of these as TODOs; broken form mechanics ship as 
 - [`states.md`](states.md): field-level states (default/hover/focus/error/disabled/loading/success).
 - [`accessibility.md`](accessibility.md): ARIA labels, focus order, screen-reader content, RTL form layout.
 - [`composition-patterns.md`](composition-patterns.md): slot design for `Field` and `Input` components.
-- [`assets/design-system/components.md`](../assets/design-system/components.md): visual treatment of inputs (border, focus ring, error colour).
-- [`assets/design-system/voice.md`](../assets/design-system/voice.md): error message tone, microcopy patterns.
+- [`design-system/components.md`](../design-system/components.md): visual treatment of inputs (border, focus ring, error colour).
+- [`design-system/voice.md`](../design-system/voice.md): error message tone, microcopy patterns.

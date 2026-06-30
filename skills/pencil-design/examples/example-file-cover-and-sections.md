@@ -14,7 +14,7 @@ This example shows the agent setting up a fresh `.pen` per the file-architecture
 get_editor_state();
 ```
 
-The agent reads `assets/design-system/file-architecture.md` (project's file-architecture commitments), `visual-style.md`, and `tokens.md`. Loads `references/file-architecture.md` (the canonical Cover frame, section regions, hierarchical naming reference).
+The agent reads `design-system/file-architecture.md` (project's file-architecture commitments), `visual-style.md`, and `tokens.md`. Loads `references/file-architecture.md` (the canonical Cover frame, section regions, hierarchical naming reference).
 
 ## Step 2: Find canvas origin
 
@@ -306,7 +306,7 @@ The full canvas screenshot shows the regions visually. Cover top-left, Source of
 
 - `references/file-architecture.md`: the canonical reference for Cover frames, sections, naming, multi-`.pen` decisions.
 - `references/composition-patterns.md` § Component status workflow.
-- `assets/design-system/file-architecture.md`: project's file-architecture commitments.
-- `assets/design-system/visual-style.md`: project's chosen style.
-- `assets/examples/example-component-deep-dive.md`: deeper example of working with components within a `.pen`.
+- `design-system/file-architecture.md`: project's file-architecture commitments.
+- `design-system/visual-style.md`: project's chosen style.
+- `examples/example-component-deep-dive.md`: deeper example of working with components within a `.pen`.
 - `SKILL.md` § Discipline rules § File architecture.

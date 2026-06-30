@@ -4,7 +4,7 @@ How to pick the right chart for the shape of the data, how to colour charts so t
 
 **What this file owns:** the 25-chart selection matrix (data shape → ideal chart → failure mode), colour-blind-safe palette recommendations, dashboard tile shapes (KPI / chart / table), default chart styling rules, and chart anti-patterns.
 
-**What this file does NOT own:** the project's *committed* chart palette. That lives in `assets/design-system/data-viz.md` (when populated) or `assets/design-system/tokens.md`. General colour theory is in [`colour-palettes.md`](colour-palettes.md). Dashboard layout patterns (sidebar / top nav / three-column) are in [`layout-patterns.md`](layout-patterns.md). Performance for chart rendering is in [`performance-design.md`](performance-design.md).
+**What this file does NOT own:** the project's *committed* chart palette. That lives in `design-system/data-viz.md` (when populated) or `design-system/tokens.md`. General colour theory is in [`colour-palettes.md`](colour-palettes.md). Dashboard layout patterns (sidebar / top nav / three-column) are in [`layout-patterns.md`](layout-patterns.md). Performance for chart rendering is in [`performance-design.md`](performance-design.md).
 
 ## When to load this file
 
@@ -200,7 +200,7 @@ Charts in `.pen` are slot-filled containers. The pattern:
 
 Example `context` for a bar-chart component: *'Renders a vertical bar chart. Expects an array of `{label: string, value: number}`. Uses `$chart1` for the bar fill. 240-400px height; 100% width within container. Skeleton with axis hints during load. Animation: bars rise from baseline over 300ms.'*
 
-For the project's chart palette commitment (which Okabe-Ito or ColorBrewer scale is used), see `assets/design-system/data-viz.md` (when populated; an optional Tier 2 design-system template).
+For the project's chart palette commitment (which Okabe-Ito or ColorBrewer scale is used), see `design-system/data-viz.md` (when populated; an optional Tier 2 design-system template).
 
 ## Sources
 
@@ -225,5 +225,5 @@ For the project's chart palette commitment (which Okabe-Ito or ColorBrewer scale
 - [`interactions.md`](interactions.md): loading-state timing rules for chart loads.
 - [`microcopy.md`](microcopy.md): chart titles, captions, and KPI label patterns.
 - [`industry-patterns.md`](industry-patterns.md) § Fintech (trading), § SaaS (analytics), § Healthcare (clinical): industries where data-viz is dominant.
-- [`assets/design-system/data-viz.md`](../assets/design-system/data-viz.md): the project's chart palette and library commitment (optional Tier 2 template).
-- [`example-data-visualization.md`](../assets/examples/example-data-visualization.md): worked example of a multi-chart dashboard (Phase 4).
+- [`design-system/data-viz.md`](../design-system/data-viz.md): the project's chart palette and library commitment (optional Tier 2 template).
+- [`example-data-visualization.md`](../examples/example-data-visualization.md): worked example of a multi-chart dashboard (Phase 4).

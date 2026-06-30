@@ -14,7 +14,7 @@ This example shows the agent picking the right chart per data shape, applying a 
 get_editor_state();
 ```
 
-The agent reads `assets/design-system/visual-style.md`, `tokens.md`, and `data-viz.md` (the project's chart palette and library commitments). Loads `references/data-viz.md` (the 25-chart selection matrix and the Okabe-Ito / ColorBrewer / Viridis palettes) and `references/layout-patterns.md` § Dashboard layouts.
+The agent reads `design-system/visual-style.md`, `tokens.md`, and `data-viz.md` (the project's chart palette and library commitments). Loads `references/data-viz.md` (the 25-chart selection matrix and the Okabe-Ito / ColorBrewer / Viridis palettes) and `references/layout-patterns.md` § Dashboard layouts.
 
 ## Step 2: Pick the chart per data shape
 
@@ -37,7 +37,7 @@ Per `references/data-viz.md` § Colour-blind-safe palettes, three families:
 - **ColorBrewer Sequential / Diverging**: for ordered data (heatmaps).
 - **Viridis**: for continuous, perceptually uniform.
 
-The project commits in `assets/design-system/data-viz.md`. For this example: Okabe-Ito for categorical (bar charts, line series), Viridis for the cohort heatmap.
+The project commits in `design-system/data-viz.md`. For this example: Okabe-Ito for categorical (bar charts, line series), Viridis for the cohort heatmap.
 
 The agent commits the chart palette tokens in `tokens.md`:
 
@@ -198,7 +198,7 @@ Document each pairing in the relevant component's `context`.
 Per `references/data-viz.md` § Loading states for charts:
 
 - Skeleton with axis hints during chart load (better than a spinner; tells the user the shape).
-- Empty state per chart (per `assets/design-system/empty-states.md` § Search results style: name what's empty, suggest refinements).
+- Empty state per chart (per `design-system/empty-states.md` § Search results style: name what's empty, suggest refinements).
 
 ## Step 12: Verify with one screenshot
 
@@ -222,6 +222,6 @@ Run a colour-blind simulator (Stark, Sim Daltonism, Chrome DevTools Vision Defic
 - `references/data-viz.md`: 25-chart selection matrix, colour-blind-safe palettes, dashboard tile shapes.
 - `references/layout-patterns.md` § Dashboard layouts.
 - `references/states.md` § Loading taxonomy.
-- `assets/design-system/data-viz.md`: project's chart palette and library commitments.
-- `assets/examples/example-dashboard.md`: simpler dashboard example.
-- `assets/design-system/tokens.md`: chart palette tokens (`$chart1` through `$chart8`).
+- `design-system/data-viz.md`: project's chart palette and library commitments.
+- `examples/example-dashboard.md`: simpler dashboard example.
+- `design-system/tokens.md`: chart palette tokens (`$chart1` through `$chart8`).

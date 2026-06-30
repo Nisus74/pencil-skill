@@ -72,7 +72,7 @@ get_variables({ documentId: <doc-id> })
 
 This returns the current variables (probably empty for a greenfield project) and the document's themes. The agent confirms the document declares `themes.mode: ["light", "dark"]` (or adds it if missing).
 
-## Step 6: Populate `assets/design-system/tokens.md`
+## Step 6: Populate `design-system/tokens.md`
 
 The agent edits `tokens.md` to commit the chosen palette and fonts as semantic tokens. The hex values come from the Tailwind scales the agent looked up in step 3.
 
@@ -162,7 +162,7 @@ After this call, the `.pen` file's `variables` section holds the same values as 
 
 ## Step 8: Record commitments in `visual-style.md`
 
-The agent edits `assets/design-system/visual-style.md`:
+The agent edits `design-system/visual-style.md`:
 
 ```markdown
 ## Chosen style
@@ -203,7 +203,7 @@ No deviations. The catalogue picks fit the brief directly.
 
 ## Step 9: Scaffold starter components matching the style
 
-With tokens populated, the agent scaffolds the foundational components in a `.lib.pen` (per [`composition-patterns.md`](../../references/composition-patterns.md) § When to extract to .lib.pen). Starter components:
+With tokens populated, the agent scaffolds the foundational components in a `.lib.pen` (per [`composition-patterns.md`](../references/composition-patterns.md) § When to extract to .lib.pen). Starter components:
 
 - `Button` (Primary, Secondary, Ghost, Destructive): uses `$accent`, `$accentHover`, `$danger`.
 - `Input` (Text, Email, Search, Password): uses `$surface`, `$border`, `$textPrimary`, `$focusRing`.
@@ -285,8 +285,8 @@ The catalogues (style, palettes, fonts) are consulted *once* per project. After 
 - `references/colour-palettes.md`: the menu of palette recipes.
 - `references/font-pairings.md`: the menu of font pairings.
 - `references/industry-patterns.md`: per-industry recommendations.
-- `assets/design-system/visual-style.md`: the project commitment template.
-- `assets/design-system/tokens.md`: the project token template.
+- `design-system/visual-style.md`: the project commitment template.
+- `design-system/tokens.md`: the project token template.
 - `references/composition-patterns.md`: when and how to extract starter components to a `.lib.pen`.
 - `references/iteration-patterns.md`: rescues when the chosen style isn't landing.
 - `SKILL.md` § Verification ladder: when to screenshot during this flow.

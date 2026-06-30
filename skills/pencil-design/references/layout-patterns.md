@@ -4,7 +4,7 @@ How the agent picks the *shape* of a page. Most AI-generated UIs default to the 
 
 **What this file owns:** the named layout patterns the agent picks from for marketing pages, dashboards, settings, list-detail screens, and empty pages. For each pattern: when it works, when it doesn't, real-world exemplars that ship it well.
 
-**What this file does NOT own:** the typography, colour, and spacing that fill the layout. That's [`assets/design-system/tokens.md`](../assets/design-system/tokens.md) and the per-project commitments. Component-level state (loading, error, hover) is in [`states.md`](states.md). Visual hierarchy within a chosen layout is in [`visual-hierarchy.md`](visual-hierarchy.md). Microcopy that fills the layout is in [`microcopy.md`](microcopy.md).
+**What this file does NOT own:** the typography, colour, and spacing that fill the layout. That's [`design-system/tokens.md`](../design-system/tokens.md) and the per-project commitments. Component-level state (loading, error, hover) is in [`states.md`](states.md). Visual hierarchy within a chosen layout is in [`visual-hierarchy.md`](visual-hierarchy.md). Microcopy that fills the layout is in [`microcopy.md`](microcopy.md).
 
 ## When to load this file
 
@@ -53,7 +53,7 @@ Three-tier pricing with a highlighted middle tier is the dominant pattern for a 
 | **Usage-based** | Pricing scales with consumption (API calls, storage, seats). Show the price calculator inline; let the user explore. | Stripe, Vercel, AWS-style products. |
 | **Enterprise contact** | Top tier is 'Contact us'. Reserve for genuinely enterprise-only features (SSO, SLAs, dedicated support). Don't gate basic features behind it. | Linear (Enterprise tier), Vercel Enterprise. |
 
-The highlighted tier carries: a coloured border (one accent colour, never multiple), a layered shadow (ambient + direct, per `SKILL.md` § Shadows), a slight scale-up, and either a 'Most popular' or 'Recommended' badge. Don't combine all four. A coloured border plus a badge is plenty. See [`example-pricing-table.md`](../assets/examples/example-pricing-table.md) (Phase 4).
+The highlighted tier carries: a coloured border (one accent colour, never multiple), a layered shadow (ambient + direct, per `SKILL.md` § Shadows), a slight scale-up, and either a 'Most popular' or 'Recommended' badge. Don't combine all four. A coloured border plus a badge is plenty. See [`example-pricing-table.md`](../examples/example-pricing-table.md) (Phase 4).
 
 ## Testimonials
 
@@ -96,7 +96,7 @@ Don't mix architectures. A sitemap with a giant 'Subscribe to our newsletter' fo
 | **Three-column (nav / list / detail)** | Email, messaging, asset browsers. The user picks an item from the middle column; the right column shows it. | Apple Mail, Things, Linear's issue view. |
 | **Command-driven** | Power-user products where ⌘+K is the primary navigation. The chrome stays minimal because the keyboard does the work. | Linear, Raycast, Arc. |
 
-For multi-product platforms, the sidebar may need a workspace switcher or a product switcher at the top. Document the chosen pattern in the project's `assets/design-system/navigation.md` (Phase 4).
+For multi-product platforms, the sidebar may need a workspace switcher or a product switcher at the top. Document the chosen pattern in the project's `design-system/navigation.md` (Phase 4).
 
 ## Settings pages
 
@@ -129,7 +129,7 @@ The 404, 500, and offline pages are a brand opportunity. Treat them as designed 
 - **Helpful 404** with a sitemap or popular links below the error block. Right for content-heavy sites where the user might be looking for something specific.
 - **Branded fault states** with a custom illustration that ties to the brand voice. The fault state is one of the rare moments the user sees the brand without the product chrome around it. Worth the design investment.
 
-First-run welcome pages are different from empty states (which live inside a populated product). They're the user's first interaction. Show what the product can do: sample data, a guided tour, or a 60-second video. See [`example-onboarding-flow.md`](../assets/examples/example-onboarding-flow.md) (Phase 4).
+First-run welcome pages are different from empty states (which live inside a populated product). They're the user's first interaction. Show what the product can do: sample data, a guided tour, or a 60-second video. See [`example-onboarding-flow.md`](../examples/example-onboarding-flow.md) (Phase 4).
 
 ## Pencil expression
 
@@ -171,7 +171,7 @@ These read as layout-blind designs and should be fixed in passing:
 - [`states.md`](states.md): empty, error, and fault state vocabulary for the empty-page templates.
 - [`flows.md`](flows.md): how the user moves between pages within these layouts (modal vs page, back-stack, deep links).
 - [`microcopy.md`](microcopy.md): the words that fill these layouts.
-- [`assets/design-system/patterns.md`](../assets/design-system/patterns.md): the project's chosen layouts, lifted from this menu.
-- [`assets/design-system/navigation.md`](../assets/design-system/navigation.md): the project's chosen navigation pattern (Phase 4).
-- [`assets/examples/example-marketing-page.md`](../assets/examples/example-marketing-page.md): worked example of a non-three-card-grid marketing page (Phase 4).
-- [`assets/examples/example-dashboard.md`](../assets/examples/example-dashboard.md): worked example of a dashboard with proper hierarchy (Phase 4).
+- [`design-system/patterns.md`](../design-system/patterns.md): the project's chosen layouts, lifted from this menu.
+- [`design-system/navigation.md`](../design-system/navigation.md): the project's chosen navigation pattern (Phase 4).
+- [`examples/example-marketing-page.md`](../examples/example-marketing-page.md): worked example of a non-three-card-grid marketing page (Phase 4).
+- [`examples/example-dashboard.md`](../examples/example-dashboard.md): worked example of a dashboard with proper hierarchy (Phase 4).

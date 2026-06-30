@@ -14,7 +14,7 @@ This example shows the agent reading project context, picking the dashboard layo
 get_editor_state();
 ```
 
-The agent reads `assets/design-system/visual-style.md` (style + palette + fonts), `tokens.md` (token values), `navigation.md` (project commits sidebar + main), and `data-viz.md` (project's chart palette and library commitments).
+The agent reads `design-system/visual-style.md` (style + palette + fonts), `tokens.md` (token values), `navigation.md` (project commits sidebar + main), and `data-viz.md` (project's chart palette and library commitments).
 
 Loads `references/layout-patterns.md` § Dashboard layouts and `references/data-viz.md` (the 25-chart selection matrix and tile shapes).
 
@@ -168,7 +168,7 @@ Per `references/states.md` § Component states matrix and § Loading taxonomy:
 - KPI card skeleton (placeholder values + sparkline skeleton).
 - Chart tile skeleton (axis hints + placeholder line).
 - Activity table skeleton (5 rows of placeholder cells).
-- Empty state per tile (per `assets/design-system/empty-states.md`).
+- Empty state per tile (per `design-system/empty-states.md`).
 - Error state per tile (inline retry; rest of the dashboard renders normally per `references/states.md` § Partial-failure).
 
 ## Step 8: Verify with one screenshot
@@ -195,5 +195,5 @@ Hand back with one-paragraph summary.
 - `references/states.md` § Component states matrix and § Loading taxonomy.
 - `references/microcopy.md` § System status: time-based copy.
 - `references/performance-design.md` § Virtualisation: when to virtualise the activity table.
-- `assets/examples/example-data-visualization.md`: deeper example of a multi-chart dashboard.
-- `assets/design-system/data-viz.md`: project's chart palette commitments.
+- `examples/example-data-visualization.md`: deeper example of a multi-chart dashboard.
+- `design-system/data-viz.md`: project's chart palette commitments.

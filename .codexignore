@@ -1,0 +1,23 @@
+# Files not needed when the plugin is packaged and installed.
+# The skill content under skills/ and the platform manifests are what ship.
+
+# CI, tooling, and project meta
+.github/
+tools/
+.pre-commit-config.yaml
+.gitignore
+.codexignore
+
+# Contributor and policy docs (kept in the repo, not in the plugin bundle)
+docs/
+CONTRIBUTING.md
+CODE_OF_CONDUCT.md
+
+# Other platform adapters (Codex only needs .codex-plugin/)
+.claude-plugin/
+.cursor-plugin/
+gemini-extension.json
+
+# Editor and OS cruft
+.DS_Store
+node_modules/

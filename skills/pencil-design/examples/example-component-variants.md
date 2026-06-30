@@ -4,7 +4,7 @@ A worked walkthrough of authoring a reusable component family in `.lib.pen`. The
 
 > *"Build the Button component for our design system. Cover the variants we need (primary, secondary, destructive, ghost, icon-only) and all the states."*
 
-This example exercises the explicit-variants pattern, the `state` theme axis, slot anatomy for label and icons, and the loading-state choreography that won't shift layout. Cross-references: [`references/composition-patterns.md`](../../references/composition-patterns.md) for the explicit-variants rule and `.lib.pen` extraction rules; [`references/states.md`](../../references/states.md) for the state matrix and the two authoring conventions; [`assets/design-system/components.md`](../design-system/components.md) for the project's component conventions.
+This example exercises the explicit-variants pattern, the `state` theme axis, slot anatomy for label and icons, and the loading-state choreography that won't shift layout. Cross-references: [`references/composition-patterns.md`](../references/composition-patterns.md) for the explicit-variants rule and `.lib.pen` extraction rules; [`references/states.md`](../references/states.md) for the state matrix and the two authoring conventions; [`design-system/components.md`](../design-system/components.md) for the project's component conventions.
 
 ---
 
@@ -12,10 +12,10 @@ This example exercises the explicit-variants pattern, the `state` theme axis, sl
 
 Before touching the canvas, read the project's design system. The Button has to honour what's already there.
 
-- `assets/design-system/visual-style.md` for the button shape language (rounded radius, no inner shadow, etc.).
-- `assets/design-system/tokens.md` for palette tokens (`$accent`, `$surface`, `$textPrimary`, `$danger`, `$focusRing`, `$surfaceMuted`) and type tokens (`$textBase`, `$fontMedium`).
-- `assets/design-system/components.md` for the project's component conventions, including whether the project uses variant siblings or a `state` theme axis.
-- `assets/design-system/accessibility.md` for the focus ring spec (2px outline, 2px offset, `$focusRing` colour).
+- `design-system/visual-style.md` for the button shape language (rounded radius, no inner shadow, etc.).
+- `design-system/tokens.md` for palette tokens (`$accent`, `$surface`, `$textPrimary`, `$danger`, `$focusRing`, `$surfaceMuted`) and type tokens (`$textBase`, `$fontMedium`).
+- `design-system/components.md` for the project's component conventions, including whether the project uses variant siblings or a `state` theme axis.
+- `design-system/accessibility.md` for the focus ring spec (2px outline, 2px offset, `$focusRing` colour).
 
 Then load the references that govern this kind of work:
 
@@ -118,7 +118,7 @@ ghostLabel=I(btnGhost, { type: "text", name: "Slot_Label", slot: true, content: 
 
 ## Step 7: focus ring across all variants
 
-Per `references/states.md` and `assets/design-system/accessibility.md`, focus is the one state you can't skip. Every variant binds a stroke that's transparent by default and visible on `focus`. Apply to each variant frame:
+Per `references/states.md` and `design-system/accessibility.md`, focus is the one state you can't skip. Every variant binds a stroke that's transparent by default and visible on `focus`. Apply to each variant frame:
 
 ```
 U("btnPrimary", {
@@ -133,7 +133,7 @@ The ring colour is the same across variants so consumers learn it once.
 
 ## Step 8: loading-state choreography
 
-Per `assets/design-system/forms.md` § Submit-state choreography and `references/states.md` § Component states matrix: the loading state replaces the label with a spinner-plus-label lockup. Width has to stay constant so the surrounding layout doesn't jump.
+Per `design-system/forms.md` § Submit-state choreography and `references/states.md` § Component states matrix: the loading state replaces the label with a spinner-plus-label lockup. Width has to stay constant so the surrounding layout doesn't jump.
 
 The cleanest way is a `loading` sibling inside each variant that holds the spinner-and-label group, gated to render only when `theme.state == "loading"`:
 
@@ -230,4 +230,4 @@ Confirm:
 - **Icon-only accessibility documented in `context`** so the engineer wires up `aria-label` and tooltip from the design.
 - **Status workflow surfaced in `context`** so consumers know the family's `ready` (safe to use) rather than `draft` or `deprecated`.
 
-See also: [`references/composition-patterns.md`](../../references/composition-patterns.md) for explicit variants and slot design rules; [`references/states.md`](../../references/states.md) for the state matrix and authoring conventions; [`assets/design-system/components.md`](../design-system/components.md) for the project's required state coverage.
+See also: [`references/composition-patterns.md`](../references/composition-patterns.md) for explicit variants and slot design rules; [`references/states.md`](../references/states.md) for the state matrix and authoring conventions; [`design-system/components.md`](../design-system/components.md) for the project's required state coverage.

@@ -4,11 +4,11 @@ A library of named UI styles the agent picks from when starting greenfield. Most
 
 **What this file owns:** 30+ named UI styles with mood, when-to-use guidance, anti-pattern, sample component cues, and real-world exemplars. The styles are organised loosely by family (modernist, expressive, technical, retro) for navigation; the agent can pick from any family per project.
 
-**What this file does NOT own:** the project's *committed* style. That lives in `assets/design-system/visual-style.md` (when the project has chosen one). The visual tokens (colours, type scale, spacing) lift to `assets/design-system/tokens.md`. Component anatomy is in [`composition-patterns.md`](composition-patterns.md).
+**What this file does NOT own:** the project's *committed* style. That lives in `design-system/visual-style.md` (when the project has chosen one). The visual tokens (colours, type scale, spacing) lift to `design-system/tokens.md`. Component anatomy is in [`composition-patterns.md`](composition-patterns.md).
 
 ## When to load this file
 
-- The agent is starting a greenfield design and the project has no `assets/design-system/visual-style.md` yet.
+- The agent is starting a greenfield design and the project has no `design-system/visual-style.md` yet.
 - The user says 'make it feel like Linear' or 'I want a brutalist look' or names any aesthetic direction.
 - The design feels generic and the agent needs to commit harder to one style (per [`iteration-patterns.md`](iteration-patterns.md) § Failure mode: too generic).
 - The user is exploring directions and wants to see options before committing.
@@ -18,8 +18,8 @@ A library of named UI styles the agent picks from when starting greenfield. Most
 1. The agent reads the user's brief and any reference images.
 2. The agent picks one style from the catalogue that fits the brief. If no fit is obvious, the agent surfaces 2 to 3 candidate styles and asks the user to pick.
 3. The chosen style's mood, anti-pattern, and sample-component cues become the constraints on the design.
-4. When the design ships, the chosen style gets recorded in `assets/design-system/visual-style.md` so future agents (and future iterations) stay coherent.
-5. The MCP `set_variables` call populates the project's tokens to match the style. See [`example-style-selection.md`](../assets/examples/example-style-selection.md) (Phase 4) for the worked flow.
+4. When the design ships, the chosen style gets recorded in `design-system/visual-style.md` so future agents (and future iterations) stay coherent.
+5. The MCP `set_variables` call populates the project's tokens to match the style. See [`example-style-selection.md`](../examples/example-style-selection.md) (Phase 4) for the worked flow.
 
 Each entry below carries: a short description, the *mood* it lands in, *when to use it*, *anti-pattern* (the most common way the style ships wrong), *sample components* (what a button or card looks like in this style), and *exemplars* (real products that ship the style well).
 
@@ -273,8 +273,8 @@ When the agent isn't sure, surface 2 to 3 candidates. *'I think this could be Sw
 
 A chosen style maps to two layers of the project:
 
-- **`assets/design-system/visual-style.md`** records the chosen style and any deviations: *'Style: Swiss / International with Bento for marketing pages. Deviations: warmer accent colour (#FF6B35) instead of the typical Swiss blue, to land closer to the brand's energy.'*
-- **`assets/design-system/tokens.md`** holds the type, colour, and spacing tokens that match the style. The agent populates them via `set_variables` MCP calls. See [`example-style-selection.md`](../assets/examples/example-style-selection.md) (Phase 4) for the worked sequence.
+- **`design-system/visual-style.md`** records the chosen style and any deviations: *'Style: Swiss / International with Bento for marketing pages. Deviations: warmer accent colour (#FF6B35) instead of the typical Swiss blue, to land closer to the brand's energy.'*
+- **`design-system/tokens.md`** holds the type, colour, and spacing tokens that match the style. The agent populates them via `set_variables` MCP calls. See [`example-style-selection.md`](../examples/example-style-selection.md) (Phase 4) for the worked sequence.
 
 When designing a new screen, the agent reads `visual-style.md` first to recall which style applies, then constrains every choice to that style. A Brutalist project doesn't get glassmorphic modals; a Swiss project doesn't get Memphis-shaped dividers.
 
@@ -298,10 +298,10 @@ When designing a new screen, the agent reads `visual-style.md` first to recall w
 
 ## See also
 
-- [`assets/design-system/visual-style.md`](../assets/design-system/visual-style.md): the project's chosen style, lifted from this catalogue (when populated, Phase 4).
+- [`design-system/visual-style.md`](../design-system/visual-style.md): the project's chosen style, lifted from this catalogue (when populated, Phase 4).
 - [`colour-palettes.md`](colour-palettes.md): industry-tagged colour palettes to pair with the chosen style.
 - [`font-pairings.md`](font-pairings.md): typography pairings to pair with the chosen style.
 - [`industry-patterns.md`](industry-patterns.md): which styles pair with which industries.
 - [`iteration-patterns.md`](iteration-patterns.md) § Failure mode: too generic: the rescue when the design isn't committing to a style.
 - [`layout-patterns.md`](layout-patterns.md): the layouts each style favours (Bento maps to bento; Editorial maps to alternating-rows; etc.).
-- [`example-style-selection.md`](../assets/examples/example-style-selection.md): worked example of picking a style + palette + font pairing and populating tokens via `set_variables` (Phase 4).
+- [`example-style-selection.md`](../examples/example-style-selection.md): worked example of picking a style + palette + font pairing and populating tokens via `set_variables` (Phase 4).

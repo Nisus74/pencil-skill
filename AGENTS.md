@@ -69,35 +69,34 @@ skills/pencil-design/              # The platform-agnostic core
     colour-palettes.md             # 40+ palette recipes (menu) tagged by industry/mood; recipes point to Tailwind/Radix/IBM Carbon/Material 3/Apple HIG
     font-pairings.md               # 30+ typography pairings (menu); recipes point to Google Fonts/Vercel/GitHub/commercial foundries
     codex-tools.md                 # OpenAI Codex tool name mappings
-  assets/
-    design-system/                 # Optional design-system reference templates
-      README.md                    # Agent loading guide
-      CUSTOMISING.md               # Plain-English guide for non-technical editors
-      accessibility.md             # Project a11y standards (WCAG/APCA, keyboard, screen reader)
-      empty-states.md              # Per-surface empty state catalogue with copy templates
-      file-architecture.md         # Project .pen file structure and naming conventions
-      forms.md                     # Form conventions (validation, error display, save patterns)
-      micro-interactions.md        # Per-interaction motion specs
-      navigation.md                # Primary nav patterns, workspace switcher, mobile tab bar
-      onboarding.md                # First-run experience (sample-data vs blank slate)
-      search.md                    # Search shape (instant / submit / hybrid), filters, URL state
-      visual-style.md              # Project's chosen style identity (style + palette + font picks)
-    examples/                      # 15 worked examples with real MCP tool sequences
-      example-login-screen.md      # Greenfield auth screen
-      example-import-library.md    # Import .lib.pen library + instantiate components
-      example-error-screen.md      # 404 + offline page pair
-      example-form-flow.md         # Multi-step signup with email verification
-      example-component-deep-dive.md # Full read→understand→instantiate cycle
-      example-style-selection.md   # Catalogue (style + palette + fonts) → set_variables MCP → tokens commit → starter components
-      example-settings-page.md     # Settings with sidebar nav, autosave + explicit-save for high-stakes
-      example-dashboard.md         # KPI cards + chart tile + recent-activity table
-      example-marketing-page.md    # Marketing page avoiding three-card grid (asymmetric hero, bento features)
-      example-mobile-app.md        # Mobile app with bottom tab bar, sheet detents, safe areas, haptics
-      example-data-visualization.md # Multi-chart dashboard with colour-blind-safe palettes
-      example-onboarding-flow.md   # Three-step onboarding with progress, skip, sample-data routing
-      example-component-variants.md # Complete Button family with all variants and states
-      example-pricing-table.md     # Three-tier pricing with highlighted recommended tier
-      example-file-cover-and-sections.md # .pen file with Cover frame, section regions, hierarchical naming
+  design-system/                   # Optional design-system reference templates (one level deep)
+    README.md                      # Agent loading guide
+    CUSTOMISING.md                 # Plain-English guide for non-technical editors
+    accessibility.md               # Project a11y standards (WCAG/APCA, keyboard, screen reader)
+    empty-states.md                # Per-surface empty state catalogue with copy templates
+    file-architecture.md           # Project .pen file structure and naming conventions
+    forms.md                       # Form conventions (validation, error display, save patterns)
+    micro-interactions.md          # Per-interaction motion specs
+    navigation.md                  # Primary nav patterns, workspace switcher, mobile tab bar
+    onboarding.md                  # First-run experience (sample-data vs blank slate)
+    search.md                      # Search shape (instant / submit / hybrid), filters, URL state
+    visual-style.md                # Project's chosen style identity (style + palette + font picks)
+  examples/                        # 15 worked examples with real MCP tool sequences (one level deep)
+    example-login-screen.md        # Greenfield auth screen
+    example-import-library.md      # Import .lib.pen library + instantiate components
+    example-error-screen.md        # 404 + offline page pair
+    example-form-flow.md           # Multi-step signup with email verification
+    example-component-deep-dive.md # Full read→understand→instantiate cycle
+    example-style-selection.md     # Catalogue (style + palette + fonts) → set_variables MCP → tokens commit → starter components
+    example-settings-page.md       # Settings with sidebar nav, autosave + explicit-save for high-stakes
+    example-dashboard.md           # KPI cards + chart tile + recent-activity table
+    example-marketing-page.md      # Marketing page avoiding three-card grid (asymmetric hero, bento features)
+    example-mobile-app.md          # Mobile app with bottom tab bar, sheet detents, safe areas, haptics
+    example-data-visualization.md  # Multi-chart dashboard with colour-blind-safe palettes
+    example-onboarding-flow.md     # Three-step onboarding with progress, skip, sample-data routing
+    example-component-variants.md  # Complete Button family with all variants and states
+    example-pricing-table.md       # Three-tier pricing with highlighted recommended tier
+    example-file-cover-and-sections.md # .pen file with Cover frame, section regions, hierarchical naming
 
 # Platform install adapters (required by each platform's installer)
 .claude-plugin/plugin.json         # Claude Code plugin manifest
@@ -127,10 +126,10 @@ tools/
   requirements.txt                 # pip deps for Dependabot
 
 # Documentation
+SECURITY.md                          # Security policy + OWASP AST compliance map (repo root)
 docs/
   CONTRIBUTING.md
   CODE_OF_CONDUCT.md
-  SECURITY.md
   CHANGELOG.md
 
 # GitHub repo configuration
@@ -237,7 +236,7 @@ When writing or editing `skills/pencil-design/SKILL.md`:
 | `.github/workflows/skill-lint.yml` | push, PR | Runs `tools/skill-lint.py` (OWASP Agentic Skills Top 10) and unit tests |
 | `.pre-commit-config.yaml` | local `git commit` | Same skill-lint + gitleaks + basic hygiene; install with `pip install pre-commit && pre-commit install` |
 
-The OWASP AST compliance map lives in [docs/SECURITY.md](./docs/SECURITY.md).
+The OWASP AST compliance map lives in [SECURITY.md](./SECURITY.md).
 
 ---
 
