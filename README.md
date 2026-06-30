@@ -178,19 +178,18 @@ skills/pencil-design/
     style-catalogue.md, industry-patterns.md, …           # Menu-style catalogues
     amplify.md, pare.md, trim.md, soften.md, …            # Sub-command references
     codex-tools.md                  # Codex tool name mappings
-  assets/
-    design-system/                  # Optional design-system reference templates
-      README.md                     # Agent loading guide
-      CUSTOMISING.md                # Plain-English guide for non-technical editors
-      accessibility.md, empty-states.md, file-architecture.md,
-      forms.md, micro-interactions.md, navigation.md,
-      onboarding.md, search.md, visual-style.md
-    examples/                       # 15 worked examples with real MCP sequences
-      example-login-screen.md
-      example-dashboard.md
-      example-marketing-page.md
-      example-form-flow.md
-      (and 11 more)
+  design-system/                    # Optional design-system reference templates (one level deep)
+    README.md                       # Agent loading guide
+    CUSTOMISING.md                  # Plain-English guide for non-technical editors
+    accessibility.md, empty-states.md, file-architecture.md,
+    forms.md, micro-interactions.md, navigation.md,
+    onboarding.md, search.md, visual-style.md
+  examples/                         # 15 worked examples with real MCP sequences (one level deep)
+    example-login-screen.md
+    example-dashboard.md
+    example-marketing-page.md
+    example-form-flow.md
+    (and 11 more)
   evals/
     evals.json
 

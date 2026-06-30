@@ -14,7 +14,7 @@ This example shows the agent designing a three-tier pricing table with the highl
 get_editor_state();
 ```
 
-The agent reads `assets/design-system/visual-style.md`, `tokens.md`, and `voice.md` (for pricing copy tone). Loads `references/layout-patterns.md` § Pricing tables and `SKILL.md` § Aesthetic defaults: Shadows.
+The agent reads `design-system/visual-style.md`, `tokens.md`, and `voice.md` (for pricing copy tone). Loads `references/layout-patterns.md` § Pricing tables and `SKILL.md` § Aesthetic defaults: Shadows.
 
 ## Step 2: Pick the pricing pattern
 
@@ -245,6 +245,6 @@ Confirm:
 - `references/microcopy.md` § Buttons / CTAs, § Headlines.
 - `references/data-viz.md` § Pairing colour with shape (for the feature comparison checkmarks).
 - `SKILL.md` § Aesthetic defaults: Shadows, Colour.
-- `assets/design-system/visual-style.md`: project's chosen style and palette.
-- `assets/design-system/components.md`: `Card_Pricing` and `Card_Pricing_Highlighted` definitions.
-- `assets/design-system/voice.md`: pricing-related microcopy tone.
+- `design-system/visual-style.md`: project's chosen style and palette.
+- `design-system/components.md`: `Card_Pricing` and `Card_Pricing_Highlighted` definitions.
+- `design-system/voice.md`: pricing-related microcopy tone.

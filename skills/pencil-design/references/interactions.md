@@ -87,7 +87,7 @@ The split-second between "user pressed something" and "user sees the result" is 
 - **Keep the original label visible.** A button that goes from `Save` to `Saving…` (with a spinner) tells the user what's happening. A button that goes from `Save` to a spinner *only* leaves them wondering.
 - **Min show-delay 150–300ms.** Don't show the loading state for requests that complete in 50ms; the flicker is jarring. Wait 150–300ms before rendering the spinner; if the response arrives before then, skip the spinner entirely.
 - **Min visible time 300–500ms.** Once the spinner appears, keep it visible for a minimum duration even if the response arrives quickly. A spinner that flashes for 80ms is more confusing than no spinner at all.
-- **Skeleton screens for layout-known loads** (cards, lists, tables loading their data). They reserve the space and signal "content arriving here." Pair with a 1.4s shimmer animation per [`assets/design-system/motion.md`](../assets/design-system/motion.md).
+- **Skeleton screens for layout-known loads** (cards, lists, tables loading their data). They reserve the space and signal "content arriving here." Pair with a 1.4s shimmer animation per [`design-system/motion.md`](../design-system/motion.md).
 - **Spinners only for unknown-duration loads** (a long-running export) or for actions where layout doesn't change (a button submit).
 - **Progress indicators when duration is known.** A determinate progress bar (showing `47%`) is more reassuring than a perpetual spinner for any operation taking > 2 seconds.
 
@@ -281,5 +281,5 @@ Fix what fails. Don't note any of these as TODOs; broken interactions ship as us
 - [`flows.md`](flows.md): multi-step flow orchestration, modal-vs-page, optimistic UI patterns.
 - [`accessibility.md`](accessibility.md): ARIA roles, focus order, screen-reader content, keyboard discoverability.
 - [`modern-patterns.md`](modern-patterns.md): animation timing, command palette, AI-UI affordances.
-- [`assets/design-system/motion.md`](../assets/design-system/motion.md): durations, easings, skeleton shimmer.
-- [`assets/design-system/components.md`](../assets/design-system/components.md): visual treatment of interactive components.
+- [`design-system/motion.md`](../design-system/motion.md): durations, easings, skeleton shimmer.
+- [`design-system/components.md`](../design-system/components.md): visual treatment of interactive components.

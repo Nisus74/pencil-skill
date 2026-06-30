@@ -12,7 +12,7 @@ This example exercises:
 - A bottom tab bar with 4 tabs and proper home-indicator clearance.
 - A Compose flow as a full sheet with detents.
 - Keyboard avoidance, haptic feedback, and inline submit states.
-- Cross-references: [`references/mobile-patterns.md`](../../references/mobile-patterns.md) for safe areas, sheet detents, keyboard avoidance, and haptics; [`references/file-architecture.md`](../../references/file-architecture.md) § Hierarchical naming for the multi-screen layout; [`references/states.md`](../../references/states.md) for the loading/success/failure matrix; [`assets/design-system/empty-states.md`](../design-system/empty-states.md) for the first-launch feed.
+- Cross-references: [`references/mobile-patterns.md`](../references/mobile-patterns.md) for safe areas, sheet detents, keyboard avoidance, and haptics; [`references/file-architecture.md`](../references/file-architecture.md) § Hierarchical naming for the multi-screen layout; [`references/states.md`](../references/states.md) for the loading/success/failure matrix; [`design-system/empty-states.md`](../design-system/empty-states.md) for the first-launch feed.
 
 ---
 
@@ -32,7 +32,7 @@ Result: succeeds. No active document.
 
 ## Step 3. Load guidelines + inventory components
 
-Read `design-system/README.md`, then `design-system/mobile.md` (the project's mobile commitments: iOS first, Dynamic Type respected, native gestures preserved), `design-system/navigation.md` (commits a 4-tab bottom bar with Home, Search, Notifications, Profile), `design-system/visual-style.md`, and `design-system/tokens.md`. The skill's [`references/mobile-patterns.md`](../../references/mobile-patterns.md) is the playbook for safe areas, sheet detents, keyboard handling, and haptic conventions.
+Read `design-system/README.md`, then `design-system/mobile.md` (the project's mobile commitments: iOS first, Dynamic Type respected, native gestures preserved), `design-system/navigation.md` (commits a 4-tab bottom bar with Home, Search, Notifications, Profile), `design-system/visual-style.md`, and `design-system/tokens.md`. The skill's [`references/mobile-patterns.md`](../references/mobile-patterns.md) is the playbook for safe areas, sheet detents, keyboard handling, and haptic conventions.
 
 Call `get_guidelines()` to confirm the live category list, then load `Mobile App` for native iOS conventions.
 
@@ -219,8 +219,8 @@ Three notes for the user:
 
 ## See also
 
-- [`references/mobile-patterns.md`](../../references/mobile-patterns.md) for safe areas, sheet detents, keyboard avoidance, and haptics.
-- [`references/states.md`](../../references/states.md) for the loading, success, failure, and empty-state matrix.
-- [`references/industry-patterns.md`](../../references/industry-patterns.md) § Mobile pressure test for splash, permissions, offline, and push notifications.
-- [`references/file-architecture.md`](../../references/file-architecture.md) § Hierarchical naming for the `Mobile / Compose / 01 / Sheet / Default / iPhone15` shape.
-- [`assets/design-system/mobile.md`](../design-system/mobile.md) and [`assets/design-system/navigation.md`](../design-system/navigation.md) for the project's mobile and tab-bar commitments.
+- [`references/mobile-patterns.md`](../references/mobile-patterns.md) for safe areas, sheet detents, keyboard avoidance, and haptics.
+- [`references/states.md`](../references/states.md) for the loading, success, failure, and empty-state matrix.
+- [`references/industry-patterns.md`](../references/industry-patterns.md) § Mobile pressure test for splash, permissions, offline, and push notifications.
+- [`references/file-architecture.md`](../references/file-architecture.md) § Hierarchical naming for the `Mobile / Compose / 01 / Sheet / Default / iPhone15` shape.
+- [`design-system/mobile.md`](../design-system/mobile.md) and [`design-system/navigation.md`](../design-system/navigation.md) for the project's mobile and tab-bar commitments.

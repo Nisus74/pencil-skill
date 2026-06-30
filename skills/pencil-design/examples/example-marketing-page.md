@@ -10,7 +10,7 @@ The brief carries a constraint inside the request: avoid the SaaS defaults. The 
 
 ## Step 1: read context
 
-The agent loads `assets/design-system/visual-style.md`, `assets/design-system/tokens.md`, and `references/layout-patterns.md`. The rule from `layout-patterns.md` § Feature sections is the load-bearing one for this brief: *the three-card feature grid is the most over-used SaaS marketing pattern; reach for alternating image-text rows or a bento grid first*. The agent commits to that rule before placing anything.
+The agent loads `design-system/visual-style.md`, `design-system/tokens.md`, and `references/layout-patterns.md`. The rule from `layout-patterns.md` § Feature sections is the load-bearing one for this brief: *the three-card feature grid is the most over-used SaaS marketing pattern; reach for alternating image-text rows or a bento grid first*. The agent commits to that rule before placing anything.
 
 It also opens four headings inside `layout-patterns.md`: Hero variations for the top of the page, Pricing tables for the middle, plus Testimonial layouts and Footer architectures lower down. Each section of the page will pick deliberately from those menus.
 
@@ -223,4 +223,4 @@ If anything's off, fix structurally and re-screenshot only the affected section.
 - `references/layout-patterns.md` § Hero variations, § Feature sections, § Pricing tables, § Footer architectures.
 - `references/file-architecture.md` § Section frames as canvas regions.
 - `references/microcopy.md` § Headlines, § Buttons / CTAs.
-- `assets/examples/example-style-selection.md`: how the tokens this example references got committed in the first place.
+- `examples/example-style-selection.md`: how the tokens this example references got committed in the first place.

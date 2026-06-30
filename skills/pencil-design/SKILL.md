@@ -1,6 +1,6 @@
 ---
 name: pencil-design
-description: Use this skill for any pencil.dev work — designing UI in a .pen file, editing an open Pencil canvas, sketching or mocking screens, instantiating components from a .lib.pen library, reading an existing design system from a .pen or .lib.pen file, fixing batch_design schema errors, or recovering from Pencil MCP host-not-connected issues. Pick it on any mention of pencil.dev, .pen, .lib.pen, "the Pencil MCP", "the Pencil canvas", or a design-system/ folder in a Pencil context — even when the user phrases it casually, mid-sentence, or doesn't name the tool. This is the canonical skill for all Pencil tasks; reach for it before any general design or frontend skill when Pencil signals are present.
+description: Use this skill for any pencil.dev work, such as designing UI in a .pen file, editing an open Pencil canvas, sketching or mocking screens, instantiating components from a .lib.pen library, reading an existing design system from a .pen or .lib.pen file, fixing batch_design schema errors, or recovering from Pencil MCP host-not-connected issues. Pick it on any mention of pencil.dev, .pen, .lib.pen, "the Pencil MCP", "the Pencil canvas", or a design-system/ folder in a Pencil context, even when the user phrases it casually, mid-sentence, or doesn't name the tool. This is the canonical skill for all Pencil tasks; reach for it before any general design or frontend skill when Pencil signals are present.
 license: MIT
 compatibility: Any AI coding tool with the Pencil MCP server configured (Claude Code, Codex, Gemini CLI, Copilot CLI, Cursor). Headless workflows (CI, batch generation, scripted exports) are supported via the `@pencil.dev/cli` package, which the agent uses when explicitly directed; see `references/pencil-cli.md` for the When CLI vs MCP decision table and the no-auto-fall-back policy.
 metadata:
@@ -21,7 +21,7 @@ permissions:
     - pencil:replace_all_matching_properties
     - pencil:export_nodes
   shell: none
-  filesystem: project-only  # reads ./design-system/ if present; assets/design-system/ holds optional templates for users to adapt
+  filesystem: project-only  # reads ./design-system/ if present; design-system/ holds optional templates for users to adapt
   network: none
 ---
 
@@ -86,7 +86,7 @@ The check has two parts and you do both at the start of every design task:
 batch_get({ nodeIds: ["ComponentId"], readDepth: 4 })
 ```
 
-In the result, look for: `slot` frames (content holes you fill via `descendants`), named children (their `id` values are valid `descendants` keys), and `theme` values (active states). A child at path `a → b → c` is addressable as `"a/b/c"` in `descendants`. See [`references/component-anatomy.md`](references/component-anatomy.md) for the complete guide with a worked example at [`assets/examples/example-component-deep-dive.md`](assets/examples/example-component-deep-dive.md).
+In the result, look for: `slot` frames (content holes you fill via `descendants`), named children (their `id` values are valid `descendants` keys), and `theme` values (active states). A child at path `a → b → c` is addressable as `"a/b/c"` in `descendants`. See [`references/component-anatomy.md`](references/component-anatomy.md) for the complete guide with a worked example at [`examples/example-component-deep-dive.md`](examples/example-component-deep-dive.md).
 
 Build a short mental inventory: what components exist, what they're called, what they're for. When the user asks for X (button, input, card, badge, modal), reach for a matching component first via a `ref` node with optional `descendants` overrides. Build from primitives only when:
 
@@ -279,7 +279,7 @@ Fix what surfaces. Don't ship the design without running the gate; don't note th
 
 ### Design source priority
 
-Before any design work, establish what the project already has. The live `.pen` file is the authoritative design system. The packaged templates in `assets/design-system/` are user-facing reference docs — never read or applied by the agent automatically.
+Before any design work, establish what the project already has. The live `.pen` file is the authoritative design system. The packaged templates in `design-system/` are user-facing reference docs — never read or applied by the agent automatically.
 
 Priority order (highest → lowest):
 
@@ -426,15 +426,15 @@ Do not bundle multiple concerns into one note. One concern per note keeps them f
 The default workflow assumes a fresh, end-to-end design. Most tasks aren't that. Deviate as follows:
 
 - **"Edit the X" or "change the Y to Z".** Skip step 4's plan-the-tree work. `batch_get` the affected node first to see its current shape, then issue `R` (full replace) or `U` (property-level update) ops. The aesthetic direction step still applies, but it inherits from the existing design (read its tokens and structure to stay consistent). `snapshot_layout` or `batch_get` on the changed node is usually enough; screenshot only if the change was visual.
-- **"Use my design library" / library is imported.** After step 3, check the open document's `imports` field. If the named `.lib.pen` is imported, query its reusable components via `batch_get` and instantiate them with `ref` nodes, never re-build a Button from primitives when one exists. If the library isn't imported, add it first via a `U` op on the document root (see `assets/examples/example-import-library.md`).
+- **"Use my design library" / library is imported.** After step 3, check the open document's `imports` field. If the named `.lib.pen` is imported, query its reusable components via `batch_get` and instantiate them with `ref` nodes, never re-build a Button from primitives when one exists. If the library isn't imported, add it first via a `U` op on the document root (see `examples/example-import-library.md`).
 - **User mentions an icon by name.** Always reach for `icon_font` (Lucide / Material Symbols / Phosphor / Feather). If the project has declared a specific icon library, use that. Don't import an SVG unless the user is naming a specific custom asset.
 - **Big screen (>30 visible elements).** Plan multiple `batch_design` calls before starting. Build the page-level frame and main columns first, screenshot, then fill in. Cramming 60 ops into one call is asking for ordering bugs.
 - **"Quick sketch" / "throwaway" / "just mock something up".** Skip steps 2 (aesthetic direction) and 3 (guidelines + inventory) entirely. Go straight from step 1 → step 5 using the negative-space defaults in the Aesthetic foundation. Verification still happens, but the taste pass also skips.
 - **User shows you a reference image.** This is the canonical input for step 2 (aesthetic direction). Read the image, name the layout pattern and aesthetic direction out loud (e.g. "split-screen with hero left, form right; dense, dark, monospace figures"), then plan the tree.
 - **Adding frames to a populated canvas** (multiple existing top-level frames already on the canvas). Before placing a new top-level frame at step 5, call `find_empty_space_on_canvas({ width, height, padding, direction })` at step 4 to locate a coordinate region that doesn't overlap existing content. All four parameters are required; `direction` accepts `"top" | "right" | "bottom" | "left"`. Optionally pass `nodeId` to anchor the search to a specific frame instead of the whole canvas. Pass the returned position as `x`/`y` on the outermost frame in your first `batch_design` call. Skipping this on a crowded canvas produces invisible overlaps that look like rendering failures.
 - **"Export this", "generate assets", "hand off the design".** Use `export_nodes` with the target node id(s). Ask the user what format (PNG, SVG, PDF) and destination path if not stated, the answer shapes the call. Do not substitute `get_screenshot` for an export; `get_screenshot` produces a canvas preview, not a properly-sized export artifact.
-- **User asks for an error, 404, 500, offline, or empty screen.** Load `references/states.md` before planning. It owns the screen-level fault state taxonomy and the empty-state taxonomy (first-use / no-results / no-permission / post-action). See `assets/examples/example-error-screen.md` for a worked walkthrough.
-- **User asks for a multi-step form, wizard, signup, onboarding, or any flow that crosses screens.** Load `references/flows.md` before planning. It owns validation timing, modal-vs-page decisions, the back-stack model, and multi-step confirmation anatomy. See `assets/examples/example-form-flow.md` for a worked walkthrough.
+- **User asks for an error, 404, 500, offline, or empty screen.** Load `references/states.md` before planning. It owns the screen-level fault state taxonomy and the empty-state taxonomy (first-use / no-results / no-permission / post-action). See `examples/example-error-screen.md` for a worked walkthrough.
+- **User asks for a multi-step form, wizard, signup, onboarding, or any flow that crosses screens.** Load `references/flows.md` before planning. It owns validation timing, modal-vs-page decisions, the back-stack model, and multi-step confirmation anatomy. See `examples/example-form-flow.md` for a worked walkthrough.
 - **User mentions container queries, fluid type, AI UI affordances, optimistic updates, real-time presence, or "modern" patterns.** Load `references/modern-patterns.md`. It surfaces the patterns the model under-uses by default and flags the AI defaults (glassmorphism, three-card grids, parallax-everywhere) that read as already-dated.
 - **User wants to use a Pencil MCP tool you haven't touched recently** (`get_variables`, `set_variables`, `search_all_unique_properties`, `replace_all_matching_properties`, `find_empty_space_on_canvas`, `export_nodes`). Load `references/mcp-tools.md` — it's a per-tool cookbook with worked invocations and composite recipes (token audit, greenfield bootstrap, library smoke test).
 - **User mentions headless / CI / batch / scripted / `pencil` command / `@pencil.dev/cli` / one-shot generation, OR explicitly asks for design without opening the editor, OR is in a CI environment with no desktop app available.** Load `references/pencil-cli.md`. It owns the `@pencil.dev/cli` reference (install, agent mode `--prompt`, interactive mode, batch `--tasks`, `--export` for headless artifact generation, auth via `PENCIL_CLI_KEY` / `ANTHROPIC_API_KEY`) and the When CLI vs MCP decision table. The default policy stays no-auto-fall-back: when MCP isn't connected, stop and ask the user; only invoke the CLI when the user explicitly directs it or the context is unambiguously headless.
@@ -472,7 +472,7 @@ This makes the library's variables and `reusable: true` components available. In
 
 When to make a `.lib.pen`: as soon as the project has more than one `.pen` and you find yourself recreating the same component. Don't create one prematurely; one-off designs don't need it.
 
-When to import a library on the user's behalf: only when the open document's `imports` doesn't include a library that the project clearly has. See `assets/examples/example-import-library.md` for the exact ops.
+When to import a library on the user's behalf: only when the open document's `imports` doesn't include a library that the project clearly has. See `examples/example-import-library.md` for the exact ops.
 
 ## batch_design grammar (essentials)
 
@@ -547,7 +547,7 @@ Four concrete cases. Detect, respond, do not improvise.
 |---|------|------------------|----------|
 | 1 | MCP not connected | `get_editor_state` errors with `transport not connected to app: desktop` (or any connection-refused message) | Stop. Tell the user: *"Pencil's MCP server isn't reachable. Open the Pencil desktop app or the Pencil IDE extension, then ask me again."* Do not fall back to the CLI silently. |
 | 2 | No .pen file open | `get_editor_state` succeeds but reports no active document | Ask the user: *"No `.pen` file is open. Should I (a) open an existing one — give me the path, or (b) create a new one with `open_document('new')`?"* Wait for the answer. |
-| 3 | No variables or components in the `.pen` | `get_variables()` returns empty AND `batch_get({ patterns: [{ reusable: true }] })` returns nothing AND no `.lib.pen` in `imports` | The live file has no design system yet. Ask the user once: *"This file doesn't have any variables or components yet. Should I (a) establish a token set and visual style now so the design stays consistent, or (b) start designing and formalise the system as patterns emerge?"* If they want markdown docs as a reference, point them to `assets/design-system/` — optional templates they can copy and adapt to their project. Do not auto-copy anything. Do not ask again this session. |
+| 3 | No variables or components in the `.pen` | `get_variables()` returns empty AND `batch_get({ patterns: [{ reusable: true }] })` returns nothing AND no `.lib.pen` in `imports` | The live file has no design system yet. Ask the user once: *"This file doesn't have any variables or components yet. Should I (a) establish a token set and visual style now so the design stays consistent, or (b) start designing and formalise the system as patterns emerge?"* If they want markdown docs as a reference, point them to `design-system/` — optional templates they can copy and adapt to their project. Do not auto-copy anything. Do not ask again this session. |
 | 4 | Conflicting `design-system/` | Folder exists but contains code files (`.tsx`, `.ts`, `package.json`, `index.js`, etc.) | Do not overwrite. Ask where to place docs instead: `design-system/docs/`, `docs/design-system/`, `.pencil/design-system/`, or a custom path. |
 | 5 | .lib.pen import missing | `design-system/design-system.md` names a library path; the open doc's `imports` doesn't include it (or the file at the path doesn't exist) | If the file exists: add the `imports` entry via `batch_design` `U` op on the document root. If the file doesn't exist: tell the user the path in `design-system.md` is stale, ask whether to update the path or create the library. Don't silently invent. |
 | 6 | batch_design schema error | Server returns an error mentioning invalid op, unknown type, invalid property, or missing parent | Read the error verbatim. Cross-reference `references/batch-design-grammar.md` and `references/pen-schema.md`. Common causes: id contains `/`; used `width: "100%"` (use bare-string `"fill_container"`); used the older `{ sizing: "fill_container" }` object (use the bare string); used `stroke.fills` plural or `stroke.alignment` (use singular `stroke.fill`); passed raw color where a `$variable` was expected; referenced a parent before binding it. Retry with the fix; never blindly. |
@@ -586,22 +586,22 @@ The Pencil MCP tool names (`get_editor_state`, `batch_design`, etc.) are identic
 - `references/accessibility.md`: beyond the SKILL baseline. ARIA, focus order, keyboard nav, screen-reader content, deeper-cut contrast (incl. APCA), `prefers-*` media queries, dynamic type, RTL & internationalisation, motor accessibility; WCAG 2.2 (ISO/IEC 40500:2025) baseline
 - `references/modern-patterns.md`: patterns the model under-uses by default. Container queries, fluid type, AI-UI affordances (incl. command palette / cmd+K), animation & motion timing, perceived performance (skeleton, optimistic UI, LQIP), modern dark mode; plus dated defaults to avoid
 - `references/pencil-cli.md` — full `@pencil.dev/cli` reference: install, agent mode, interactive mode, every flag, headless/CI workflows, auth troubleshooting, when CLI vs MCP. Preserves the no-auto-fall-back policy.
-- `assets/examples/example-login-screen.md` — worked example: greenfield design from prompt
-- `assets/examples/example-import-library.md` — worked example: importing a `.lib.pen` and instantiating its components
-- `assets/examples/example-scaffold-system.md` — worked example: scaffolding `design-system/` into a fresh project
-- `assets/examples/example-error-screen.md` — worked example: 404 + offline page pair using `get_variables`/`set_variables` and a shared lockup
-- `assets/examples/example-form-flow.md` — worked example: multi-step signup with email verification across three sibling frames
-- `assets/examples/example-component-deep-dive.md` — worked example: full read→understand→instantiate cycle using an existing card component (slot fill, nested path, state variant)
-- `assets/examples/example-style-selection.md`: worked example: catalogue (style + palette + fonts) → `set_variables` MCP → `tokens.md` commit → starter components matching the chosen style
-- `assets/examples/example-settings-page.md`: worked example: settings page with sidebar nav, autosave defaults, explicit-save for high-stakes (Billing), validation, dirty state
-- `assets/examples/example-dashboard.md`: worked example: dashboard with KPI cards, chart tile, recent-activity table, proper hierarchy
-- `assets/examples/example-marketing-page.md`: worked example: marketing page that avoids the three-card grid (asymmetric hero, alternating image-text or bento features, three-tier pricing, avatar-grid testimonials)
-- `assets/examples/example-mobile-app.md`: worked example: mobile app home screen + Compose flow with bottom tab bar, sheet detents, safe areas, haptics, keyboard avoidance
-- `assets/examples/example-data-visualization.md`: worked example: multi-chart dashboard with colour-blind-safe palettes (Okabe-Ito for categorical, Viridis for heatmaps), correct chart per data shape
-- `assets/examples/example-onboarding-flow.md`: worked example: three-step onboarding with progress, skip, sample-data-vs-blank-slate routing, validation, save-progress-on-exit
-- `assets/examples/example-component-variants.md`: worked example: complete Button component family (Primary / Secondary / Destructive / Ghost / IconOnly variants × 7 states each) with theme-axis state authoring
-- `assets/examples/example-pricing-table.md`: worked example: three-tier pricing with highlighted recommended tier (coloured border + badge + layered shadow), two-role colour, mobile stack
-- `assets/examples/example-file-cover-and-sections.md`: worked example: setting up a fresh `.pen` with Cover frame at origin, section regions (Source of Truth / Build Ready / UX States / Exploration / Archive), hierarchical naming for multi-screen flows
+- `examples/example-login-screen.md` — worked example: greenfield design from prompt
+- `examples/example-import-library.md` — worked example: importing a `.lib.pen` and instantiating its components
+- `examples/example-scaffold-system.md` — worked example: scaffolding `design-system/` into a fresh project
+- `examples/example-error-screen.md` — worked example: 404 + offline page pair using `get_variables`/`set_variables` and a shared lockup
+- `examples/example-form-flow.md` — worked example: multi-step signup with email verification across three sibling frames
+- `examples/example-component-deep-dive.md` — worked example: full read→understand→instantiate cycle using an existing card component (slot fill, nested path, state variant)
+- `examples/example-style-selection.md`: worked example: catalogue (style + palette + fonts) → `set_variables` MCP → `tokens.md` commit → starter components matching the chosen style
+- `examples/example-settings-page.md`: worked example: settings page with sidebar nav, autosave defaults, explicit-save for high-stakes (Billing), validation, dirty state
+- `examples/example-dashboard.md`: worked example: dashboard with KPI cards, chart tile, recent-activity table, proper hierarchy
+- `examples/example-marketing-page.md`: worked example: marketing page that avoids the three-card grid (asymmetric hero, alternating image-text or bento features, three-tier pricing, avatar-grid testimonials)
+- `examples/example-mobile-app.md`: worked example: mobile app home screen + Compose flow with bottom tab bar, sheet detents, safe areas, haptics, keyboard avoidance
+- `examples/example-data-visualization.md`: worked example: multi-chart dashboard with colour-blind-safe palettes (Okabe-Ito for categorical, Viridis for heatmaps), correct chart per data shape
+- `examples/example-onboarding-flow.md`: worked example: three-step onboarding with progress, skip, sample-data-vs-blank-slate routing, validation, save-progress-on-exit
+- `examples/example-component-variants.md`: worked example: complete Button component family (Primary / Secondary / Destructive / Ghost / IconOnly variants × 7 states each) with theme-axis state authoring
+- `examples/example-pricing-table.md`: worked example: three-tier pricing with highlighted recommended tier (coloured border + badge + layered shadow), two-role colour, mobile stack
+- `examples/example-file-cover-and-sections.md`: worked example: setting up a fresh `.pen` with Cover frame at origin, section regions (Source of Truth / Build Ready / UX States / Exploration / Archive), hierarchical naming for multi-screen flows
 - `references/codex-tools.md`, `references/gemini-tools.md`, `references/copilot-tools.md` — platform tool-name mappings
-- `assets/design-system/`: optional reference templates users can copy and customise to document their own project's design system. Current templates: `README.md`, `CUSTOMISING.md`, `visual-style.md`, `accessibility.md`, `empty-states.md`, `file-architecture.md`, `forms.md`, `micro-interactions.md`, `navigation.md`, `onboarding.md`, `search.md`. These are not read or applied by the skill automatically — they exist for users who want a starting structure for their `design-system/` folder.
-- `assets/examples/` — worked walkthroughs the agent loads on demand (greenfield design, library import, scaffolding, error screens, multi-step form flows)
+- `design-system/`: optional reference templates users can copy and customise to document their own project's design system. Current templates: `README.md`, `CUSTOMISING.md`, `visual-style.md`, `accessibility.md`, `empty-states.md`, `file-architecture.md`, `forms.md`, `micro-interactions.md`, `navigation.md`, `onboarding.md`, `search.md`. These are not read or applied by the skill automatically — they exist for users who want a starting structure for their `design-system/` folder.
+- `examples/` — worked walkthroughs the agent loads on demand (greenfield design, library import, scaffolding, error screens, multi-step form flows)

@@ -126,7 +126,7 @@ Without an abort, slow-running AI feels broken — users don't know if it's stil
 
 ## Animation & motion
 
-Animation is one of the strongest "feels finished" signals in product design and one of the easiest to get wrong. The rules below apply unless the project's [`motion.md`](../assets/design-system/motion.md) overrides them.
+Animation is one of the strongest "feels finished" signals in product design and one of the easiest to get wrong. The rules below apply unless the project's [`motion.md`](../design-system/motion.md) overrides them.
 
 **Timing by interaction type.** Different interactions earn different durations:
 
@@ -186,7 +186,7 @@ Avoid layout-shifting hover patterns (`translateY(-8px)`, `scale(1.05)`); they l
 
 **Reduced motion.** Respect `prefers-reduced-motion: reduce` (already covered in [`accessibility.md`](accessibility.md)). When set, transitions > 200ms become instant; loops disable; micro-interactions ≤ 120ms stay (they're imperceptible to most users and provide the affordance signal).
 
-For the project's specific durations, easings, and the skeleton shimmer pattern, see [`assets/design-system/motion.md`](../assets/design-system/motion.md).
+For the project's specific durations, easings, and the skeleton shimmer pattern, see [`design-system/motion.md`](../design-system/motion.md).
 
 ## Modern UI affordances
 

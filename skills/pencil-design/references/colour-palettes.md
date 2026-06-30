@@ -1,18 +1,18 @@
 # Colour palettes
 
-A library of starting palette *recipes* the agent picks from when starting greenfield. Each entry names a neutral family and an accent scale from an established source system (Tailwind, Radix Colors, IBM Carbon, Material 3, Apple HIG). The agent looks up the actual hex values from the source, then commits them to the project's `assets/design-system/tokens.md` and the `.pen` file's `variables` via `set_variables` MCP calls. After commitment, every design references the project's tokens (`$bg`, `$accent`), never literal hex from this catalogue.
+A library of starting palette *recipes* the agent picks from when starting greenfield. Each entry names a neutral family and an accent scale from an established source system (Tailwind, Radix Colors, IBM Carbon, Material 3, Apple HIG). The agent looks up the actual hex values from the source, then commits them to the project's `design-system/tokens.md` and the `.pen` file's `variables` via `set_variables` MCP calls. After commitment, every design references the project's tokens (`$bg`, `$accent`), never literal hex from this catalogue.
 
 **What this file owns:** 40+ named palette recipes tagged by industry and mood. Each entry: name, mood, accent scale (named, with source), neutral pairing, when to use.
 
-**What this file does NOT own:** the project's actual hex values. Those live in `assets/design-system/tokens.md` (project-owned, version-controlled) and in the `.pen` file's `variables` section (live in the design). This file does not define the project's palette; it lists the menu of starting picks the agent surfaces.
+**What this file does NOT own:** the project's actual hex values. Those live in `design-system/tokens.md` (project-owned, version-controlled) and in the `.pen` file's `variables` section (live in the design). This file does not define the project's palette; it lists the menu of starting picks the agent surfaces.
 
 Colour theory and the two-role-architecture rule are in `SKILL.md` § Aesthetic defaults: Colour. Colour-blind-safe palettes specifically for charts are in [`data-viz.md`](data-viz.md). The chosen style (which constrains the palette) is in [`style-catalogue.md`](style-catalogue.md).
 
 ## When to load this file
 
-- The agent is starting a greenfield design and the project has no `assets/design-system/tokens.md` populated yet.
+- The agent is starting a greenfield design and the project has no `design-system/tokens.md` populated yet.
 - The user names an industry or mood ('fintech', 'calming', 'warm', 'serious') and the agent needs a starting palette to anchor the design.
-- The agent is following [`example-style-selection.md`](../assets/examples/example-style-selection.md) (Phase 4) and needs to pick the palette half of the style + palette + font triple.
+- The agent is following [`example-style-selection.md`](../examples/example-style-selection.md) (Phase 4) and needs to pick the palette half of the style + palette + font triple.
 - The user wants to see palette options before committing.
 
 ## How this catalogue works (architecture)
@@ -21,7 +21,7 @@ Three layers; the catalogue sits at the top.
 
 1. **This file (`references/colour-palettes.md`)** is a *menu of starting recipes*. Each recipe names a neutral family and an accent scale from an established source system. The recipes don't hold the project's palette; they're the starting point.
 2. **The source systems** hold the actual hex values. The agent looks up the values at the source URLs (Tailwind: https://tailwindcss.com/docs/colors. Radix: https://radix-ui.com/colors. IBM Carbon: https://carbondesignsystem.com/elements/colour. Material 3: https://m3.material.io/styles/color. Apple HIG: https://developer.apple.com/design/human-interface-guidelines/color).
-3. **`assets/design-system/tokens.md`** records the project's *committed* palette. The agent copies the chosen scale's hex values into this file as semantic tokens (`$bg`, `$surface`, `$border`, `$textPrimary`, `$accent`, etc.). This file is project-owned; the user can edit it.
+3. **`design-system/tokens.md`** records the project's *committed* palette. The agent copies the chosen scale's hex values into this file as semantic tokens (`$bg`, `$surface`, `$border`, `$textPrimary`, `$accent`, etc.). This file is project-owned; the user can edit it.
 4. **The `.pen` file's `variables` section** is the live design's palette. The agent calls `set_variables` MCP to populate the variables from the project's `tokens.md`. Designs reference `$tokenName`, never literal hex.
 
 The rule: **the agent reads this catalogue once at the start of a project, then never again.** Subsequent designs reference the project's variables. If the user wants to change the palette, they edit `tokens.md` and the `.pen` variables; this catalogue stays untouched.
@@ -32,12 +32,12 @@ The rule: **the agent reads this catalogue once at the start of a project, then 
 2. Pick a neutral family from the Neutrals section below.
 3. Pick an accent palette from the matching industry section. Cross-check the mood with the chosen style from [`style-catalogue.md`](style-catalogue.md).
 4. Look up the full hex scale from the source system cited in the recipe.
-5. Populate `assets/design-system/tokens.md` with the chosen scale as semantic tokens (`$accent`, `$bg`, etc.).
+5. Populate `design-system/tokens.md` with the chosen scale as semantic tokens (`$accent`, `$bg`, etc.).
 6. Call `set_variables` MCP to mirror the tokens into the `.pen` file's `variables` section.
-7. Record the chosen palette recipe name in `assets/design-system/visual-style.md`.
+7. Record the chosen palette recipe name in `design-system/visual-style.md`.
 8. From this point onward, design with `$tokens`. Never with literal hex.
 
-See [`example-style-selection.md`](../assets/examples/example-style-selection.md) (Phase 4) for the full worked sequence including the `set_variables` invocation.
+See [`example-style-selection.md`](../examples/example-style-selection.md) (Phase 4) for the full worked sequence including the `set_variables` invocation.
 
 ## Two-role architecture refresher
 
@@ -213,7 +213,7 @@ A chosen palette recipe maps to the project's `tokens.md` and the `.pen` file's 
 
 1. Agent picks 'Indigo Calm' (Tailwind Indigo + Pure Slate).
 2. Agent looks up the Tailwind Indigo scale (50, 100, 200, ..., 900, 950) and the Tailwind Slate scale at https://tailwindcss.com/docs/colors.
-3. Agent populates `assets/design-system/tokens.md` with semantic tokens:
+3. Agent populates `design-system/tokens.md` with semantic tokens:
    - `$bg` = Slate 50 (light) / Slate 950 (dark)
    - `$surface` = Slate 100 / Slate 900
    - `$border` = Slate 200 / Slate 800
@@ -225,14 +225,14 @@ A chosen palette recipe maps to the project's `tokens.md` and the `.pen` file's 
    - `$warning` = Amber 500 / Amber 400
    - `$danger` = Red 600 / Red 400
 4. Agent calls `set_variables` MCP to mirror these into the `.pen` file's `variables` section.
-5. Agent records the palette recipe name in `assets/design-system/visual-style.md`: *'Palette: Indigo Calm. Source: Tailwind v4 (Indigo and Slate scales). APCA Lc 75+ verified across both modes.'*
+5. Agent records the palette recipe name in `design-system/visual-style.md`: *'Palette: Indigo Calm. Source: Tailwind v4 (Indigo and Slate scales). APCA Lc 75+ verified across both modes.'*
 6. Subsequent designs reference `$accent`, `$bg`, `$textPrimary`, etc. via `batch_design`. The agent never types literal hex into `batch_design` for surfaces, accents, or text.
 
-For the worked example, see [`example-style-selection.md`](../assets/examples/example-style-selection.md) (Phase 4).
+For the worked example, see [`example-style-selection.md`](../examples/example-style-selection.md) (Phase 4).
 
 ## Anti-patterns
 
-- **Hard-coding hex from this catalogue into `batch_design`.** This file is a menu of recipes, not a source of values. Hex codes belong in `assets/design-system/tokens.md` and the `.pen` file's `variables`. Designs reference tokens.
+- **Hard-coding hex from this catalogue into `batch_design`.** This file is a menu of recipes, not a source of values. Hex codes belong in `design-system/tokens.md` and the `.pen` file's `variables`. Designs reference tokens.
 - **Inventing hex codes.** Lifting random hex codes from a Dribbble shot rarely produces a coherent system. Pick a recipe from the catalogue, then look up the scale at the source.
 - **Mixing neutral families.** A Slate background with a Stone surface clashes. Pick one neutral family and stick to it.
 - **Light-mode accent transferred to dark mode unchanged.** The accent that pops on white often disappears on near-black. The agent picks a lighter step (1-2 shades up) for dark mode and verifies contrast.
@@ -259,5 +259,5 @@ For the worked example, see [`example-style-selection.md`](../assets/examples/ex
 - [`industry-patterns.md`](industry-patterns.md): per-industry pattern density and which palettes belong where.
 - [`data-viz.md`](data-viz.md): colour-blind-safe palettes for charts and dashboards.
 - [`accessibility.md`](accessibility.md): contrast verification, APCA, WCAG 2.2 baseline.
-- [`assets/design-system/tokens.md`](../assets/design-system/tokens.md): where the chosen palette gets recorded as project tokens (the destination, not this file).
-- [`example-style-selection.md`](../assets/examples/example-style-selection.md): worked sequence of catalogue → MCP variable population → starter components (Phase 4).
+- [`design-system/tokens.md`](../design-system/tokens.md): where the chosen palette gets recorded as project tokens (the destination, not this file).
+- [`example-style-selection.md`](../examples/example-style-selection.md): worked sequence of catalogue → MCP variable population → starter components (Phase 4).

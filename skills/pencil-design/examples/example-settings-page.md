@@ -18,10 +18,10 @@ get_editor_state({ include_schema: false })
 
 Then read the project files. They tell the agent what's already been decided so it doesn't redecide:
 
-- `assets/design-system/visual-style.md`: chosen style, palette, font pairing.
-- `assets/design-system/tokens.md`: variable names for colour, spacing, type.
-- `assets/design-system/navigation.md`: confirms the project commits to a left-sidebar main nav.
-- `assets/design-system/forms.md`: § Save patterns by surface confirms autosave by default plus explicit Save for high-stakes surfaces like Billing.
+- `design-system/visual-style.md`: chosen style, palette, font pairing.
+- `design-system/tokens.md`: variable names for colour, spacing, type.
+- `design-system/navigation.md`: confirms the project commits to a left-sidebar main nav.
+- `design-system/forms.md`: § Save patterns by surface confirms autosave by default plus explicit Save for high-stakes surfaces like Billing.
 
 Inventory the library too:
 
@@ -33,7 +33,7 @@ The library has `Field`, `Toggle`, `Form`, `Button`, `Card`, and a `Banner` comp
 
 ## Step 2. Plan the layout
 
-Reference [`references/layout-patterns.md`](../../references/layout-patterns.md) § Settings pages: four sections sits on the boundary between tabs (≤ 6) and sidebar (> 6). Tabs would technically work, but the project's main nav is already a left sidebar, so the settings page reuses that mental model. A nested sidebar inside the settings surface keeps navigation coherent.
+Reference [`references/layout-patterns.md`](../references/layout-patterns.md) § Settings pages: four sections sits on the boundary between tabs (≤ 6) and sidebar (> 6). Tabs would technically work, but the project's main nav is already a left sidebar, so the settings page reuses that mental model. A nested sidebar inside the settings surface keeps navigation coherent.
 
 Three-column layout: main app sidebar | settings sidebar | settings content. The main app sidebar renders collapsed (icons only) so the settings sidebar gets its proper visual weight.
 
@@ -58,7 +58,7 @@ The settings sidebar's section list is built next as four `LinkText` rows (`Prof
 
 ## Step 4. Build the four sections as sibling frames
 
-Per [`references/file-architecture.md`](../../references/file-architecture.md) § Hierarchical naming, each section becomes a sibling top-level frame named with the `Settings_` prefix. They live side-by-side on canvas so an engineer can scrub between them:
+Per [`references/file-architecture.md`](../references/file-architecture.md) § Hierarchical naming, each section becomes a sibling top-level frame named with the `Settings_` prefix. They live side-by-side on canvas so an engineer can scrub between them:
 
 - `Settings_Profile`
 - `Settings_Notifications`
@@ -138,17 +138,17 @@ github=I(grid, { type: "ref", ref: "IntegrationCard", descendants: { logo: { sou
 `})
 ```
 
-For the empty case (nothing connected at all), the section renders the empty-state pattern from [`assets/design-system/empty-states.md`](../design-system/empty-states.md) § Settings: a small illustration, a one-line headline (*"Connect your tools."*), a single explanation, and the same grid below as a teaser. Don't gate the grid behind the empty state, the user needs to see what's available to act.
+For the empty case (nothing connected at all), the section renders the empty-state pattern from [`design-system/empty-states.md`](../design-system/empty-states.md) § Settings: a small illustration, a one-line headline (*"Connect your tools."*), a single explanation, and the same grid below as a teaser. Don't gate the grid behind the empty state, the user needs to see what's available to act.
 
 ## Step 9. States to design
 
-Per [`references/states.md`](../../references/states.md) § Settings states, the states that matter on this surface:
+Per [`references/states.md`](../references/states.md) § Settings states, the states that matter on this surface:
 
 - **Saved.** Default. No indicator. The absence is the signal.
 - **Saving.** Subtle spinner inline next to the field, label *"Saving..."* in `$textSecondary`.
 - **Saved-just-now.** Check-mark icon for 2 seconds, then decay to default.
 - **Dirty.** Billing form only. Save button enables; *"Unsaved changes"* badge in the page chrome; beforeunload warning fires on navigation.
-- **Validation.** Inline error per [`assets/design-system/forms.md`](../design-system/forms.md) § Error display.
+- **Validation.** Inline error per [`design-system/forms.md`](../design-system/forms.md) § Error display.
 - **Conflict.** Banner above the section: *"<Other user> changed this setting <time> ago. <View their version> or <Save anyway>."* Forces a conscious choice; relevant because the project is collaborative.
 
 Build at least the dirty-Billing state and one validation error on Profile as canvas-visible variants so the engineer can read them directly.
@@ -191,10 +191,10 @@ Five sibling top-level frames placed side-by-side on canvas: `Settings` (the she
 
 ## See also
 
-- [`references/layout-patterns.md`](../../references/layout-patterns.md) § Settings pages: tab vs sidebar threshold, autosave default.
-- [`references/states.md`](../../references/states.md) § Settings states: the six states this surface needs to handle.
-- [`references/file-architecture.md`](../../references/file-architecture.md) § Hierarchical naming: the `Settings_*` sibling-frame convention for multi-screen flows.
-- [`assets/design-system/forms.md`](../design-system/forms.md) § Save patterns by surface and § Unsaved-changes warning.
-- [`assets/design-system/navigation.md`](../design-system/navigation.md) § Main nav patterns: why the settings sidebar rhymes with the project's main nav.
-- [`assets/design-system/empty-states.md`](../design-system/empty-states.md) § Settings: the no-permission and nothing-connected templates.
+- [`references/layout-patterns.md`](../references/layout-patterns.md) § Settings pages: tab vs sidebar threshold, autosave default.
+- [`references/states.md`](../references/states.md) § Settings states: the six states this surface needs to handle.
+- [`references/file-architecture.md`](../references/file-architecture.md) § Hierarchical naming: the `Settings_*` sibling-frame convention for multi-screen flows.
+- [`design-system/forms.md`](../design-system/forms.md) § Save patterns by surface and § Unsaved-changes warning.
+- [`design-system/navigation.md`](../design-system/navigation.md) § Main nav patterns: why the settings sidebar rhymes with the project's main nav.
+- [`design-system/empty-states.md`](../design-system/empty-states.md) § Settings: the no-permission and nothing-connected templates.
 - `SKILL.md` § Verification ladder: structural-first verification, one screenshot for sign-off.

@@ -4,7 +4,7 @@ How design defaults shift by industry. A fintech product calibrates differently 
 
 **What this file owns:** 8 industry families (SaaS, fintech, healthcare, e-commerce, creative tools, social, education, communication) with 15-20 rules per family covering layout, palette mood, typography personality, density, animations, anti-patterns, completeness must-haves, and recommended catalogue picks. Plus the brutal-honesty completeness pressure tests for SaaS, Website, and Mobile projects.
 
-**What this file does NOT own:** the project's *committed* style or palette. Those live in `assets/design-system/visual-style.md` and `assets/design-system/tokens.md`. The catalogues this file recommends from are [`style-catalogue.md`](style-catalogue.md), [`colour-palettes.md`](colour-palettes.md), and [`font-pairings.md`](font-pairings.md). The fault-state taxonomy is in [`states.md`](states.md). The flow patterns are in [`flows.md`](flows.md).
+**What this file does NOT own:** the project's *committed* style or palette. Those live in `design-system/visual-style.md` and `design-system/tokens.md`. The catalogues this file recommends from are [`style-catalogue.md`](style-catalogue.md), [`colour-palettes.md`](colour-palettes.md), and [`font-pairings.md`](font-pairings.md). The fault-state taxonomy is in [`states.md`](states.md). The flow patterns are in [`flows.md`](flows.md).
 
 ## When to load this file
 
@@ -376,7 +376,7 @@ If the design covers only the home tab and the create flow, it's not a mobile ap
 
 Industry context lives in two places:
 
-1. **`assets/design-system/visual-style.md`** records the project's industry and the chosen style/palette/font picks. The agent reads this at the start of every design pass.
+1. **`design-system/visual-style.md`** records the project's industry and the chosen style/palette/font picks. The agent reads this at the start of every design pass.
 2. **The `.pen` file's `Cover` frame** (per [`file-architecture.md`](file-architecture.md)) records the project's industry, scope, and links to the brief. The agent reads the Cover at session start.
 
 When the agent designs a new screen, it cross-references the industry's must-have list (above) against the project's existing screens. If the project is a SaaS but lacks a 'no-permission' or 'plan-restricted' state, the agent surfaces that gap to the user: *'I notice the design doesn't cover the no-permission state. Should I add it?'*
@@ -412,5 +412,5 @@ When the agent designs a new screen, it cross-references the industry's must-hav
 - [`mobile-patterns.md`](mobile-patterns.md): the mobile-specific patterns required by the Mobile pressure test.
 - [`data-viz.md`](data-viz.md): chart-type selection for analytics, fintech, healthcare dashboards.
 - [`file-architecture.md`](file-architecture.md): the Cover frame that records the project's industry.
-- [`assets/design-system/visual-style.md`](../assets/design-system/visual-style.md): the project's chosen industry-aligned style commitment.
-- [`example-style-selection.md`](../assets/examples/example-style-selection.md): worked example of picking style + palette + fonts per industry (Phase 4).
+- [`design-system/visual-style.md`](../design-system/visual-style.md): the project's chosen industry-aligned style commitment.
+- [`example-style-selection.md`](../examples/example-style-selection.md): worked example of picking style + palette + fonts per industry (Phase 4).

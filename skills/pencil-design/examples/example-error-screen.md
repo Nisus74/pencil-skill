@@ -24,7 +24,7 @@ Announced direction: *"match the existing product shell — plain `$surface` bac
 
 ## Step 3: Load guidelines + inventory components
 
-Call `get_guidelines()`, then load `Web App`. The skill's own [`references/states.md`](../../references/states.md) is the playbook for screen-level fault states.
+Call `get_guidelines()`, then load `Web App`. The skill's own [`references/states.md`](../references/states.md) is the playbook for screen-level fault states.
 
 Call `get_guidelines()` to confirm the live category list, then load `Web App`.
 
@@ -166,4 +166,4 @@ If yes: mark the `block` node `reusable: true`. If no: leave as-is. Two-instance
 
 - **`find_empty_space_on_canvas` on a populated canvas.** Placing new frames at arbitrary coordinates risks invisible overlaps with existing work. The canvas tool returns safe coordinates; use it every time the canvas already has content.
 
-For the screen-state taxonomy and the full fault-state matrix, see [`references/states.md`](../../references/states.md).
+For the screen-state taxonomy and the full fault-state matrix, see [`references/states.md`](../references/states.md).
