@@ -55,19 +55,11 @@ You'll need three things:
 
 ### Plugin install (recommended)
 
-**Claude Code:** two install paths, pick either.
-
-Direct install:
+**Claude Code:** add the marketplace, then install the plugin. This lets you pin and update through the marketplace commands.
 
 ```bash
-/plugin install github:Nisus74/pencil-skill
-```
-
-Or via the marketplace listing (lets you pin and update via marketplace commands):
-
-```bash
-/plugin marketplace add github:Nisus74/pencil-skill
-/plugin install pencil-dev-skill
+/plugin marketplace add Nisus74/pencil-skill
+/plugin install pencil-dev-skill@pencil-dev-skill
 ```
 
 **Cursor 2.5+:** in the editor, run `/add-plugin` and point it at `github.com/Nisus74/pencil-skill`.
@@ -107,7 +99,7 @@ Available for Claude Code and Cursor.
 
 1. Fork [Nisus74/pencil-skill](https://github.com/Nisus74/pencil-skill) on GitHub.
 2. Install your fork as a plugin:
-   - Claude Code: `/plugin install github:<your-handle>/pencil-skill`
+   - Claude Code: `/plugin marketplace add <your-handle>/pencil-skill`, then `/plugin install pencil-dev-skill@pencil-dev-skill`
    - Cursor: `/add-plugin` pointing at `github.com/<your-handle>/pencil-skill`
 3. Edit your fork, commit, and push. The next plugin update pulls your changes.
 4. To pull upstream changes, rebase your fork against `Nisus74/pencil-skill`.
