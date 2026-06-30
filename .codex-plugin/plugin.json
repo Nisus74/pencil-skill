@@ -11,8 +11,5 @@
   "repository": "https://github.com/Nisus74/pencil-skill",
   "license": "MIT",
   "keywords": ["design", "pencil-dev", "ui", "mcp", "design-tool", "ai-skill"],
-  "skills": "./skills/",
-  "interface": {
-    "displayName": "Pencil.dev Design Skill"
-  }
+  "skills": "./skills/"
 }

@@ -127,10 +127,10 @@ tools/
   requirements.txt                 # pip deps for Dependabot
 
 # Documentation
+SECURITY.md                          # Security policy + OWASP AST compliance map (repo root)
 docs/
   CONTRIBUTING.md
   CODE_OF_CONDUCT.md
-  SECURITY.md
   CHANGELOG.md
 
 # GitHub repo configuration
@@ -237,7 +237,7 @@ When writing or editing `skills/pencil-design/SKILL.md`:
 | `.github/workflows/skill-lint.yml` | push, PR | Runs `tools/skill-lint.py` (OWASP Agentic Skills Top 10) and unit tests |
 | `.pre-commit-config.yaml` | local `git commit` | Same skill-lint + gitleaks + basic hygiene; install with `pip install pre-commit && pre-commit install` |
 
-The OWASP AST compliance map lives in [docs/SECURITY.md](./docs/SECURITY.md).
+The OWASP AST compliance map lives in [SECURITY.md](./SECURITY.md).
 
 ---
 
