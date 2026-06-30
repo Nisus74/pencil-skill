@@ -56,7 +56,7 @@ After running the evals:
 | 2 | import-library-and-use | Confirm `imports` field check, `ref` instantiation, scoped get_screenshot. |
 | 3 | edit-existing-card-verification-ladder | Total get_screenshot calls in the edit phase: 1. Scoped to the LoginCard, not the page. |
 | 4 | multi-section-page-verification-cadence | Total get_screenshot across the build: 1 or 2. Per-region verification is structural. |
-| 5 | preserve-existing-variables | get_variables() before set_variables. Diff against existing keys. Never `replace: true`. |
+| 5 | preserve-existing-variables | get_variables() before SetVariables. Diff against existing keys. Never `replace: true`. |
 | 6 | clarify-intent-before-designing | Three clarifying questions before any batch_design. Skipped if design-system/ is populated. |
 | 7 | shadow-and-color-architecture | Two-role colour, layered shadow, hover increases contrast, nested radius child ≤ parent. |
 | 8 | form-design-discipline | Visible labels, on-blur validation, autocomplete attrs, mobile font-size ≥ 16px. |

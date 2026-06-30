@@ -32,7 +32,7 @@ batch_get({ nodeIds: ["ComponentId"], readDepth: 4 })
 1. Identify top-level children — their `id` values are your primary `descendants` keys.
 2. For each child, check for `slot` (content hole) or nested `children` (deeper paths).
 3. Note any `theme` values — those are the component's active state options.
-4. Look at `content`, `iconName`, or other value fields on text/icon nodes — these are the properties you'll typically override per instance.
+4. Look at `content`, `icon`, or other value fields on text/icon nodes — these are the properties you'll typically override per instance.
 
 **Example component structure returned by `batch_get`:**
 
@@ -47,7 +47,7 @@ batch_get({ nodeIds: ["ComponentId"], readDepth: 4 })
       "id": "iconWrap",
       "type": "frame",
       "children": [
-        { "id": "icon", "type": "icon", "iconName": "arrow-right" }
+        { "id": "icon", "type": "icon", "library": "lucide", "icon": "arrow-right" }
       ]
     },
     { "id": "label", "type": "text", "content": "Button" }
@@ -123,7 +123,7 @@ Every `id` in a component's tree is a potential `descendants` key. The rules for
 
 ```jsonc
 "descendants": {
-  "iconWrap/icon": { "iconName": "log-in" }
+  "iconWrap/icon": { "icon": "log-in" }
 }
 ```
 
@@ -131,7 +131,7 @@ Every `id` in a component's tree is a potential `descendants` key. The rules for
 
 ```jsonc
 "descendants": {
-  "header/avatar/badge": { "visible": false }
+  "header/avatar/badge": { "enabled": false }
 }
 ```
 
@@ -142,7 +142,7 @@ Build paths left-to-right by following the tree: parent id `/` child id `/` gran
 | Intent | How |
 |--------|-----|
 | Override properties | Pass only the properties to change: `{ "content": "New label" }` |
-| Replace the node entirely | Include `type` in the entry: `{ "type": "icon", "iconName": "check" }` |
+| Replace the node entirely | Include `type` in the entry: `{ "type": "icon", "icon": "check" }` |
 | Replace its children | Pass `children: [...]`: `{ "children": [{ "type": "text", "content": "Hi" }] }` |
 
 **Worked trace — three paths from one tree:**
@@ -179,15 +179,15 @@ When you override a descendant, the valid properties depend on the node's `type`
 
 | Node type | Commonly overridable properties |
 |-----------|--------------------------------|
-| `text` | `content`, `color`, `fontSize`, `fontWeight`, `visible` |
-| `icon` | `iconName`, `color`, `width`, `height`, `visible` |
-| `frame` | `width`, `height`, `fill`, `cornerRadius`, `visible`, `children` |
-| `image` | `src`, `width`, `height`, `visible` |
-| `ref` | `ref` (swap to a different component), `descendants`, `theme` |
+| `text` | `content`, `fill`, `fontSize`, `fontWeight`, `enabled` |
+| `icon` | `icon`, `library`, `fill`, `width`, `height`, `enabled` |
+| `frame` | `width`, `height`, `fill`, `cornerRadius`, `enabled`, `children` |
+| `frame`/`rectangle` with image fill | `fill` (image `url`), `width`, `height`, `enabled` (there is no `image` node type) |
+| `ref` | `descendants`, `theme` (a `ref`'s `ref`/`type` are immutable on update) |
 
-**At the top-level ref node**, the properties you can pass are those on the root frame itself (`width`, `height`, `x`, `y`, `theme`, `visible`, `context`) plus `descendants`. You cannot override internal children directly on the ref — use `descendants` for that.
+**At the top-level ref node**, the properties you can pass are those on the root frame itself (`width`, `height`, `x`, `y`, `theme`, `enabled`, `context`) plus `descendants`. You cannot override internal children directly on the ref — use `descendants` for that.
 
-**Reading current values as a type hint:** if the origin has `"content": "Button"` on a text node, you know `content` is a string. If it has `"iconName": "arrow-right"`, you know that field takes an icon name string. Match the type you see, not what you guess.
+**Reading current values as a type hint:** if the origin has `"content": "Button"` on a text node, you know `content` is a string. If it has `"icon": "arrow-right"`, you know that field takes an icon name string. Match the type you see, not what you guess.
 
 ---
 

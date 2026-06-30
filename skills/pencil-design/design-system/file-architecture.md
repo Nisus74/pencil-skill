@@ -54,7 +54,7 @@ Each `.pen` organises its top-level frames into sections, positioned in named ca
 | Exploration | Far-right region | Drafts and rejected directions |
 | Archive | Bottom region | Superseded designs |
 
-Use `find_empty_space_on_canvas` between sections to honour the regions. Never place an exploration frame in the Source of Truth region; if an exploration gets promoted, move it.
+Call `FindEmptySpace` (as the first line of a `batch_design` snippet; it returns `{x, y}`) between sections to honour the regions. Never place an exploration frame in the Source of Truth region; if an exploration gets promoted, move it.
 
 ## Cover frame template
 
@@ -103,7 +103,7 @@ Per `references/composition-patterns.md` § Component status workflow.
 
 ## Library imports
 
-`design-system.lib.pen` is imported by every other `.pen` in the project via the document's `imports` field. Agents check the `imports` list before designing; if the library isn't imported, add it via a `U` op on the document root before instantiating any components.
+`design-system.lib.pen` is imported by every other `.pen` in the project via the document's `imports` field. Agents check the `imports` list before designing; if the library isn't imported, attach it through the editor's import UI (then confirm via `get_editor_state`) before instantiating any components.
 
 For multi-library projects, the `imports` list shows the load order. Foundations first (`foundations.lib.pen`), then `components.lib.pen`, then patterns.
 

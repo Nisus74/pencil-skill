@@ -36,27 +36,25 @@ Per `references/file-architecture.md` § Section frames as canvas regions, each 
 - `Marketing_CTA_Closing`
 - `Marketing_Footer`
 
-Six frames stacked vertically at the canvas origin. The agent will use `find_empty_space_on_canvas` once for the hero anchor, then offset each subsequent section by its predecessor's height plus a 120-pixel gutter.
+Six frames stacked vertically at the canvas origin. The agent calls `FindEmptySpace` once (as the first line of the hero's `batch_design` snippet) for the hero anchor, then offsets each subsequent section by its predecessor's height plus a 120-pixel gutter.
 
 ## Step 4: build the hero (asymmetric)
 
 Title sits left of centre, supporting paragraph below. Primary CTA *'Start your free trial'* paired with a secondary text link *'See how it works'*. The illustration sits right, deliberately off the vertical centre line so the composition reads as designed rather than templated.
 
 ```js
-batch_design({
-  documentId: "doc",
-  ops: [
-    { op: "C", parent: "doc", node: { type: "frame", name: "Marketing_Hero", layout: { direction: "row", justify: "between", align: "center", gap: 80 }, size: { width: 1440, height: 720, padding: { x: 120, y: 96 } }, fill: "$bg" } },
-    { op: "C", parent: "Marketing_Hero", node: { type: "frame", name: "HeroCopy", layout: { direction: "column", gap: 24 }, size: { width: 560 } } },
-    { op: "C", parent: "HeroCopy", node: { type: "text", name: "Eyebrow", text: "For engineering teams", fontFamily: "$fontMono", fontSize: 14, color: "$accent" } },
-    { op: "C", parent: "HeroCopy", node: { type: "text", name: "Title", text: "Cut your build time by 40%.", fontFamily: "$fontDisplay", fontSize: 64, fontWeight: "$fontWeightBold", letterSpacing: -0.02, color: "$textPrimary" } },
-    { op: "C", parent: "HeroCopy", node: { type: "text", name: "Sub", text: "We cache every step, parallelise across machines, and never rebuild what hasn't changed.", fontSize: 18, color: "$textSecondary" } },
-    { op: "C", parent: "HeroCopy", node: { type: "frame", name: "HeroActions", layout: { direction: "row", gap: 16, align: "center" } } },
-    { op: "C", parent: "HeroActions", node: { type: "ref", ref: "Button_Primary", descendants: { label: { text: "Start your free trial" } } } },
-    { op: "C", parent: "HeroActions", node: { type: "ref", ref: "Link_Text", descendants: { label: { text: "See how it works" } } } },
-    { op: "C", parent: "Marketing_Hero", node: { type: "frame", name: "HeroIllustration", size: { width: 560, height: 480 }, fill: "$surfaceElevated", cornerRadius: 16 } },
-  ],
-});
+batch_design({ filePath: "", input: `
+const slot = FindEmptySpace({ width: 1440, height: 720, padding: 80, direction: "right" })
+hero = Insert(document, { type: "frame", name: "Marketing_Hero", x: slot.x, y: slot.y, layout: "horizontal", justify: "between", align: "center", gap: 80, width: 1440, height: 720, padding: { x: 120, y: 96 }, fill: "$bg" })
+heroCopy = Insert(hero, { type: "frame", name: "HeroCopy", layout: "vertical", gap: 24, width: 560 })
+Insert(heroCopy, { type: "text", name: "Eyebrow", content: "For engineering teams", fontFamily: "$fontMono", fontSize: 14, fill: "$accent" })
+Insert(heroCopy, { type: "text", name: "Title", content: "Cut your build time by 40%.", fontFamily: "$fontDisplay", fontSize: 64, fontWeight: "$fontWeightBold", letterSpacing: -0.02, fill: "$textPrimary" })
+Insert(heroCopy, { type: "text", name: "Sub", content: "We cache every step, parallelise across machines, and never rebuild what hasn't changed.", fontSize: 18, fill: "$textSecondary" })
+heroActions = Insert(heroCopy, { type: "frame", name: "HeroActions", layout: "horizontal", gap: 16, align: "center" })
+Insert(heroActions, { type: "ref", ref: "Button_Primary", descendants: { label: { content: "Start your free trial" } } })
+Insert(heroActions, { type: "ref", ref: "Link_Text", descendants: { label: { content: "See how it works" } } })
+Insert(hero, { type: "frame", name: "HeroIllustration", width: 560, height: 480, fill: "$surfaceElevated", cornerRadius: 16 })
+` })
 ```
 
 **In Pencil:** the hero is one flex row, copy left, illustration right. The off-centre feel comes from the 560-pixel copy column not being centred in the 1440-pixel frame; it sits left of the optical midline, which reads as intentional.
@@ -71,19 +69,16 @@ Two candidate shapes per `layout-patterns.md` § Feature sections:
 Pick **Bento** for visual impact. The headline feature gets the largest tile; supporting features fan out asymmetrically.
 
 ```js
-batch_design({
-  documentId: "doc",
-  ops: [
-    { op: "C", parent: "doc", node: { type: "frame", name: "Marketing_Features", layout: { direction: "column", gap: 48 }, size: { width: 1440, padding: { x: 120, y: 120 } }, fill: "$bg" } },
-    { op: "C", parent: "Marketing_Features", node: { type: "text", name: "SectionTitle", text: "Everything your CI lacks.", fontSize: 48, fontWeight: "$fontWeightBold", color: "$textPrimary" } },
-    { op: "C", parent: "Marketing_Features", node: { type: "frame", name: "BentoGrid", layout: { direction: "row", wrap: true, gap: 24 }, size: { width: 1200 } } },
-    { op: "C", parent: "BentoGrid", node: { type: "frame", name: "Tile_Headline", size: { width: 780, height: 420, padding: 40 }, fill: "$surface", cornerRadius: 20, stroke: { thickness: 1, color: "$border" } } },
-    { op: "C", parent: "BentoGrid", node: { type: "frame", name: "Tile_Cache", size: { width: 396, height: 198, padding: 32 }, fill: "$surface", cornerRadius: 20, stroke: { thickness: 1, color: "$border" } } },
-    { op: "C", parent: "BentoGrid", node: { type: "frame", name: "Tile_Parallel", size: { width: 396, height: 198, padding: 32 }, fill: "$surface", cornerRadius: 20, stroke: { thickness: 1, color: "$border" } } },
-    { op: "C", parent: "BentoGrid", node: { type: "frame", name: "Tile_Insights", size: { width: 588, height: 240, padding: 32 }, fill: "$surface", cornerRadius: 20, stroke: { thickness: 1, color: "$border" } } },
-    { op: "C", parent: "BentoGrid", node: { type: "frame", name: "Tile_Selfhost", size: { width: 588, height: 240, padding: 32 }, fill: "$surface", cornerRadius: 20, stroke: { thickness: 1, color: "$border" } } },
-  ],
-});
+batch_design({ filePath: "", input: `
+features = Insert(document, { type: "frame", name: "Marketing_Features", layout: "vertical", gap: 48, width: 1440, padding: { x: 120, y: 120 }, fill: "$bg" })
+Insert(features, { type: "text", name: "SectionTitle", content: "Everything your CI lacks.", fontSize: 48, fontWeight: "$fontWeightBold", fill: "$textPrimary" })
+bentoGrid = Insert(features, { type: "frame", name: "BentoGrid", layout: "horizontal", gap: 24, width: 1200 })
+Insert(bentoGrid, { type: "frame", name: "Tile_Headline", width: 780, height: 420, padding: 40, fill: "$surface", cornerRadius: 20, stroke: "$border", strokeWidth: 1 })
+Insert(bentoGrid, { type: "frame", name: "Tile_Cache", width: 396, height: 198, padding: 32, fill: "$surface", cornerRadius: 20, stroke: "$border", strokeWidth: 1 })
+Insert(bentoGrid, { type: "frame", name: "Tile_Parallel", width: 396, height: 198, padding: 32, fill: "$surface", cornerRadius: 20, stroke: "$border", strokeWidth: 1 })
+Insert(bentoGrid, { type: "frame", name: "Tile_Insights", width: 588, height: 240, padding: 32, fill: "$surface", cornerRadius: 20, stroke: "$border", strokeWidth: 1 })
+Insert(bentoGrid, { type: "frame", name: "Tile_Selfhost", width: 588, height: 240, padding: 32, fill: "$surface", cornerRadius: 20, stroke: "$border", strokeWidth: 1 })
+` })
 ```
 
 **In Pencil:** the bento grid is asymmetric on purpose. The large tile anchors the eye; smaller tiles compose around it. Apple's iPhone product pages popularised the pattern, and Linear's feature pages adopted it.
@@ -93,19 +88,16 @@ batch_design({
 Three-tier (Free / Pro / Team) with **Pro** highlighted, per `references/layout-patterns.md` § Pricing tables. The catch most agents miss: highlighting a tier with five competing treatments (coloured border + shadow + scale-up + badge + different background) is louder than the rest of the page combined. Pick two: a coloured border using `$accent` plus a 'Most popular' badge. That's plenty.
 
 ```js
-batch_design({
-  documentId: "doc",
-  ops: [
-    { op: "C", parent: "doc", node: { type: "frame", name: "Marketing_Pricing", layout: { direction: "column", align: "center", gap: 48 }, size: { width: 1440, padding: { x: 120, y: 120 } }, fill: "$surface" } },
-    { op: "C", parent: "Marketing_Pricing", node: { type: "text", name: "SectionTitle", text: "Pricing that scales with your team.", fontSize: 48, fontWeight: "$fontWeightBold", color: "$textPrimary" } },
-    { op: "C", parent: "Marketing_Pricing", node: { type: "frame", name: "PricingRow", layout: { direction: "row", gap: 24, align: "stretch" } } },
-    { op: "C", parent: "PricingRow", node: { type: "frame", name: "Tier_Free", size: { width: 360, padding: 32 }, fill: "$bg", cornerRadius: 16, stroke: { thickness: 1, color: "$border" } } },
-    { op: "C", parent: "PricingRow", node: { type: "frame", name: "Tier_Pro", size: { width: 360, padding: 32 }, fill: "$bg", cornerRadius: 16, stroke: { thickness: 2, color: "$accent" }, context: "Highlighted tier. Coloured accent border + 'Most popular' badge. No scale-up, no extra shadow; the border + badge is enough." } },
-    { op: "C", parent: "Tier_Pro", node: { type: "frame", name: "PopularBadge", layout: { direction: "row", align: "center" }, size: { padding: { x: 12, y: 4 } }, fill: "$accent", cornerRadius: 999 } },
-    { op: "C", parent: "PopularBadge", node: { type: "text", text: "Most popular", fontSize: 12, fontWeight: "$fontWeightMedium", color: "$bg" } },
-    { op: "C", parent: "PricingRow", node: { type: "frame", name: "Tier_Team", size: { width: 360, padding: 32 }, fill: "$bg", cornerRadius: 16, stroke: { thickness: 1, color: "$border" } } },
-  ],
-});
+batch_design({ filePath: "", input: `
+pricing = Insert(document, { type: "frame", name: "Marketing_Pricing", layout: "vertical", align: "center", gap: 48, width: 1440, padding: { x: 120, y: 120 }, fill: "$surface" })
+Insert(pricing, { type: "text", name: "SectionTitle", content: "Pricing that scales with your team.", fontSize: 48, fontWeight: "$fontWeightBold", fill: "$textPrimary" })
+pricingRow = Insert(pricing, { type: "frame", name: "PricingRow", layout: "horizontal", gap: 24, align: "stretch" })
+Insert(pricingRow, { type: "frame", name: "Tier_Free", width: 360, padding: 32, fill: "$bg", cornerRadius: 16, stroke: "$border", strokeWidth: 1 })
+tierPro = Insert(pricingRow, { type: "frame", name: "Tier_Pro", width: 360, padding: 32, fill: "$bg", cornerRadius: 16, stroke: "$accent", strokeWidth: 2, context: "Highlighted tier. Coloured accent border + 'Most popular' badge. No scale-up, no extra shadow; the border + badge is enough." })
+popularBadge = Insert(tierPro, { type: "frame", name: "PopularBadge", layout: "horizontal", align: "center", padding: { x: 12, y: 4 }, fill: "$accent", cornerRadius: 999 })
+Insert(popularBadge, { type: "text", content: "Most popular", fontSize: 12, fontWeight: "$fontWeightMedium", fill: "$bg" })
+Insert(pricingRow, { type: "frame", name: "Tier_Team", width: 360, padding: 32, fill: "$bg", cornerRadius: 16, stroke: "$border", strokeWidth: 1 })
+` })
 ```
 
 **In Pencil:** the highlighted Pro tier reads as the recommended pick without screaming. Stripe and Linear both use the same restraint on their pricing pages; the brief's *'don't look like every other SaaS'* is satisfied by skipping the pile-on.
@@ -115,18 +107,15 @@ batch_design({
 Don't auto-rotate. An auto-rotating carousel hides 80% of the content behind a timer the user didn't ask for, and it's an accessibility headache. Use a static avatar grid (4 quotes); each tile holds an avatar paired with the person's name and short quote, captioned by their role at company.
 
 ```js
-batch_design({
-  documentId: "doc",
-  ops: [
-    { op: "C", parent: "doc", node: { type: "frame", name: "Marketing_Testimonials", layout: { direction: "column", gap: 48 }, size: { width: 1440, padding: { x: 120, y: 120 } }, fill: "$bg" } },
-    { op: "C", parent: "Marketing_Testimonials", node: { type: "text", name: "SectionTitle", text: "Teams that ship faster with us.", fontSize: 48, fontWeight: "$fontWeightBold", color: "$textPrimary" } },
-    { op: "C", parent: "Marketing_Testimonials", node: { type: "frame", name: "QuoteGrid", layout: { direction: "row", wrap: true, gap: 24 }, size: { width: 1200 } } },
-    { op: "C", parent: "QuoteGrid", node: { type: "frame", name: "Quote_1", size: { width: 588, padding: 32 }, fill: "$surface", cornerRadius: 16, stroke: { thickness: 1, color: "$border" } } },
-    { op: "C", parent: "QuoteGrid", node: { type: "frame", name: "Quote_2", size: { width: 588, padding: 32 }, fill: "$surface", cornerRadius: 16, stroke: { thickness: 1, color: "$border" } } },
-    { op: "C", parent: "QuoteGrid", node: { type: "frame", name: "Quote_3", size: { width: 588, padding: 32 }, fill: "$surface", cornerRadius: 16, stroke: { thickness: 1, color: "$border" } } },
-    { op: "C", parent: "QuoteGrid", node: { type: "frame", name: "Quote_4", size: { width: 588, padding: 32 }, fill: "$surface", cornerRadius: 16, stroke: { thickness: 1, color: "$border" } } },
-  ],
-});
+batch_design({ filePath: "", input: `
+testimonials = Insert(document, { type: "frame", name: "Marketing_Testimonials", layout: "vertical", gap: 48, width: 1440, padding: { x: 120, y: 120 }, fill: "$bg" })
+Insert(testimonials, { type: "text", name: "SectionTitle", content: "Teams that ship faster with us.", fontSize: 48, fontWeight: "$fontWeightBold", fill: "$textPrimary" })
+quoteGrid = Insert(testimonials, { type: "frame", name: "QuoteGrid", layout: "horizontal", gap: 24, width: 1200 })
+Insert(quoteGrid, { type: "frame", name: "Quote_1", width: 588, padding: 32, fill: "$surface", cornerRadius: 16, stroke: "$border", strokeWidth: 1 })
+Insert(quoteGrid, { type: "frame", name: "Quote_2", width: 588, padding: 32, fill: "$surface", cornerRadius: 16, stroke: "$border", strokeWidth: 1 })
+Insert(quoteGrid, { type: "frame", name: "Quote_3", width: 588, padding: 32, fill: "$surface", cornerRadius: 16, stroke: "$border", strokeWidth: 1 })
+Insert(quoteGrid, { type: "frame", name: "Quote_4", width: 588, padding: 32, fill: "$surface", cornerRadius: 16, stroke: "$border", strokeWidth: 1 })
+` })
 ```
 
 **In Pencil:** four static tiles in a 2x2 grid. Keyboard-accessible by default, no JavaScript timer, every quote visible at once.
@@ -136,16 +125,13 @@ batch_design({
 A second CTA at the bottom of the page restates the offer for users who scrolled past the hero without converting. Use different copy from the hero so the page doesn't feel repetitive: hero said *'Start your free trial'*; closing says *'Try Forge free for 14 days'*. Pair with a secondary *'Contact sales'* link for enterprise leads.
 
 ```js
-batch_design({
-  documentId: "doc",
-  ops: [
-    { op: "C", parent: "doc", node: { type: "frame", name: "Marketing_CTA_Closing", layout: { direction: "column", align: "center", gap: 24 }, size: { width: 1440, padding: { x: 120, y: 120 } }, fill: "$surfaceElevated" } },
-    { op: "C", parent: "Marketing_CTA_Closing", node: { type: "text", text: "Ready to ship faster?", fontSize: 56, fontWeight: "$fontWeightBold", color: "$textPrimary" } },
-    { op: "C", parent: "Marketing_CTA_Closing", node: { type: "frame", name: "ClosingActions", layout: { direction: "row", gap: 16, align: "center" } } },
-    { op: "C", parent: "ClosingActions", node: { type: "ref", ref: "Button_Primary", descendants: { label: { text: "Try Forge free for 14 days" } } } },
-    { op: "C", parent: "ClosingActions", node: { type: "ref", ref: "Link_Text", descendants: { label: { text: "Contact sales" } } } },
-  ],
-});
+batch_design({ filePath: "", input: `
+closing = Insert(document, { type: "frame", name: "Marketing_CTA_Closing", layout: "vertical", align: "center", gap: 24, width: 1440, padding: { x: 120, y: 120 }, fill: "$surfaceElevated" })
+Insert(closing, { type: "text", content: "Ready to ship faster?", fontSize: 56, fontWeight: "$fontWeightBold", fill: "$textPrimary" })
+closingActions = Insert(closing, { type: "frame", name: "ClosingActions", layout: "horizontal", gap: 16, align: "center" })
+Insert(closingActions, { type: "ref", ref: "Button_Primary", descendants: { label: { content: "Try Forge free for 14 days" } } })
+Insert(closingActions, { type: "ref", ref: "Link_Text", descendants: { label: { content: "Contact sales" } } })
+` })
 ```
 
 ## Step 9: build the footer
@@ -153,19 +139,16 @@ batch_design({
 Per `references/layout-patterns.md` § Footer architectures, pick one shape and stick to it. A 4-column sitemap (Product, Company, Resources, Legal) is the right pick for a SaaS that ships feature pages alongside a blog and a changelog. Don't cram a newsletter signup into the same footer; that's a different architecture.
 
 ```js
-batch_design({
-  documentId: "doc",
-  ops: [
-    { op: "C", parent: "doc", node: { type: "frame", name: "Marketing_Footer", layout: { direction: "column", gap: 48 }, size: { width: 1440, padding: { x: 120, y: 80 } }, fill: "$bg" } },
-    { op: "C", parent: "Marketing_Footer", node: { type: "frame", name: "Sitemap", layout: { direction: "row", justify: "between", gap: 64 } } },
-    { op: "C", parent: "Sitemap", node: { type: "frame", name: "Col_Product", layout: { direction: "column", gap: 12 } } },
-    { op: "C", parent: "Sitemap", node: { type: "frame", name: "Col_Company", layout: { direction: "column", gap: 12 } } },
-    { op: "C", parent: "Sitemap", node: { type: "frame", name: "Col_Resources", layout: { direction: "column", gap: 12 } } },
-    { op: "C", parent: "Sitemap", node: { type: "frame", name: "Col_Legal", layout: { direction: "column", gap: 12 } } },
-    { op: "C", parent: "Marketing_Footer", node: { type: "rectangle", name: "FooterDivider", size: { width: 1200, height: 1 }, fill: "$border" } },
-    { op: "C", parent: "Marketing_Footer", node: { type: "text", text: "© 2026 Forge Labs. All rights reserved.", fontSize: 14, color: "$textMuted" } },
-  ],
-});
+batch_design({ filePath: "", input: `
+footer = Insert(document, { type: "frame", name: "Marketing_Footer", layout: "vertical", gap: 48, width: 1440, padding: { x: 120, y: 80 }, fill: "$bg" })
+sitemap = Insert(footer, { type: "frame", name: "Sitemap", layout: "horizontal", justify: "between", gap: 64 })
+Insert(sitemap, { type: "frame", name: "Col_Product", layout: "vertical", gap: 12 })
+Insert(sitemap, { type: "frame", name: "Col_Company", layout: "vertical", gap: 12 })
+Insert(sitemap, { type: "frame", name: "Col_Resources", layout: "vertical", gap: 12 })
+Insert(sitemap, { type: "frame", name: "Col_Legal", layout: "vertical", gap: 12 })
+Insert(footer, { type: "rectangle", name: "FooterDivider", width: 1200, height: 1, fill: "$border" })
+Insert(footer, { type: "text", content: "© 2026 Forge Labs. All rights reserved.", fontSize: 14, fill: "$textMuted" })
+` })
 ```
 
 Each column gets 4-6 links populated through children of `Col_Product`, `Col_Company`, etc. Skipped here for brevity; the pattern is one column heading text node plus link text nodes.
@@ -187,12 +170,12 @@ The CTAs themselves get the same treatment per `references/microcopy.md` § Butt
 One screenshot per section. Six screenshots total, since each section is its own top-level frame.
 
 ```js
-get_screenshot({ documentId: "doc", nodeId: "Marketing_Hero" });
-get_screenshot({ documentId: "doc", nodeId: "Marketing_Features" });
-get_screenshot({ documentId: "doc", nodeId: "Marketing_Pricing" });
-get_screenshot({ documentId: "doc", nodeId: "Marketing_Testimonials" });
-get_screenshot({ documentId: "doc", nodeId: "Marketing_CTA_Closing" });
-get_screenshot({ documentId: "doc", nodeId: "Marketing_Footer" });
+get_screenshot({ filePath: "", nodeId: hero });
+get_screenshot({ filePath: "", nodeId: features });
+get_screenshot({ filePath: "", nodeId: pricing });
+get_screenshot({ filePath: "", nodeId: testimonials });
+get_screenshot({ filePath: "", nodeId: closing });
+get_screenshot({ filePath: "", nodeId: footer });
 ```
 
 Confirm:

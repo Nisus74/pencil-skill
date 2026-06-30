@@ -41,16 +41,17 @@ skill is the capability the AI invokes.
 
 ```
 skills/pencil-design/              # The platform-agnostic core
-  SKILL.md                         # The skill: YAML frontmatter + instructions (v1.11.0)
+  SKILL.md                         # The skill: YAML frontmatter + instructions (v0.8.0)
   references/                      # On-demand references loaded by the skill
-    mcp-tools.md                   # Cookbook for all 13 MCP tools + composite recipes
+    mcp-tools.md                   # Cookbook for all 9 MCP tools + composite recipes
     states.md                      # Component states + screen-level fault states + onboarding/settings states
     flows.md                       # Transitions between screens (modal, validation, back-stack, onboarding, settings, search)
     accessibility.md               # ARIA, focus order, APCA, ARIA live regions, keyboard shortcuts, WCAG 2.2
     modern-patterns.md             # Container queries, fluid type, AI-UI, animation timing, command palette, perceived perf
     pencil-cli.md                  # Full Pencil CLI reference + When CLI vs MCP table
-    pen-schema.md                  # .pen file JSON schema reference
-    batch-design-grammar.md        # batch_design op syntax (I/C/R/U/G/D/M)
+    pen-schema.md                  # .pen file JSON schema reference (v2.14)
+    batch-design-grammar.md        # batch_design JavaScript API (Insert/Copy/Update/Replace/Move/Delete/SetVariables/Generate/FindEmptySpace)
+    advanced-canvas.md             # v2.14 canvas features: shader fills, mesh gradients, script nodes, ellipse arcs/donuts, prompt/context nodes
     component-anatomy.md           # Reading component structure: slots, descendants paths, state activation
     composition-patterns.md        # Compound components, slot design, variant naming, status workflow
     file-architecture.md           # Cover frame, section regions, hierarchical naming, multi-.pen layouts
@@ -87,7 +88,7 @@ skills/pencil-design/              # The platform-agnostic core
     example-error-screen.md        # 404 + offline page pair
     example-form-flow.md           # Multi-step signup with email verification
     example-component-deep-dive.md # Full read→understand→instantiate cycle
-    example-style-selection.md     # Catalogue (style + palette + fonts) → set_variables MCP → tokens commit → starter components
+    example-style-selection.md     # Catalogue (style + palette + fonts) → SetVariables → tokens commit → starter components
     example-settings-page.md       # Settings with sidebar nav, autosave + explicit-save for high-stakes
     example-dashboard.md           # KPI cards + chart tile + recent-activity table
     example-marketing-page.md      # Marketing page avoiding three-card grid (asymmetric hero, bento features)
@@ -195,21 +196,26 @@ any code file. While they can technically be read with file tools, **all reading
 and writing in this project goes through the Pencil MCP server**. It gives you
 schema validation, live screenshots, and stays in sync with the running editor:
 
+The server exposes **nine tools**. Tokens (`SetVariables`), empty-space search (`FindEmptySpace`), and
+image generation (`Generate`) are JavaScript functions invoked *inside* a `batch_design` snippet, not
+standalone tools.
+
 | Tool | Purpose |
 |------|---------|
-| `get_editor_state` | Get current document state |
-| `open_document` | Open a `.pen` file |
-| `get_guidelines` | Retrieve design guidelines |
+| `get_editor_state` | Get current document state + schema (call with `include_schema: true` first) |
+| `get_guidelines` | Retrieve design guidelines (guides + style archetypes) |
 | `batch_get` | Read multiple nodes |
-| `batch_design` | Write / modify design nodes |
+| `batch_design` | Write / modify design nodes (JS snippet: `Insert`/`Copy`/`Update`/`Replace`/`Move`/`Delete`/`SetVariables`/`Generate`/`FindEmptySpace`) |
 | `snapshot_layout` | Capture layout state |
 | `get_screenshot` | Visual screenshot of the design |
 | `get_variables` | Read design tokens / variables |
-| `set_variables` | Update design tokens / variables |
-| `find_empty_space_on_canvas` | Locate available canvas space |
-| `search_all_unique_properties` | Search across design properties |
-| `replace_all_matching_properties` | Bulk-replace properties |
-| `export_nodes` | Export nodes to external format |
+| `export_nodes` | Export nodes to image / PDF files |
+| `export_html` | Export nodes to HTML (Tailwind or CSS) |
+
+There is no `open_document` tool (the user opens files in the editor), and no
+`set_variables` / `find_empty_space_on_canvas` / `search_all_unique_properties` /
+`replace_all_matching_properties` tools (the first two became `batch_design` functions; bulk
+property work is now a `batch_get` + `Update`-loop pattern).
 
 ---
 

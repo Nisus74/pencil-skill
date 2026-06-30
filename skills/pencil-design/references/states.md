@@ -54,14 +54,16 @@ ButtonPrimary (reusable: true)
 
 The instance picks a sibling by `descendants` override or by `theme: { state: "hover" }` if you've added a `state` axis.
 
-**`state` theme axis.** The `state` axis registers automatically once you declare state-conditional variable values via `set_variables`. No explicit axis-declaration step is needed. Bind state-conditional values on the component:
+**`state` theme axis.** Declare a state-conditional **variable** with `SetVariables` (the `state` axis registers automatically from the themed values), bind it on the component, and activate a state with `theme: { state: "..." }`. A `{ value, theme }` array placed directly on a node's `fill`/`stroke`/`opacity` is rejected by the server — the themed values live on the **variable**; the node just references it.
 
 ```
-fill: [
+SetVariables({ buttonFill: { type: "color", value: [
   { value: "$primary",      theme: { state: "default" } },
   { value: "$primaryMuted", theme: { state: "hover"   } },
   { value: "$primaryDark",  theme: { state: "pressed" } }
-]
+] } })
+component = Insert(parent, { type: "frame", name: "ButtonPrimary", reusable: true, fill: "$buttonFill" })
+Update(instanceId, { theme: { state: "hover" } })
 ```
 
 Cleaner for products with a small, consistent state set. Heavier for components with many state-specific shapes (where variant siblings stay clearer).

@@ -8,18 +8,14 @@ metadata:
 permissions:
   mcp:
     - pencil:get_editor_state
-    - pencil:open_document
     - pencil:get_guidelines
     - pencil:batch_get
     - pencil:batch_design
     - pencil:snapshot_layout
     - pencil:get_screenshot
     - pencil:get_variables
-    - pencil:set_variables
-    - pencil:find_empty_space_on_canvas
-    - pencil:search_all_unique_properties
-    - pencil:replace_all_matching_properties
     - pencil:export_nodes
+    - pencil:export_html
   shell: none
   filesystem: project-only  # reads ./design-system/ if present; design-system/ holds optional templates for users to adapt
   network: none
@@ -100,22 +96,20 @@ If a component exists but its name doesn't quite match what the user said (`Prim
 
 Every new document declares a `mode` theme axis with `light` and `dark` values. Every color variable carries both. No exceptions for "we'll add dark mode later" — the variables are nearly free to declare upfront, and retrofitting a colorscape after the design exists is brutal.
 
-**Before writing any tokens, call `get_variables()`.** If it returns a non-empty set, the document already has tokens the user may have customised. Treat those as authoritative — never re-declare a variable that already exists. `replace: false` (the `set_variables` merge default) still overwrites existing values for any key you pass, so calling it with a full default suite silently clobbers user-configured tokens.
+**Before writing any tokens, call `get_variables()`.** If it returns a non-empty set, the document already has tokens the user may have customised. Treat those as authoritative — never re-declare a variable that already exists. `replace: false` (the `SetVariables` merge default) still overwrites existing values for any key you pass, so calling it with a full default suite silently clobbers user-configured tokens.
 
 Workflow for bootstrapping tokens:
 
 1. `get_variables()` → note which variable names already exist.
-2. Set themes only if not already declared (check `get_editor_state` for an existing `mode` axis before issuing `U("doc", { themes: { mode: ["light","dark"] } })`).
-3. Call `set_variables` with **only** the variables absent from step 1. If the document already has a complete token set, skip bootstrapping entirely.
+2. Call `SetVariables` (inside a `batch_design` snippet) with **only** the variables absent from step 1. Themed values auto-register the `mode` axis — there is no separate theme-declaration step. If the document already has a complete token set, skip bootstrapping entirely.
 
-Concretely, for a genuinely empty doc:
+Concretely, for a genuinely empty doc, one `batch_design` call:
 
 ```
-U("doc", { themes: { mode: ["light", "dark"] } })
-set_variables({ variables: { surface: { type: "color", value: [
+SetVariables({ surface: { type: "color", value: [
   { value: "#FAFAFA", theme: { mode: "light" } },
   { value: "#0B1117", theme: { mode: "dark" } }
-] }, /* ...only tokens absent from get_variables() result */ }, replace: false })
+] } /* ...only tokens absent from get_variables() result */ })
 ```
 
 Test under both modes by updating the page frame's `theme` property before declaring the design done.
@@ -159,7 +153,7 @@ A `.pen` is a file other people (and other agents) will open later. Three rules 
 
 **Cover frame.** Every `.pen` opens with a top-level frame named `Cover` at canvas origin. Inside it: file owner, status (one of `Discovery`, `In design`, `Design review`, `Engineering review`, `Ready for build`, `In build`, `QA`, `Shipped`, `Deprecated`), version, last-updated date, scope (in / out), links (brief, ticket, prototype, design-system). Without a Cover, no one can answer *"is this safe to build from?"* in under 30 seconds. The Cover's `context` reads `"File operating manual: owner, status, version, scope, links."` and its children are text nodes for each field. Backfill a Cover into any `.pen` that doesn't have one when you open it for real work.
 
-**Section frames as canvas regions.** Top-level frames belong in named sections, positioned in distinct canvas regions: `SourceOfTruth` (approved current), `BuildReady` (current iteration in flight), `UXStates` (state matrices), `Responsive` (per-breakpoint), `Exploration` (drafts and rejected directions), `Archive` (superseded). Use `find_empty_space_on_canvas` between sections so they don't overlap. Never place an exploration frame inside the SourceOfTruth region or vice versa. The whole point is that a code generator (or a teammate) can answer *"which is canonical?"* without asking. When an exploration is promoted, move it; don't dual-track it.
+**Section frames as canvas regions.** Top-level frames belong in named sections, positioned in distinct canvas regions: `SourceOfTruth` (approved current), `BuildReady` (current iteration in flight), `UXStates` (state matrices), `Responsive` (per-breakpoint), `Exploration` (drafts and rejected directions), `Archive` (superseded). Use `FindEmptySpace` (inside `batch_design`) between sections so they don't overlap. Never place an exploration frame inside the SourceOfTruth region or vice versa. The whole point is that a code generator (or a teammate) can answer *"which is canonical?"* without asking. When an exploration is promoted, move it; don't dual-track it.
 
 **Hierarchical frame naming for flows.** Multi-screen flows extend the PascalCase rule with a `/`-delimited path:
 
@@ -286,7 +280,7 @@ Priority order (highest → lowest):
 1. **Live `.pen` variables** — call `get_variables()`. Any non-empty result means tokens are established. Do not consult any packaged template for token decisions; use what's there.
 2. **Live `.pen` components** — `batch_get({ patterns: [{ reusable: true }], readDepth: 2 })`. Any matching components are the project's component library. Build with them; do not invent equivalents.
 3. **Imported `.lib.pen` libraries** — read `imports` from `get_editor_state`. For each listed library, call `get_variables({ filePath: "..." })` and `batch_get({ filePath: "...", patterns: [{ reusable: true }], readDepth: 2 })`. These are authoritative across the whole project.
-4. **Project `design-system/` docs** — if steps 1–3 yield nothing, check for a `design-system/` folder in the project root. Read `README.md` then `design-system.md` to understand intent; use that to bootstrap `.pen` variables via `set_variables`.
+4. **Project `design-system/` docs** — if steps 1–3 yield nothing, check for a `design-system/` folder in the project root. Read `README.md` then `design-system.md` to understand intent; use that to bootstrap `.pen` variables via `SetVariables`.
 5. **Skill defaults** — only when steps 1–4 yield nothing. Apply aesthetic reasoning from the discipline rules and reference files in this skill.
 
 **If steps 1–3 return results, steps 4 and 5 are irrelevant for token and component decisions. The live file wins.**
@@ -300,7 +294,7 @@ These patterns immediately read as machine-generated. Treat each as a bug to fix
 - Neon glow shadows, outer glows, or purple/blue gradient fills on headings.
 - Three-column equal-card grids as the default layout for "features" or "benefits".
 - Fabricated numbers, metrics, or "system stats" sections invented to fill space.
-- Placeholder names like `John Doe`, `Acme`, `Nexus`, `Lorem Ipsum` left in shipped designs, use plausible context-appropriate content or `G(node, "ai", ...)` for imagery.
+- Placeholder names like `John Doe`, `Acme`, `Nexus`, `Lorem Ipsum` left in shipped designs, use plausible context-appropriate content or `Generate(node, "ai", ...)` for imagery.
 - AI copywriting clichés: "Elevate", "Seamless", "Unleash", "Next-Gen", "Revolutionize", "Empower". Strike them from any text you author. For the full cliché list (three severity levels), the replacement strategy, and the positive guidance for buttons, errors, empty states, and microcopy, see [references/ux-writing.md](references/ux-writing.md).
 - `LABEL // YEAR` and similar typographic affectations borrowed from generated portfolio sites.
 - Emojis in production UI (acceptable in voice/microcopy only if the user explicitly opts in).
@@ -357,7 +351,7 @@ This is the reflex sequence for any design task. Follow it; deviate only at the 
 
    If you cannot name all nine, the plan is incomplete. Return to steps 2 and 3 (and load `references/states.md`, `references/flows.md`, `references/onboard.md`, `references/interaction-design.md` as relevant before re-planning).
 
-5. **Build, screenshot, react.** Work in small chunks: **≤8 ops per `batch_design` call for visual work** (up to 25 ops only for non-visual sweeps such as renames, context backfills, metadata). After each visual chunk: screenshot the affected subtree, narrate what you see in one or two sentences (*'the form card landed at 360px wide; the title sits tight against the subtitle, gap looks about 4px when it should be 16'*), then either keep building or issue a small adjustment. The user is watching; they should see the design take shape on the canvas as you work, with each chunk visible. **First chunk on a new document:** call `set_variables` first to declare the design tokens, themed values like `{ value: "#FAFAFA", theme: { mode: "light" } }` auto-register the `mode` theme axis. There is no `U(docRootId, themes: ...)` step; the server handles axis registration for you. After tokens, issue the first `batch_design` skeleton call. Every new top-level frame is created with `placeholder: true`, and the flag is removed per-frame as each frame is complete. Use the `foo=I("parent", {...})` binding form for in-call references. For images, use `G(nodeId, "ai", "<prompt>")` rather than placeholder rectangles. See `references/batch-design-grammar.md` for the full op grammar.
+5. **Build, screenshot, react.** Work in small chunks: **≤8 ops per `batch_design` call for visual work** (larger only for non-visual sweeps such as renames, context backfills, metadata). After each visual chunk: screenshot the affected subtree, narrate what you see in one or two sentences (*'the form card landed at 360px wide; the title sits tight against the subtitle, gap looks about 4px when it should be 16'*), then either keep building or issue a small adjustment. The user is watching; they should see the design take shape on the canvas as you work, with each chunk visible. **First chunk on a new document:** call `SetVariables` first (inside the `batch_design` snippet) to declare the design tokens — themed values like `{ value: "#FAFAFA", theme: { mode: "light" } }` auto-register the `mode` theme axis; the server handles axis registration for you. After tokens, build the first skeleton. Every new top-level frame is created with `placeholder: true`, and the flag is removed per-frame as each frame is complete. Capture in-call references with bare assignment (`foo = Insert("parent", {...})`, no `const`/`let`); a binding lasts only for that call, so reference a node from a later call by its returned id. For images, use `Generate(nodeId, "ai", "<prompt>")` rather than placeholder rectangles. See `references/batch-design-grammar.md` for the full API.
 
    **Pre-flight checklist (run mentally before sending every `batch_design` call):**
    1. **Name?** Every node has a meaningful PascalCase `name` (no `Frame 1`, `wrapper`, `f4`).
@@ -370,7 +364,7 @@ This is the reflex sequence for any design task. Follow it; deviate only at the 
 
    **First-screenshot protocol.** After placing the skeleton and taking the first screenshot, run this check before continuing with detail work:
    1. **Direction match:** does this match the aesthetic direction stated in step 2? If the user gave a reference, compare directly. If you used negative-space defaults, verify nothing reads as AI-generic.
-   2. **Drift signal:** name one element that already looks AI-default and fix it before continuing (e.g. "card has a drop shadow that wasn't in the direction; fixing now with `U(cardId, { effect: [] })`").
+   2. **Drift signal:** name one element that already looks AI-default and fix it before continuing (e.g. "card has a drop shadow that wasn't in the direction; fixing now with `Update(cardId, { effect: [] })`").
    If either check fails, fix it before adding any detail. A wrong skeleton under 60 ops is nearly unrecoverable. For a fuller 5-question diagnostic, read `references/design-eye.md`.
 
 6. **Verification checklist + accessibility.** Once visual chunks are done, run all of the following. Each is a gate, failing any one of them means the design is not done.
@@ -427,16 +421,17 @@ The default workflow assumes a fresh, end-to-end design. Most tasks aren't that.
 
 - **"Edit the X" or "change the Y to Z".** Skip step 4's plan-the-tree work. `batch_get` the affected node first to see its current shape, then issue `R` (full replace) or `U` (property-level update) ops. The aesthetic direction step still applies, but it inherits from the existing design (read its tokens and structure to stay consistent). `snapshot_layout` or `batch_get` on the changed node is usually enough; screenshot only if the change was visual.
 - **"Use my design library" / library is imported.** After step 3, check the open document's `imports` field. If the named `.lib.pen` is imported, query its reusable components via `batch_get` and instantiate them with `ref` nodes, never re-build a Button from primitives when one exists. If the library isn't imported, add it first via a `U` op on the document root (see `examples/example-import-library.md`).
-- **User mentions an icon by name.** Always reach for `icon_font` (Lucide / Material Symbols / Phosphor / Feather). If the project has declared a specific icon library, use that. Don't import an SVG unless the user is naming a specific custom asset.
+- **User mentions an icon by name.** Always reach for an `icon` node (`type: "icon"`, with `library` + `icon`; libraries: Lucide / Material Symbols / Phosphor / Feather). If the project has declared a specific icon library, use that. Don't import an SVG unless the user is naming a specific custom asset.
 - **Big screen (>30 visible elements).** Plan multiple `batch_design` calls before starting. Build the page-level frame and main columns first, screenshot, then fill in. Cramming 60 ops into one call is asking for ordering bugs.
 - **"Quick sketch" / "throwaway" / "just mock something up".** Skip steps 2 (aesthetic direction) and 3 (guidelines + inventory) entirely. Go straight from step 1 → step 5 using the negative-space defaults in the Aesthetic foundation. Verification still happens, but the taste pass also skips.
 - **User shows you a reference image.** This is the canonical input for step 2 (aesthetic direction). Read the image, name the layout pattern and aesthetic direction out loud (e.g. "split-screen with hero left, form right; dense, dark, monospace figures"), then plan the tree.
-- **Adding frames to a populated canvas** (multiple existing top-level frames already on the canvas). Before placing a new top-level frame at step 5, call `find_empty_space_on_canvas({ width, height, padding, direction })` at step 4 to locate a coordinate region that doesn't overlap existing content. All four parameters are required; `direction` accepts `"top" | "right" | "bottom" | "left"`. Optionally pass `nodeId` to anchor the search to a specific frame instead of the whole canvas. Pass the returned position as `x`/`y` on the outermost frame in your first `batch_design` call. Skipping this on a crowded canvas produces invisible overlaps that look like rendering failures.
-- **"Export this", "generate assets", "hand off the design".** Use `export_nodes` with the target node id(s). Ask the user what format (PNG, SVG, PDF) and destination path if not stated, the answer shapes the call. Do not substitute `get_screenshot` for an export; `get_screenshot` produces a canvas preview, not a properly-sized export artifact.
+- **Adding frames to a populated canvas** (multiple existing top-level frames already on the canvas). Before placing a new top-level frame, call `FindEmptySpace({ width, height, padding, direction })` as the first line of your `batch_design` snippet to locate a coordinate region that doesn't overlap existing content; `direction` accepts `"top" | "right" | "bottom" | "left"`. Optionally pass `nodeId` to anchor the search to a specific frame (e.g. the previous screen, to chain them). Use the returned `x`/`y` on the outermost frame in the same call. Skipping this on a crowded canvas produces invisible overlaps that look like rendering failures.
+- **"Export this", "generate assets", "hand off the design".** Use `export_nodes` for image/PDF assets (`png` / `jpeg` / `webp` / `pdf`) or `export_html` for markup (`html-tailwind` / `html-css`). Ask the user which they want and the destination path if not stated, the answer shapes the call. Do not substitute `get_screenshot` for an export; `get_screenshot` produces a canvas preview, not a properly-sized export artifact.
 - **User asks for an error, 404, 500, offline, or empty screen.** Load `references/states.md` before planning. It owns the screen-level fault state taxonomy and the empty-state taxonomy (first-use / no-results / no-permission / post-action). See `examples/example-error-screen.md` for a worked walkthrough.
 - **User asks for a multi-step form, wizard, signup, onboarding, or any flow that crosses screens.** Load `references/flows.md` before planning. It owns validation timing, modal-vs-page decisions, the back-stack model, and multi-step confirmation anatomy. See `examples/example-form-flow.md` for a worked walkthrough.
 - **User mentions container queries, fluid type, AI UI affordances, optimistic updates, real-time presence, or "modern" patterns.** Load `references/modern-patterns.md`. It surfaces the patterns the model under-uses by default and flags the AI defaults (glassmorphism, three-card grids, parallax-everywhere) that read as already-dated.
-- **User wants to use a Pencil MCP tool you haven't touched recently** (`get_variables`, `set_variables`, `search_all_unique_properties`, `replace_all_matching_properties`, `find_empty_space_on_canvas`, `export_nodes`). Load `references/mcp-tools.md` — it's a per-tool cookbook with worked invocations and composite recipes (token audit, greenfield bootstrap, library smoke test).
+- **User wants a shader/generative background, a mesh gradient, a donut/arc/gauge, a parameterised or procedurally-generated layer, or an embedded AI `prompt`/`context` node.** Load `references/advanced-canvas.md`. It owns the v2.14 canvas capabilities beyond the primitives: `shader` fills (WebGL fragment shaders with `@directive` uniforms), `mesh_gradient` fills, `script` nodes (`@input`-driven JavaScript generators), ellipse `innerRadius`/`startAngle`/`sweepAngle`, and the non-rendering `prompt`/`context` node types, each with a worked `batch_design` snippet.
+- **User wants to use a Pencil MCP tool you haven't touched recently** (`get_variables`, `batch_get`, `snapshot_layout`, `export_nodes`, `export_html`) **or a migrated `batch_design` function** (`SetVariables`, `FindEmptySpace`, `Generate`). Load `references/mcp-tools.md` — it's a per-tool cookbook with worked invocations and composite recipes (token audit, greenfield bootstrap, library smoke test), and it maps the operations that used to be standalone tools onto their `batch_design` replacements.
 - **User mentions headless / CI / batch / scripted / `pencil` command / `@pencil.dev/cli` / one-shot generation, OR explicitly asks for design without opening the editor, OR is in a CI environment with no desktop app available.** Load `references/pencil-cli.md`. It owns the `@pencil.dev/cli` reference (install, agent mode `--prompt`, interactive mode, batch `--tasks`, `--export` for headless artifact generation, auth via `PENCIL_CLI_KEY` / `ANTHROPIC_API_KEY`) and the When CLI vs MCP decision table. The default policy stays no-auto-fall-back: when MCP isn't connected, stop and ask the user; only invoke the CLI when the user explicitly directs it or the context is unambiguously headless.
 - **Request is open-ended (no reference image, no description of who uses it, no `design-system/` to follow).** Before step 4 (Plan), ask three quick questions: *(1) Who uses this and what problem does it solve? (2) Atmosphere: any words, references, or brand direction? (3) Hard constraints (stack, responsive targets, dark-mode-only, mobile-first)?* Skip the questions if the `.pen` file already has variables and components (steps 1–3 of the Design source priority rule); those answer them. Also skip if the project has a populated `design-system/` folder with intent documented. Skip if the user gave a reference image or a clear domain signal. Don't ask twice in the same session.
 - **User wants a form, signup, multi-field input, validation, or anything the user types into.** Load `references/forms.md`. Forms have their own dense vocabulary (Enter-to-submit, focus-first-error-on-submit, autocomplete attributes, password-manager friendliness, mobile font-size to defeat iOS zoom) that's easy to skip and hard to retrofit.
@@ -452,8 +447,8 @@ The default workflow assumes a fresh, end-to-end design. Most tasks aren't that.
 - **Image optimisation, font loading, network budgets, perceived performance, or anything that affects Core Web Vitals.** Load `references/performance-design.md`. It owns network budgets, LCP/CLS/INP targets, virtualisation, image and font optimisation, theme-color matching, skeleton-vs-spinner choices.
 - **Industry-specific design (SaaS, fintech, healthcare, e-commerce, creative tools, education, social, communication).** Load `references/industry-patterns.md`. It owns 8 industry families with 15-20 rules per family, per-industry style/palette/font picks, anti-patterns by industry, and the brutal-honesty completeness pressure tests for SaaS / Website / Mobile projects.
 - **Charts, dashboards, KPIs, sparklines, or any data visualisation.** Load `references/data-viz.md`. It owns the 25-chart selection matrix (data shape → ideal chart), colour-blind-safe palettes (Okabe-Ito, ColorBrewer, Viridis), dashboard tile shapes, default chart styling rules, and the chart anti-patterns (3D, pie > 5 slices, dual y-axes, red-green only).
-- **Greenfield project; need to pick a visual style direction.** Load `references/style-catalogue.md`. A 30+ named UI style menu (Swiss / International, Editorial, Bento, Brutalist, Dark-mode-first, Terminal / Hacker, etc.) organised by family. The agent picks one style, commits to it via `set_variables` in the `.pen` file and — if the project has a `design-system/` folder — documents the choice in `design-system/visual-style.md`. Every design decision is then constrained to it.
-- **Greenfield project; need to pick a colour palette.** Load `references/colour-palettes.md`. A library of palette *recipes* (neutral family + accent scale from established source systems like Tailwind, Radix, IBM Carbon). The agent picks a recipe, looks up the hex values from the source, and populates the `.pen` variables via `set_variables`. If the project has a `design-system/` folder, it also records the recipe in `design-system/tokens.md`. Designs reference `$tokens`, never literal hex.
+- **Greenfield project; need to pick a visual style direction.** Load `references/style-catalogue.md`. A 30+ named UI style menu (Swiss / International, Editorial, Bento, Brutalist, Dark-mode-first, Terminal / Hacker, etc.) organised by family. The agent picks one style, commits to it via `SetVariables` in the `.pen` file and — if the project has a `design-system/` folder — documents the choice in `design-system/visual-style.md`. Every design decision is then constrained to it.
+- **Greenfield project; need to pick a colour palette.** Load `references/colour-palettes.md`. A library of palette *recipes* (neutral family + accent scale from established source systems like Tailwind, Radix, IBM Carbon). The agent picks a recipe, looks up the hex values from the source, and populates the `.pen` variables via `SetVariables`. If the project has a `design-system/` folder, it also records the recipe in `design-system/tokens.md`. Designs reference `$tokens`, never literal hex.
 - **Greenfield project; need to pick typography.** Load `references/font-pairings.md`. 30+ Google Fonts (and a few commercial) pairings with weights, mood, industry fit. Same recipe-menu pattern as colour-palettes: pick once, commit to `tokens.md`, mirror to `.pen` `variables`, designs reference `$fontBody`/`$fontMono`.
 
 **Screenshot cadence.** Screenshots are how the user watches you design. Take one after every chunk that changes visible state. Each one answers: 'what landed, what needs to change before I keep going?'. Narrate what you see in plain language, then either keep building or issue a small adjustment. A typical design task produces five to fifteen screenshots; that *is* the design loop, not waste. Skip screenshots only on edits that change no rendered pixels (a `name` rename, a `context` backfill, a metadata-only update). Hand back with a one-paragraph summary once the requirements are covered and accessibility passes.
@@ -474,31 +469,38 @@ When to make a `.lib.pen`: as soon as the project has more than one `.pen` and y
 
 When to import a library on the user's behalf: only when the open document's `imports` doesn't include a library that the project clearly has. See `examples/example-import-library.md` for the exact ops.
 
-## batch_design grammar (essentials)
+## batch_design API (essentials)
 
-`batch_design` takes a single string of ops, one per line. Five op functions cover most work:
+`batch_design` runs a single **JavaScript snippet** (the `input` string). You write real JavaScript —
+loops, arrays, spreads, helpers — and call these functions:
 
-- **Insert:** `foo=I("parent", { type: "frame", ... })`, creates a child of `parent`. The `foo=` binding lets later ops reference the new node's id. Use `I(document, ...)` to create top-level frames.
-- **Copy:** `bar=C("sourceId", "parent", { ...overrides })`, duplicates an existing node into `parent`, optionally overriding properties.
-- **Replace:** `R("nodeId", { ...newProps })`, full replacement of a node's properties.
-- **Update:** `U("nodeId", { ...partialProps })`, merges partial property changes.
-- **AI image:** `G(nodeId, "ai", "<prompt>")`, fills an existing node with an AI-generated image (use Unsplash mode `"unsplash"` for stock photos).
+- **Insert:** `foo = Insert("parent", { type: "frame", ... })`, creates a child of `parent` and returns
+  its id. Use `Insert(document, ...)` for top-level frames.
+- **Copy:** `bar = Copy("sourceId", "parent", { ...overrides })`, duplicates a node into a parent.
+- **Replace:** `Replace("nodeId", { ...newProps })`, swaps a node for a new one.
+- **Update:** `Update("nodeId", { ...partialProps })`, merges partial property changes.
+- **Delete / Move:** `Delete("nodeId")`, `Move("nodeId", "newParent", index)`.
+- **Tokens:** `SetVariables({ name: { type, value }, ... }, replace?)`.
+- **Empty space:** `FindEmptySpace({ width, height, direction?, padding?, nodeId? })` → `{ x, y }`.
+- **Image:** `Generate(nodeId, "ai" | "stock", "<prompt>")`, fills an existing `frame`/`rectangle`.
 
 **Rules:**
 
-- Cap calls at **≤8 ops for visually-significant changes** so each call advances visible state by an amount the user can scan in one screenshot. Up to 25 ops is acceptable only for non-visual sweeps (renames, context backfills, metadata updates) where there is nothing to screenshot. Crossing 25 risks ordering bugs and slow round trips even for non-visual work.
-- IDs cannot contain `/`. The server rejects them.
-- Use the `foo=I(...)` binding pattern, never hardcode a node id you just created in the same call.
-- **Text content:** the property is `content`, not `text` or `value`. Both are rejected. Example: `{ type: "text", content: "Hello", fontFamily: "Geist", fontSize: 14, fill: "#F1F5F9" }`.
-- **Text has no colour by default, always set `fill` on text nodes or they render invisible.**
-- **Padding:** takes a number, `[horizontal, vertical]`, or `[top, right, bottom, left]` array. Object form `{ top: N, left: N }` and individual `paddingTop`/`paddingLeft` props are both rejected.
-- **`justifyContent`** values use underscores: `"space_between"`, `"space_around"`, not hyphens.
-- **Fill object type** is `"color"` not `"solid_color"`. Plain color strings (`"#RRGGBB"` or `"$variable"`) are accepted as shorthand and preferred.
-- For sizing, use `width: "fill_container"` or `width: "fit_content"` (bare strings), not `"100%"`. With fallback: `width: "fill_container(320)"`.
-- `U("document", ...)` is not supported. The `document` binding is insert-only. Tokens go through `set_variables` (themes auto-register from variable values). Imports currently have no documented MCP path, edit the `.pen` JSON directly if you need to add an `imports` entry.
-- For colors, prefer `"$variableName"` over raw `#RRGGBB`. Raw colors are accepted but lose theme-axis behavior.
+- Cap calls at **≤8 ops for visually-significant changes** so each call advances visible state by an amount the user can scan in one screenshot. Larger calls are acceptable only for non-visual sweeps (renames, context backfills, metadata) where there is nothing to screenshot.
+- Capture ids with bare assignment (`foo = Insert(...)`, no `const`/`let`). A binding lasts only for that call; reference a node from a later call by its returned literal id.
+- Never set `id`; the server assigns one. IDs cannot contain `/` (it's the `descendants`/instance path separator).
+- On error the **whole call rolls back**. Warnings come back in the response, fix them next call. No comments in the snippet.
+- **Text content:** the property is `content`, not `text` or `value`. Example: `{ type: "text", content: "Hello", fontFamily: "Geist", fontSize: 14, fill: "#F1F5F9" }`. Text has no colour by default — always set `fill` or it renders invisible.
+- **Stroke:** `stroke` is a fill value plus a separate `strokeWidth`: `{ stroke: "$border", strokeWidth: 1 }`. The old `stroke: { color, thickness }` object form is rejected.
+- **Icons:** `type: "icon"` with `library` + `icon` (not the old `icon_font`/`iconFontName`).
+- **Padding:** a number, `[vertical, horizontal]`, or `[top, right, bottom, left]`. No `{ top }` object, no `paddingTop`.
+- **`justifyContent`** uses underscores (`"space_between"`, `"space_around"`); **`alignItems`** is `start`/`center`/`end` (no `stretch`). Fill type is `"color"`, not `"solid_color"`.
+- Sizing uses bare strings `"fill_container"` / `"fit_content"` (with fallback `"fill_container(320)"`), never `"100%"`.
+- There is no `Update(document, ...)`; the `document` binding is insert-only. Tokens go through `SetVariables` (themes auto-register). Imports are attached through the editor's import UI, not `batch_design`.
+- Prefer `"$variableName"` over raw `#RRGGBB`; raw colours are accepted but lose theme-axis behaviour.
 
-See `references/batch-design-grammar.md` for the complete grammar including delete and move ops, ordering rules, and common error fixes.
+See `references/batch-design-grammar.md` for the complete API including ordering rules, instance
+`descendants`, and common error fixes.
 
 ## Screenshot loop
 
@@ -508,7 +510,7 @@ After each visual `batch_design` chunk:
 
 1. Call `get_screenshot({ nodeId: "<most specific node containing the change>" })`. Never screenshot the whole document when a card subtree will do.
 2. Narrate what you see in one or two sentences. Be specific: name what landed correctly, and what needs fixing. Example: *'the form card lands at 360px, title is tight against the subtitle (gap reads about 4px, should be 16), submit button looks 12px shorter than the inputs'*. This is the part the user reads to know what you are seeing.
-3. Decide: keep building (next chunk) or adjust (one small `U` op, screenshot again).
+3. Decide: keep building (next chunk) or adjust (one small `Update` op, screenshot again).
 
 Skip screenshots on non-visual changes (renames, `context` backfills, metadata updates). They have nothing to show.
 
@@ -521,7 +523,7 @@ If three iterations on the same issue do not converge, stop and ask the user; th
 When a screenshot shows something is off but you cannot tell exactly what (*'the gap between sections looks wrong but I cannot read the pixels'*), drop to numbers:
 
 1. **Locate.** `batch_get` the LoginCard subtree, identify the button node and the link node. *(One JSON call; would have been needed regardless.)*
-2. **Execute.** One `batch_design` call: `U("<button>", { fill: "$brandGreen" })`, `U("<linkContainer>", { padding: [8, 0, 0, 0] })`. Server response confirms both ops landed. *(Rung 1.)* Note: there is no `paddingTop` property — use the `padding` array `[top, right, bottom, left]`; read current padding via `batch_get` first if other sides must be preserved.
+2. **Execute.** One `batch_design` call: `Update("<button>", { fill: "$brandGreen" })`, `Update("<linkContainer>", { padding: [8, 0, 0, 0] })`. Server response confirms both ops landed. *(Rung 1.)* Note: there is no `paddingTop` property — use the `padding` array `[top, right, bottom, left]`; read current padding via `batch_get` first if other sides must be preserved.
 3. **Verify structure.** `snapshot_layout(parentId: "<LoginCard>", maxDepth: 2)`. Confirm the link container's top padding is 8 (the only structural change) and that nothing else shifted unexpectedly. *(Rung 2.)*
 4. **Verify property.** `batch_get({ nodeIds: ["<button>"] })`. Confirm `fill` resolved to `$brandGreen` (not a raw hex). *(Rung 3.)*
 5. **Final visual sign-off.** `get_screenshot(nodeId: "<LoginCard>")` — scoped to the card, not the page. Confirm the green renders as expected against the card background and the spacing reads right. *(Rung 4, once.)*
@@ -533,8 +535,8 @@ These are debugging tools. The verification path is the screenshot loop above.
 User asks: *'On the LoginCard, change the Sign in button from blue to the brand green, and add 8px of breathing room above the Forgot password? link.'*
 
 1. **Locate.** `batch_get` the LoginCard subtree, identify the button node and the link node.
-2. **Chunk 1.** `U("<button>", { fill: "$brandGreen" })`. Screenshot the LoginCard. Narrate: *'button is green now; reads correctly against the card surface, contrast looks fine at a glance, will check formally in the final pass.'*
-3. **Chunk 2.** `U("<linkContainer>", { padding: [8, 0, 0, 0] })`. Screenshot the LoginCard. Narrate: *'forgot-password link now sits 8px below the button; reads as a distinct row instead of pressed against the CTA.'*
+2. **Chunk 1.** `Update("<button>", { fill: "$brandGreen" })`. Screenshot the LoginCard. Narrate: *'button is green now; reads correctly against the card surface, contrast looks fine at a glance, will check formally in the final pass.'*
+3. **Chunk 2.** `Update("<linkContainer>", { padding: [8, 0, 0, 0] })`. Screenshot the LoginCard. Narrate: *'forgot-password link now sits 8px below the button; reads as a distinct row instead of pressed against the CTA.'*
 4. **Final pass.** Run the contrast check on the green button at WCAG AA. Pass. Hand back.
 
 Three screenshots for a 4-op edit. Each one was the conversation point with the user; that is the work, not overhead on top of the work.
@@ -546,12 +548,12 @@ Four concrete cases. Detect, respond, do not improvise.
 | # | Case | Detection signal | Response |
 |---|------|------------------|----------|
 | 1 | MCP not connected | `get_editor_state` errors with `transport not connected to app: desktop` (or any connection-refused message) | Stop. Tell the user: *"Pencil's MCP server isn't reachable. Open the Pencil desktop app or the Pencil IDE extension, then ask me again."* Do not fall back to the CLI silently. |
-| 2 | No .pen file open | `get_editor_state` succeeds but reports no active document | Ask the user: *"No `.pen` file is open. Should I (a) open an existing one — give me the path, or (b) create a new one with `open_document('new')`?"* Wait for the answer. |
+| 2 | No .pen file open | `get_editor_state` succeeds but reports no active document | There is no `open_document` tool. Ask the user to open an existing `.pen` or create a new one in the Pencil editor, then continue. Wait for them to confirm a file is open. |
 | 3 | No variables or components in the `.pen` | `get_variables()` returns empty AND `batch_get({ patterns: [{ reusable: true }] })` returns nothing AND no `.lib.pen` in `imports` | The live file has no design system yet. Ask the user once: *"This file doesn't have any variables or components yet. Should I (a) establish a token set and visual style now so the design stays consistent, or (b) start designing and formalise the system as patterns emerge?"* If they want markdown docs as a reference, point them to `design-system/` — optional templates they can copy and adapt to their project. Do not auto-copy anything. Do not ask again this session. |
 | 4 | Conflicting `design-system/` | Folder exists but contains code files (`.tsx`, `.ts`, `package.json`, `index.js`, etc.) | Do not overwrite. Ask where to place docs instead: `design-system/docs/`, `docs/design-system/`, `.pencil/design-system/`, or a custom path. |
-| 5 | .lib.pen import missing | `design-system/design-system.md` names a library path; the open doc's `imports` doesn't include it (or the file at the path doesn't exist) | If the file exists: add the `imports` entry via `batch_design` `U` op on the document root. If the file doesn't exist: tell the user the path in `design-system.md` is stale, ask whether to update the path or create the library. Don't silently invent. |
-| 6 | batch_design schema error | Server returns an error mentioning invalid op, unknown type, invalid property, or missing parent | Read the error verbatim. Cross-reference `references/batch-design-grammar.md` and `references/pen-schema.md`. Common causes: id contains `/`; used `width: "100%"` (use bare-string `"fill_container"`); used the older `{ sizing: "fill_container" }` object (use the bare string); used `stroke.fills` plural or `stroke.alignment` (use singular `stroke.fill`); passed raw color where a `$variable` was expected; referenced a parent before binding it. Retry with the fix; never blindly. |
-| 7 | Token clobber | `set_variables` or `U("doc", { variables: {...} })` called before `get_variables()` on a document that already has tokens | Always call `get_variables()` before any token work. Only pass variables that are absent from the result. Never assume the document is blank — an existing `.pen` file almost certainly has user-configured tokens. |
+| 5 | .lib.pen import missing | `design-system/design-system.md` names a library path; the open doc's `imports` doesn't include it (or the file at the path doesn't exist) | If the file exists: attach it through the editor's import UI (there is no `batch_design` import function). If the file doesn't exist: tell the user the path in `design-system.md` is stale, ask whether to update the path or create the library. Don't silently invent. |
+| 6 | batch_design schema error | Server returns an error mentioning invalid op, unknown type, invalid property, or missing parent | Read the error verbatim. Cross-reference `references/batch-design-grammar.md` and `references/pen-schema.md`. Common causes: id contains `/`; used `width: "100%"` (use bare-string `"fill_container"`); used the old `stroke: { color, thickness }` object (use `stroke: "$border", strokeWidth: 1`); used `type: "icon_font"` (use `type: "icon"` with `library`/`icon`); passed raw colour where a `$variable` was expected; referenced a binding from a previous call (re-fetch the id). Retry with the fix; never blindly. |
+| 7 | Token clobber | `SetVariables({ ... })` called before `get_variables()` on a document that already has tokens | Always call `get_variables()` before any token work. Only pass variables that are absent from the result. Never assume the document is blank — an existing `.pen` file almost certainly has user-configured tokens. |
 
 ## Platform-specific tool names
 
@@ -579,8 +581,9 @@ The Pencil MCP tool names (`get_editor_state`, `batch_design`, etc.) are identic
 - `references/colour-palettes.md`: 40+ palette *recipes* (neutral + accent scale from Tailwind, Radix, IBM Carbon, Material 3, Apple HIG) tagged by industry and mood; recipe menu, not hex tables; agent commits picks to `tokens.md` and `.pen` variables
 - `references/font-pairings.md`: 30+ typography pairings (Google Fonts + a few commercial) with weights, mood, industry fit; recipe menu, agent commits picks to `tokens.md` as `$fontBody` / `$fontMono` tokens
 - `references/pen-schema.md` — full `.pen` data model: every node type, properties, layout/sizing/variables, theme axes, components, slots
-- `references/batch-design-grammar.md` — complete `batch_design` op syntax and chunking rules
-- `references/mcp-tools.md` — cookbook for all 13 Pencil MCP tools, the 8 `get_guidelines` categories, composite recipes (token audit, greenfield bootstrap, library smoke test), and a tool-cost cheatsheet
+- `references/batch-design-grammar.md` — complete `batch_design` JavaScript API, id handling, and chunking rules
+- `references/advanced-canvas.md` — new v2.14 canvas capabilities: shader fills, mesh gradients, `script` nodes, ellipse arcs/donuts, `prompt`/`context` nodes
+- `references/mcp-tools.md` — cookbook for all 9 Pencil MCP tools, the 8 `get_guidelines` categories, the operations that migrated into `batch_design`, composite recipes (token audit, greenfield bootstrap, library smoke test), and a tool-cost cheatsheet
 - `references/states.md` — component states (default/hover/focus/pressed/disabled/loading/error/success/skeleton/empty/partial-failure) and screen-level fault states (404/403/500/503/408/429/offline/partial-failure) plus the empty-state taxonomy
 - `references/flows.md` — transitions across screens: modal-vs-page, validation timing (sync/async/submit-time), multi-step wizards, back-stack model, optimistic UI, real-time/presence, deep links, plausible content
 - `references/accessibility.md`: beyond the SKILL baseline. ARIA, focus order, keyboard nav, screen-reader content, deeper-cut contrast (incl. APCA), `prefers-*` media queries, dynamic type, RTL & internationalisation, motor accessibility; WCAG 2.2 (ISO/IEC 40500:2025) baseline
@@ -589,10 +592,10 @@ The Pencil MCP tool names (`get_editor_state`, `batch_design`, etc.) are identic
 - `examples/example-login-screen.md` — worked example: greenfield design from prompt
 - `examples/example-import-library.md` — worked example: importing a `.lib.pen` and instantiating its components
 - `examples/example-scaffold-system.md` — worked example: scaffolding `design-system/` into a fresh project
-- `examples/example-error-screen.md` — worked example: 404 + offline page pair using `get_variables`/`set_variables` and a shared lockup
+- `examples/example-error-screen.md` — worked example: 404 + offline page pair using `get_variables`/`SetVariables` and a shared lockup
 - `examples/example-form-flow.md` — worked example: multi-step signup with email verification across three sibling frames
 - `examples/example-component-deep-dive.md` — worked example: full read→understand→instantiate cycle using an existing card component (slot fill, nested path, state variant)
-- `examples/example-style-selection.md`: worked example: catalogue (style + palette + fonts) → `set_variables` MCP → `tokens.md` commit → starter components matching the chosen style
+- `examples/example-style-selection.md`: worked example: catalogue (style + palette + fonts) → `SetVariables` → `tokens.md` commit → starter components matching the chosen style
 - `examples/example-settings-page.md`: worked example: settings page with sidebar nav, autosave defaults, explicit-save for high-stakes (Billing), validation, dirty state
 - `examples/example-dashboard.md`: worked example: dashboard with KPI cards, chart tile, recent-activity table, proper hierarchy
 - `examples/example-marketing-page.md`: worked example: marketing page that avoids the three-card grid (asymmetric hero, alternating image-text or bento features, three-tier pricing, avatar-grid testimonials)

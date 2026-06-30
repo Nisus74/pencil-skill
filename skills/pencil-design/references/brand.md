@@ -144,7 +144,7 @@ In addition to the bans in SKILL.md, brand work has its own:
 For brand pages designed dark, set the theme mode on the page frame:
 
 ```
-U("<pageFrameId>", { theme: { mode: "dark" } })
+Update("<pageFrameId>", { theme: { mode: "dark" } })
 ```
 
 ### Variable strategy by colour strategy
@@ -155,13 +155,13 @@ The four colour strategies map to different variable shapes:
 - **Full palette:** `$mood1`, `$mood2`, `$mood3` plus on-colour text per mood. Document which mood maps to which section in the `context` strings.
 - **Drenched:** a single `$surface` the whole page sits on, plus `$onSurface` for text.
 
-Declare these via `set_variables` before placing any frames so every colour resolves to a token, never raw hex.
+Declare these via `SetVariables` (inside `batch_design`) before placing any frames so every colour resolves to a token, never raw hex.
 
 ### Per-section frames vs single fluid frame
 Brand pages with dramatic section-level layout shifts (dense hero, wide editorial body, narrow CTA) suit per-breakpoint frames with explicit layout per breakpoint. Single fluid frames work for brand pages with simpler architecture where the same auto-layout holds together across sizes.
 
 ### Image strategy
-Use `G(nodeId, "ai", "<prompt>")` for hero imagery early in the design loop so the page has something concrete to compose against. Make the prompt specific (camera, lens, lighting, subject); generic prompts produce generic imagery. Replace AI placeholders with real assets before declaring the design done.
+Use `Generate(nodeId, "ai", "<prompt>")` for hero imagery early in the design loop so the page has something concrete to compose against. Make the prompt specific (camera, lens, lighting, subject); generic prompts produce generic imagery. Replace AI placeholders with real assets before declaring the design done.
 
 ### Composition aids
 For long-form editorial brand pages, build a single canvas frame per breakpoint and use `snapshot_layout` periodically to verify rhythm. The screenshot loop will surface visual issues; `snapshot_layout` surfaces the numbers behind them (gaps, padding, section heights) when something looks off and you can't read the pixels.

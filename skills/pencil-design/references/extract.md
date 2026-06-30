@@ -19,7 +19,7 @@ This reference is the *how-to-promote* depth that complements the *components-fi
 ## What to extract
 
 ### Tokens
-The lowest-cost extraction. A colour, a font family, a spacing value, a radius. Tokens live as variables (`set_variables` per [color-and-contrast.md](color-and-contrast.md), [typography.md](typography.md)) and are referenced via `$variableName` from every node that needs them.
+The lowest-cost extraction. A colour, a font family, a spacing value, a radius. Tokens live as variables (`SetVariables` inside `batch_design` per [color-and-contrast.md](color-and-contrast.md), [typography.md](typography.md)) and are referenced via `$variableName` from every node that needs them.
 
 Token candidates:
 - **Colours.** Any colour used in two or more places. Anything that should flip between light and dark modes.
@@ -61,7 +61,7 @@ Naming forces the role-clarification. Per the SKILL.md naming discipline rule:
 If the candidate doesn't have a clean role-bearing name, it isn't the right extraction yet. Either find the name or leave the pattern as primitives until it earns one.
 
 ### 3. Pick the extraction target
-Tokens always extract to the document's `variables` (via `set_variables`).
+Tokens always extract to the document's `variables` (via `SetVariables` inside `batch_design`).
 
 Components extract to one of:
 - **The current `.pen` document.** A `reusable: true` node lives in the document; instances inside the same file can `ref` it. Good for components specific to this `.pen`.
@@ -80,7 +80,7 @@ Build the extracted version with care; this is the version that will propagate. 
 ### 5. Replace existing instances
 Walk the existing nodes that built the pattern by hand. Replace each with a `ref` instance of the new component. Use `descendants: { ... }` overrides for per-instance content.
 
-Use `search_all_unique_properties` and `batch_get` to find candidates; use `replace_all_matching_properties` for bulk token replacements (e.g. swapping every `#3E9D55` to `$accent`).
+Use `batch_get` to read the subtree and tally the values yourself to find candidates; for bulk token replacements (e.g. swapping every `#3E9D55` to `$accent`), read the target nodes with `batch_get`, then loop `Update` inside a `batch_design` snippet (e.g. `for (id of ["a", "b"]) Update(id, { fill: "$accent" })`).
 
 ### 6. Verify
 After extraction:
@@ -93,10 +93,10 @@ After extraction:
 ### The token sweep
 A file that pre-dates the discipline rules likely has raw hex everywhere. A one-pass extraction:
 
-1. `search_all_unique_properties({ property: "fill" })` to list every fill value.
+1. Read the subtree with `batch_get` and tally every `fill` value yourself.
 2. Group the hex values by visual role (backgrounds, text, accents).
 3. Declare semantic variables (`$bg`, `$text`, `$accent`) covering the groups.
-4. `replace_all_matching_properties` to swap each hex for its variable.
+4. Loop `Update` inside a `batch_design` snippet to swap each hex for its variable (e.g. `for (id of ["a", "b"]) Update(id, { fill: "$bg" })`).
 5. Test under both light and dark modes; raw hex doesn't theme, so the swap may reveal mode-bugs the original design hid.
 
 ### The button extraction
@@ -109,7 +109,7 @@ Cards appear in many designs in different specific forms. Extract the shell (`Ca
 Empty states across a product follow a pattern: icon or illustration, headline, body copy, primary action. Build `EmptyState` once with slots for each; variants cover the four types (first-use, returning-empty, no-results, no-permission) per [onboard.md](onboard.md) and [product.md](product.md).
 
 ### The icon-set extraction
-Most projects use one icon library (Lucide, Material Symbols, Phosphor). Use `icon_font` nodes with the project's chosen library; don't import SVGs for icons that exist in the library. The icon library itself is effectively an extracted set.
+Most projects use one icon library (Lucide, Material Symbols, Phosphor). Use `icon` nodes with the project's chosen library; don't import SVGs for icons that exist in the library. The icon library itself is effectively an extracted set.
 
 ## Anti-patterns in extraction
 
@@ -127,7 +127,7 @@ A node marked `reusable: true` becomes a component. Other nodes can reference it
 
 ```
 // Inside batch_design:
-btn = I("doc", {
+btn = Insert("doc", {
   type: "frame",
   name: "PrimaryButton",
   reusable: true,
@@ -135,7 +135,7 @@ btn = I("doc", {
 })
 
 // Then elsewhere, instantiate:
-instance = I("page", {
+instance = Insert("page", {
   type: "ref",
   ref: btn,
   descendants: { "<btn-label-id>": { content: "Sign in" } }
@@ -146,7 +146,7 @@ instance = I("page", {
 A `.lib.pen` is a regular `.pen` file marked as a library. Once marked, it can't be unmarked. To use:
 
 1. Author the library file with `reusable: true` components and shared variables.
-2. Add it to the consuming document's `imports`: `U(docRootId, { imports: { "ds": "./design/system.lib.pen" } })`.
+2. Add it to the consuming document's `imports`: `Update(docRootId, { imports: { "ds": "./design/system.lib.pen" } })`.
 3. Instantiate components in the consumer via `ref` nodes pointing at library node IDs.
 
 ### When to create a `.lib.pen`
@@ -166,7 +166,7 @@ To audit what tokens exist in the current document or an imported library:
 get_variables({ filePath: "./design/system.lib.pen" })
 ```
 
-The returned set is what consumers can reference via `$variableName`. If the library is missing a semantic role you need, add it via `set_variables` against the library file before the consumer references it.
+The returned set is what consumers can reference via `$variableName`. If the library is missing a semantic role you need, add it via `SetVariables` inside `batch_design` against the library file before the consumer references it.
 
 ### Verify after extraction with the screenshot loop
 The screenshot loop catches whether the extracted component matches the visual of the originals. Replace instances in small batches (3–5 at a time), screenshot the affected region, confirm the visual is unchanged. Bulk-replacing all instances at once and screenshotting only the final result hides the case where one instance was subtly different and the extraction lost it.

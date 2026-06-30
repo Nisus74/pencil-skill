@@ -20,7 +20,7 @@ Three layers; the catalogue sits at the top.
 1. **This file (`references/font-pairings.md`)** is a *menu of starting recipes*. Each recipe names a font pairing with weights and sources. The recipes don't hold the project's typography; they're the starting point.
 2. **The source services** ship the actual font files. Google Fonts (https://fonts.google.com), Vercel Geist (https://vercel.com/font), GitHub Mona Sans (https://github.com/mona-sans), and the commercial foundries listed per recipe.
 3. **`design-system/tokens.md`** records the project's *committed* type scale. The agent records the chosen pairing here as semantic tokens (`$fontDisplay`, `$fontBody`, `$fontMono`, plus weight, size, and line-height scales). This file is project-owned; the user can edit it.
-4. **The `.pen` file's `variables` section** is the live design's typography. The agent calls `set_variables` MCP to populate the variables from the project's `tokens.md`. Designs reference `$fontBody`, `$fontMono`, never literal font names.
+4. **The `.pen` file's `variables` section** is the live design's typography. The agent calls `SetVariables` inside `batch_design` to populate the variables from the project's `tokens.md`. Designs reference `$fontBody`, `$fontMono`, never literal font names.
 
 The rule: **the agent reads this catalogue once at the start of a project, then never again.** Subsequent designs reference the project's variables. If the user wants to change typography, they edit `tokens.md` and the `.pen` variables; this catalogue stays untouched.
 
@@ -31,7 +31,7 @@ The rule: **the agent reads this catalogue once at the start of a project, then 
 3. Pick a pairing from the matching family below.
 4. Lift the font URLs from the source service (Google Fonts CDN or self-host) into the project's HTML head.
 5. Populate `design-system/tokens.md` with the chosen pairing as semantic tokens (`$fontDisplay`, `$fontBody`, `$fontMono`) plus the weight scale.
-6. Call `set_variables` MCP to mirror the type tokens into the `.pen` file's `variables` section.
+6. Call `SetVariables` inside `batch_design` to mirror the type tokens into the `.pen` file's `variables` section.
 7. Record the chosen pairing recipe name in `design-system/visual-style.md`.
 8. From this point onward, design with `$fontBody`, `$fontMono`, etc. Never hard-code font names in `batch_design`.
 
@@ -169,7 +169,7 @@ A typical project ships 2 to 4 weights total per typeface (e.g., Inter 400, 500,
 A chosen pairing maps to the project's `tokens.md` type scale and the document's `themes.font` axis. Example:
 
 1. Agent picks 'Inter + JetBrains Mono' from the SaaS section.
-2. Agent calls `set_variables` to populate the project's type tokens:
+2. Agent calls `SetVariables` inside `batch_design` to populate the project's type tokens:
    - `$fontDisplay`: 'Inter', sans-serif
    - `$fontBody`: 'Inter', sans-serif
    - `$fontMono`: 'JetBrains Mono', monospace

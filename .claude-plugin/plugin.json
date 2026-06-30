@@ -14,18 +14,14 @@
   "permissions": {
     "mcp": [
       "pencil:get_editor_state",
-      "pencil:open_document",
       "pencil:get_guidelines",
       "pencil:batch_get",
       "pencil:batch_design",
       "pencil:snapshot_layout",
       "pencil:get_screenshot",
       "pencil:get_variables",
-      "pencil:set_variables",
-      "pencil:find_empty_space_on_canvas",
-      "pencil:search_all_unique_properties",
-      "pencil:replace_all_matching_properties",
-      "pencil:export_nodes"
+      "pencil:export_nodes",
+      "pencil:export_html"
     ],
     "shell": "none",
     "filesystem": "project-only",

@@ -20,7 +20,7 @@ Before mutating, build a complete picture of what needs work.
 
 1. **Screenshot the surface in both modes.** Run `get_screenshot` on the top-level frame, once with `theme.mode: "light"` and once with `dark`. Many issues only show up in one mode (a border that disappears in dark, a shadow that overpowers in light, an accent that glows in dark).
 2. **Run the squint test.** Per [layout.md](layout.md), squint at the surface and check whether the first focal point and the second focal point are obvious. If they aren't, finalising won't fix it; the design needs hierarchy work upstream.
-3. **Sweep for raw literals.** Call `search_all_unique_properties({ property: "fill" })`. Any returned hex string that doesn't start with `$` is a token-discipline failure. Repeat for `fontFamily`, `border`, and shadow tokens.
+3. **Sweep for raw literals.** Read the subtree with `batch_get` and tally the `fill` values yourself. Any hex string that doesn't start with `$` is a token-discipline failure. Repeat for `fontFamily`, `border`, and shadow tokens.
 4. **List orphan spacing values.** Pencil's auto-layout `gap` and `padding` properties surface every spacing value in the design. Anything off the 4pt scale (22, 7, 33, 18) is a candidate to reel in.
 5. **Check the state matrix.** For every interactive component, confirm hover, focus, pressed, and disabled all share alignment, share token resolution, and step on the same elevation scale (see [interaction-design.md](interaction-design.md)).
 
@@ -31,7 +31,7 @@ The output of assessment is a punch-list, not an opinion. *"Three orphan spacing
 Pick one of three modes per surface and commit to it. Don't run all three at once; the surface gets edited in three competing directions and the result feels rushed.
 
 - **Alignment-and-rhythm.** The surface's spacing, alignment, and optical centring are off. The token system might already be clean; the issue is execution.
-- **Token-and-consistency.** The system is mostly applied but with overrides; one card has a literal hex, one button uses a raw shadow value, one font-family is named instead of variable-bound. Bulk-fix via `replace_all_matching_properties`.
+- **Token-and-consistency.** The system is mostly applied but with overrides; one card has a literal hex, one button uses a raw shadow value, one font-family is named instead of variable-bound. Bulk-fix by reading the target nodes with `batch_get`, then looping `Update` inside a `batch_design` snippet.
 - **Detail-coherence.** Borders, shadows, radii, icon weights drift between components that should match. Bring them onto a shared scale.
 
 For most surfaces, one mode is dominant; the others get a single pass after. If all three modes need substantial work, the design isn't ready for finalising; it's still in build.
@@ -56,7 +56,7 @@ For each orphan: was the goal *"slightly more than 16"* (use 20 or 24) or *"slig
 
 The discipline rule from SKILL.md: every colour, font-family, motion duration, and elevation resolves to a variable. This is where that rule gets enforced.
 
-- For each raw hex returned by `search_all_unique_properties`, identify the role it's playing (background, border, text, accent) and migrate it to the matching variable. Use `replace_all_matching_properties` for bulk fixes when the same hex maps to one variable.
+- For each raw hex found by reading the subtree with `batch_get`, identify the role it's playing (background, border, text, accent) and migrate it to the matching variable. For bulk fixes when the same hex maps to one variable, read the target nodes with `batch_get`, then loop `Update` inside a `batch_design` snippet (e.g. `for (id of ["a", "b"]) Update(id, { fill: "$accent" })`).
 - For each named font-family, confirm it's bound to `$fontDisplay`, `$fontBody`, or `$fontMono`. Switching fonts later becomes a single variable update; otherwise it's a sweep.
 - For each shadow, confirm the value steps on the elevation scale (`$shadowSm`, `$shadowMd`, `$shadowLg`). If two components use different shadows for the same elevation role, pick one and migrate.
 

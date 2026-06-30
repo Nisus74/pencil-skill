@@ -1,6 +1,6 @@
 # Colour palettes
 
-A library of starting palette *recipes* the agent picks from when starting greenfield. Each entry names a neutral family and an accent scale from an established source system (Tailwind, Radix Colors, IBM Carbon, Material 3, Apple HIG). The agent looks up the actual hex values from the source, then commits them to the project's `design-system/tokens.md` and the `.pen` file's `variables` via `set_variables` MCP calls. After commitment, every design references the project's tokens (`$bg`, `$accent`), never literal hex from this catalogue.
+A library of starting palette *recipes* the agent picks from when starting greenfield. Each entry names a neutral family and an accent scale from an established source system (Tailwind, Radix Colors, IBM Carbon, Material 3, Apple HIG). The agent looks up the actual hex values from the source, then commits them to the project's `design-system/tokens.md` and the `.pen` file's `variables` via `SetVariables` calls inside `batch_design`. After commitment, every design references the project's tokens (`$bg`, `$accent`), never literal hex from this catalogue.
 
 **What this file owns:** 40+ named palette recipes tagged by industry and mood. Each entry: name, mood, accent scale (named, with source), neutral pairing, when to use.
 
@@ -22,7 +22,7 @@ Three layers; the catalogue sits at the top.
 1. **This file (`references/colour-palettes.md`)** is a *menu of starting recipes*. Each recipe names a neutral family and an accent scale from an established source system. The recipes don't hold the project's palette; they're the starting point.
 2. **The source systems** hold the actual hex values. The agent looks up the values at the source URLs (Tailwind: https://tailwindcss.com/docs/colors. Radix: https://radix-ui.com/colors. IBM Carbon: https://carbondesignsystem.com/elements/colour. Material 3: https://m3.material.io/styles/color. Apple HIG: https://developer.apple.com/design/human-interface-guidelines/color).
 3. **`design-system/tokens.md`** records the project's *committed* palette. The agent copies the chosen scale's hex values into this file as semantic tokens (`$bg`, `$surface`, `$border`, `$textPrimary`, `$accent`, etc.). This file is project-owned; the user can edit it.
-4. **The `.pen` file's `variables` section** is the live design's palette. The agent calls `set_variables` MCP to populate the variables from the project's `tokens.md`. Designs reference `$tokenName`, never literal hex.
+4. **The `.pen` file's `variables` section** is the live design's palette. The agent calls `SetVariables` inside `batch_design` to populate the variables from the project's `tokens.md`. Designs reference `$tokenName`, never literal hex.
 
 The rule: **the agent reads this catalogue once at the start of a project, then never again.** Subsequent designs reference the project's variables. If the user wants to change the palette, they edit `tokens.md` and the `.pen` variables; this catalogue stays untouched.
 
@@ -33,11 +33,11 @@ The rule: **the agent reads this catalogue once at the start of a project, then 
 3. Pick an accent palette from the matching industry section. Cross-check the mood with the chosen style from [`style-catalogue.md`](style-catalogue.md).
 4. Look up the full hex scale from the source system cited in the recipe.
 5. Populate `design-system/tokens.md` with the chosen scale as semantic tokens (`$accent`, `$bg`, etc.).
-6. Call `set_variables` MCP to mirror the tokens into the `.pen` file's `variables` section.
+6. Call `SetVariables` inside `batch_design` to mirror the tokens into the `.pen` file's `variables` section.
 7. Record the chosen palette recipe name in `design-system/visual-style.md`.
 8. From this point onward, design with `$tokens`. Never with literal hex.
 
-See [`example-style-selection.md`](../examples/example-style-selection.md) (Phase 4) for the full worked sequence including the `set_variables` invocation.
+See [`example-style-selection.md`](../examples/example-style-selection.md) (Phase 4) for the full worked sequence including the `SetVariables` invocation.
 
 ## Two-role architecture refresher
 
@@ -224,7 +224,7 @@ A chosen palette recipe maps to the project's `tokens.md` and the `.pen` file's 
    - `$success` = Emerald 600 / Emerald 400
    - `$warning` = Amber 500 / Amber 400
    - `$danger` = Red 600 / Red 400
-4. Agent calls `set_variables` MCP to mirror these into the `.pen` file's `variables` section.
+4. Agent calls `SetVariables` inside `batch_design` to mirror these into the `.pen` file's `variables` section.
 5. Agent records the palette recipe name in `design-system/visual-style.md`: *'Palette: Indigo Calm. Source: Tailwind v4 (Indigo and Slate scales). APCA Lc 75+ verified across both modes.'*
 6. Subsequent designs reference `$accent`, `$bg`, `$textPrimary`, etc. via `batch_design`. The agent never types literal hex into `batch_design` for surfaces, accents, or text.
 

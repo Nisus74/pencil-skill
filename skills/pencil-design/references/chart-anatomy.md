@@ -20,11 +20,11 @@ The frame everything lives inside. Get this wrong and every chart inside it look
 DashboardPage (frame, 1440 x 900, layout: none)
 ├── Sidebar (frame, 220 x fill_container, layout: vertical)
 │   ├── SidebarHeader (frame, fill_container x 56, layout: horizontal)
-│   │   ├── Logo (frame or icon_font, 24 x 24)
+│   │   ├── Logo (frame or icon, 24 x 24)
 │   │   └── ProductName (text, $textSm, $textPrimary, fontWeight: 600)
 │   ├── SidebarNav (frame, fill_container x fit_content, layout: vertical, gap: 2, padding: [4, 8])
 │   │   └── NavItem × N (frame, fill_container x 32, layout: horizontal, gap: 8, padding: [0, 8], cornerRadius: 6)
-│   │       ├── NavIcon (icon_font, 16 x 16, $iconMd)
+│   │       ├── NavIcon (icon, 16 x 16, $iconMd)
 │   │       └── NavLabel (text, $textSm, $textSecondary)
 │   └── SidebarFooter (frame, fill_container x 56, layout: horizontal, padding: [0, 12])
 │       └── UserRow (avatar + name)
@@ -53,25 +53,25 @@ DashboardPage (frame, 1440 x 900, layout: none)
 ### Worked ops (skeleton, one call)
 
 ```
-page=I(document, {
+page = Insert(document, {
   type: "frame", name: "DashboardPage",
   context: "Main dashboard view. 1440-wide desktop layout.",
   layout: "horizontal", width: 1440, height: 900,
   fill: "$surfaceBase"
 })
-sidebar=I(page, {
+sidebar = Insert(page, {
   type: "frame", name: "Sidebar",
   context: "Primary navigation. Persistent on desktop.",
   layout: "vertical", width: 220, height: "fill_container",
   fill: "$surfaceSidebar",
-  stroke: { color: "$border", thickness: 1 }
+  stroke: "$border", strokeWidth: 1
 })
-main=I(page, {
+main = Insert(page, {
   type: "frame", name: "MainContent",
   layout: "vertical", width: "fill_container", height: "fill_container",
   fill: "$surfaceBase"
 })
-topbar=I(main, {
+topbar = Insert(main, {
   type: "frame", name: "Topbar",
   context: "Page-level header. Contains breadcrumb, actions, user context.",
   layout: "horizontal", alignItems: "center",
@@ -79,9 +79,9 @@ topbar=I(main, {
   width: "fill_container", height: 56,
   padding: [0, 24],
   fill: "$surface",
-  stroke: { color: "$border", thickness: 1 }
+  stroke: "$border", strokeWidth: 1
 })
-content=I(main, {
+content = Insert(main, {
   type: "frame", name: "ContentArea",
   layout: "vertical", gap: 24, padding: [24, 24],
   width: "fill_container", height: "fill_container",
@@ -93,11 +93,11 @@ content=I(main, {
 
 ```
 // WRONG: pure black sidebar, white content, no border
-sidebar=I(page, { fill: "#000000", ... })
-main=I(page, { fill: "#FFFFFF", ... })
+sidebar = Insert(page, { fill: "#000000", ... })
+main = Insert(page, { fill: "#FFFFFF", ... })
 
 // WRONG: sidebar too wide (wastes content space)
-sidebar=I(page, { width: 280, ... })
+sidebar = Insert(page, { width: 280, ... })
 
 // WRONG: no topbar height declared, no border between sidebar and content
 // Result: floating sidebar, undefined edge, AI-assembled look
@@ -113,20 +113,20 @@ The dark-sidebar-on-white-content combination is the single strongest AI-assembl
 
 ```
 BarChartCard (frame, fill_container x 280, layout: vertical, gap: 0,
-              fill: "$surface", stroke: { color: "$border", thickness: 1 }, cornerRadius: 8)
+              fill: "$surface", stroke: "$border", strokeWidth: 1, cornerRadius: 8)
 ├── ChartHeader (frame, fill_container x fit_content, layout: horizontal,
 │               justifyContent: space_between, alignItems: center, padding: [16, 16, 12, 16])
 │   ├── ChartTitle (text, $textBase, $textPrimary, fontWeight: 600)
 │   └── ChartPeriod (text, $textSm, $textMuted)
 ├── ChartBody (frame, fill_container x fill_container, layout: none, padding: [0, 16, 16, 16])
 │   ├── YAxisLabels (frame, 32 x fill_container, layout: vertical, justifyContent: space_between,
-│   │               alignItems: flex_end)
+│   │               alignItems: end)
 │   │   └── YLabel × 5 (text, $textXs, $textMuted, content: "30M", "20M", "10M", "0")
 │   ├── GridLines (frame, fill_container x fill_container, layout: none)
 │   │   └── GridLine × 4 (frame, fill_container x 1, fill: "$borderMuted")
 │   │       // positioned at 25%, 50%, 75%, 100% of chart height via y values
 │   └── BarsArea (frame, fill_container x fill_container, layout: horizontal,
-│                 alignItems: flex_end, justifyContent: space_between, gap: 8)
+│                 alignItems: end, justifyContent: space_between, gap: 8)
 │       └── BarGroup × N (frame, fill_container x fill_container, layout: vertical,
 │                          alignItems: center, gap: 4)
 │           ├── Bar (frame, fill_container x <explicit px>, fill: "$chart-1", cornerRadius: [2,2,0,0])
@@ -147,50 +147,50 @@ BarChartCard (frame, fill_container x 280, layout: vertical, gap: 0,
 ### Worked ops
 
 ```
-chartCard=I(content, {
+chartCard = Insert(content, {
   type: "frame", name: "BarChartCard",
   context: "API call volume per day. Bars are discrete daily buckets.",
   layout: "vertical", gap: 0,
   width: "fill_container", height: 280,
-  fill: "$surface", stroke: { color: "$border", thickness: 1 }, cornerRadius: 8
+  fill: "$surface", stroke: "$border", strokeWidth: 1, cornerRadius: 8
 })
-chartHeader=I(chartCard, {
+chartHeader = Insert(chartCard, {
   type: "frame", name: "ChartHeader",
   layout: "horizontal", alignItems: "center", justifyContent: "space_between",
   width: "fill_container", height: "fit_content", padding: [16, 16, 12, 16]
 })
-chartTitle=I(chartHeader, {
+chartTitle = Insert(chartHeader, {
   type: "text", name: "ChartTitle", content: "API Call Volume",
   fontSize: "$textBase", fontWeight: 600, fill: "$textPrimary"
 })
-chartPeriod=I(chartHeader, {
+chartPeriod = Insert(chartHeader, {
   type: "text", name: "ChartPeriod", content: "Last 7 days",
   fontSize: "$textSm", fill: "$textMuted"
 })
-chartBody=I(chartCard, {
+chartBody = Insert(chartCard, {
   type: "frame", name: "ChartBody",
   layout: "none",
   width: "fill_container", height: "fill_container",
   padding: [0, 16, 16, 48]   // 48px left padding for y-axis labels
 })
-barsArea=I(chartBody, {
+barsArea = Insert(chartBody, {
   type: "frame", name: "BarsArea",
-  layout: "horizontal", alignItems: "flex_end", justifyContent: "space_between",
+  layout: "horizontal", alignItems: "end", justifyContent: "space_between",
   gap: 8,
   width: "fill_container", height: "fill_container"
 })
 // Repeat for each bar — vary height to represent data
-bar1=I(barsArea, {
+bar1 = Insert(barsArea, {
   type: "frame", name: "BarGroup_Apr28",
   layout: "vertical", alignItems: "center", gap: 4,
   width: "fill_container", height: "fill_container"
 })
-barFill1=I(bar1, {
+barFill1 = Insert(bar1, {
   type: "frame", name: "Bar",
   width: "fill_container", height: 120,   // px proportional to data value
   fill: "$chart-1", cornerRadius: [2, 2, 0, 0]
 })
-xLabel1=I(bar1, {
+xLabel1 = Insert(bar1, {
   type: "text", name: "XLabel", content: "Apr 28",
   fontSize: "$textXs", fill: "$textMuted"
 })
@@ -200,13 +200,13 @@ xLabel1=I(bar1, {
 
 ```
 // WRONG: gradient fill on bars
-barFill=I(barsArea, { fill: [{ type: "gradient", ... }] })
+barFill = Insert(barsArea, { fill: [{ type: "gradient", ... }] })
 
 // WRONG: all bars same height (placeholder data with equal values)
 // Every bar at height: 100 — looks like a loading state, not data
 
 // WRONG: cornerRadius on all four corners
-barFill=I(..., { cornerRadius: 8 })  // bars become pills
+barFill = Insert(..., { cornerRadius: 8 })  // bars become pills
 
 // WRONG: purple/blue gradient that matches the sidebar
 // Result: the AI "signature" dashboard — recognisable in under 1 second
@@ -266,7 +266,7 @@ Line charts in Pencil are built as SVG `path` nodes or approximated with connect
 
 ```
 LineChartCard (frame, fill_container x 280, layout: vertical,
-               fill: "$surface", stroke: { color: "$border", thickness: 1 }, cornerRadius: 8)
+               fill: "$surface", stroke: "$border", strokeWidth: 1, cornerRadius: 8)
 ├── ChartHeader (same as bar chart)
 ├── ChartCanvas (frame, fill_container x fill_container, layout: none, padding: [16, 16, 32, 48])
 │   ├── GridLines (frame, fill_container x fill_container, layout: none)
@@ -274,7 +274,7 @@ LineChartCard (frame, fill_container x 280, layout: vertical,
 │   ├── LinePath (path or line node representing the data line)
 │   │   // Stroke: 2px, color: "$chart-1", no fill
 │   ├── (Optional) AreaFill (frame below the line — see Area chart section)
-│   ├── DataPoints (icon_font circles or small frames at each data point)
+│   ├── DataPoints (icon circles or small frames at each data point)
 │   │   // Only when highlighting specific events, not on every point
 │   ├── XAxis (frame, fill_container x 1, y: bottom, fill: "$border")
 │   └── XLabels (frame, fill_container x fit_content, layout: horizontal,
@@ -295,23 +295,23 @@ LineChartCard (frame, fill_container x 280, layout: vertical,
 ### Worked ops (line approximation with dots)
 
 ```
-canvas=I(chartCard, {
+canvas = Insert(chartCard, {
   type: "frame", name: "ChartCanvas",
   layout: "none",
   width: "fill_container", height: "fill_container",
   padding: [16, 16, 32, 48]
 })
 // Grid lines — horizontal, evenly spaced
-grid1=I(canvas, { type: "frame", name: "Grid1", width: "fill_container", height: 1,
+grid1 = Insert(canvas, { type: "frame", name: "Grid1", width: "fill_container", height: 1,
                   fill: "$borderMuted", y: 0 })
-grid2=I(canvas, { type: "frame", name: "Grid2", width: "fill_container", height: 1,
+grid2 = Insert(canvas, { type: "frame", name: "Grid2", width: "fill_container", height: 1,
                   fill: "$borderMuted", y: 55 })
-grid3=I(canvas, { type: "frame", name: "Grid3", width: "fill_container", height: 1,
+grid3 = Insert(canvas, { type: "frame", name: "Grid3", width: "fill_container", height: 1,
                   fill: "$borderMuted", y: 110 })
-grid4=I(canvas, { type: "frame", name: "Grid4", width: "fill_container", height: 1,
+grid4 = Insert(canvas, { type: "frame", name: "Grid4", width: "fill_container", height: 1,
                   fill: "$borderMuted", y: 165 })
 // X-axis labels
-xLabels=I(canvas, {
+xLabels = Insert(canvas, {
   type: "frame", name: "XLabels",
   layout: "horizontal", justifyContent: "space_between",
   width: "fill_container", height: "fit_content",
@@ -363,12 +363,12 @@ AreaFill (frame, fill_container x <height from line to x-axis>, layout: none)
 
 ```
 // WRONG: full opacity fill (blocks view of data behind it)
-AreaFill=I(canvas, { fill: "$chart-1", opacity: 1.0 })
+AreaFill = Insert(canvas, { fill: "$chart-1", opacity: 1.0 })
 
 // WRONG: gradient fill from full colour to transparent
 // → AI's go-to area chart treatment. Looks decorative, not analytical.
 // → Use flat semi-transparent fill instead.
-AreaFill=I(canvas, { fill: [{ type: "gradient", ... }] })
+AreaFill = Insert(canvas, { fill: [{ type: "gradient", ... }] })
 
 // WRONG: area chart where the baseline is not at zero
 // The fill bottom hangs in mid-air — the data looks like it starts at a non-zero baseline
@@ -384,12 +384,12 @@ Donut charts in Pencil are built with ellipse nodes (full circle) and overlappin
 
 ```
 DonutCard (frame, fill_container x 200, layout: vertical, gap: 8,
-           fill: "$surface", stroke: { color: "$border", thickness: 1 }, cornerRadius: 8,
+           fill: "$surface", stroke: "$border", strokeWidth: 1, cornerRadius: 8,
            padding: [16, 16])
 ├── ChartTitle (text, $textBase, $textPrimary, fontWeight: 600)
-├── DonutWrapper (frame, 120 x 120, layout: none, alignSelf: center)
+├── DonutWrapper (frame, 120 x 120, layout: none; centred via parent alignItems/justifyContent)
 │   ├── DonutRing (ellipse, 120 x 120, fill: none,
-│   │             stroke: { color: "$chart-1", thickness: 16 })
+│   │             stroke: "$chart-1", strokeWidth: 16)
 │   │   // For multi-segment: use multiple ellipses with stroke-dasharray offsets
 │   │   // For a single proportion: one filled arc ellipse + one "$surfaceMuted" arc
 │   ├── DonutHole (ellipse, 80 x 80, fill: "$surface", centered)
@@ -416,7 +416,7 @@ DonutCard (frame, fill_container x 200, layout: vertical, gap: 8,
 
 ```
 // WRONG: giant number in the centre that doesn't match any segment
-DonutHoleValue=I(hole, { content: "1,284" })
+DonutHoleValue = Insert(hole, { content: "1,284" })
 // ...but the donut shows a percentage breakdown — the number is the total,
 // not readable from the segments. Confusing.
 
@@ -440,7 +440,7 @@ The bullet graph replaces gauge/speedometer dials. It shows actual vs target vs 
 
 ```
 BulletCard (frame, fill_container x fit_content, layout: vertical, gap: 8,
-            fill: "$surface", stroke: { color: "$border", thickness: 1 }, cornerRadius: 8,
+            fill: "$surface", stroke: "$border", strokeWidth: 1, cornerRadius: 8,
             padding: [12, 16])
 ├── BulletLabel (text, $textSm, $textMuted, content: "P95 Latency")
 ├── BulletChart (frame, fill_container x 20, layout: none)
@@ -479,7 +479,7 @@ Most agents have never seen a bullet graph described in Pencil coordinates. With
 ```
 // WHAT AGENTS PRODUCE BY DEFAULT:
 // A progress bar with a single flat fill — no performance bands, no target marker
-ProgressBar=I(card, { type: "frame", width: "fill_container", height: 8,
+ProgressBar = Insert(card, { type: "frame", width: "fill_container", height: 8,
                        fill: "$chart-1", cornerRadius: 4 })
 // This is not a bullet graph. It shows actual but not target, and has no performance context.
 
@@ -495,7 +495,7 @@ ProgressBar=I(card, { type: "frame", width: "fill_container", height: 8,
 
 ```
 HeatmapCard (frame, fill_container x fit_content, layout: vertical, gap: 8,
-             fill: "$surface", stroke: { color: "$border", thickness: 1 }, cornerRadius: 8,
+             fill: "$surface", stroke: "$border", strokeWidth: 1, cornerRadius: 8,
              padding: [16, 16])
 ├── ChartTitle (text)
 ├── HeatmapGrid (frame, fill_container x fit_content, layout: vertical, gap: 2)
@@ -522,7 +522,7 @@ HeatmapCard (frame, fill_container x fit_content, layout: vertical, gap: 8,
 
 ```
 CalendarGrid (frame, fill_container x fit_content, layout: horizontal, gap: 2,
-              alignItems: flex_start)
+              alignItems: start)
 └── WeekColumn × 52 (frame, fit_content x fit_content, layout: vertical, gap: 2)
     └── DayCell × 7 (frame, 12 x 12, cornerRadius: 2, fill: "$chartSeq-<N>")
     // Cells with no activity: fill "$surfaceMuted"
@@ -553,7 +553,7 @@ Tables are charts too. They need the same care.
 
 ```
 TableCard (frame, fill_container x fit_content, layout: vertical, gap: 0,
-           fill: "$surface", stroke: { color: "$border", thickness: 1 }, cornerRadius: 8)
+           fill: "$surface", stroke: "$border", strokeWidth: 1, cornerRadius: 8)
 ├── TableHeader (frame, fill_container x 36, layout: horizontal, alignItems: center,
 │               fill: "$surfaceMuted", padding: [0, 16])
 │   └── ColumnHeader × N (text, $textXs, $textMuted, fontWeight: 600, fill: "$textSecondary",
@@ -600,18 +600,18 @@ TableCard (frame, fill_container x fit_content, layout: vertical, gap: 0,
 
 Full anatomy is in `batch-design-grammar.md`. Summary:
 
-- Parent: `layout: "horizontal"`, `alignItems: "flex_end"`, `gap: 2`, explicit `width` and `height` in px.
+- Parent: `layout: "horizontal"`, `alignItems: "end"`, `gap: 2`, explicit `width` and `height` in px.
 - Each bar: `width: 3` (never `fill_container`), explicit height in px, `fill: "$accent"`, `cornerRadius: 1`.
 - Vary heights across bars. Do not use equal heights.
 - No axes, no labels, no tooltip on the sparkline itself.
 
 ```
 // WRONG (the most common agent failure):
-bar=I(sparklineArea, { width: "fill_container", height: "fill_container" })
+bar = Insert(sparklineArea, { width: "fill_container", height: "fill_container" })
 // Result: one bar filling the entire sparkline area. Looks like a loading bar.
 
 // RIGHT:
-bar=I(sparklineArea, { width: 3, height: 18, fill: "$accent", cornerRadius: 1 })
+bar = Insert(sparklineArea, { width: 3, height: 18, fill: "$accent", cornerRadius: 1 })
 ```
 
 ---
@@ -622,7 +622,7 @@ These are the differences between "technically correct" and "looks finished".
 
 | Detail | Wrong | Right |
 |--------|-------|-------|
-| Card edge | No border, floating | `stroke: { color: "$border", thickness: 1 }` |
+| Card edge | No border, floating | `stroke: "$border", strokeWidth: 1` |
 | Card corner | `cornerRadius: 0` or `cornerRadius: 16` | `cornerRadius: 8` (default for data cards) |
 | Chart title weight | `fontWeight: 400` (same as body) | `fontWeight: 600` |
 | Y-axis labels | Missing entirely | Present, right-aligned, `$textXs`, `$textMuted` |

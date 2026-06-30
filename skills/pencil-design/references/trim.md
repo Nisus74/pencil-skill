@@ -40,7 +40,7 @@ A design with no perceived-performance strategy and no constraints is undelivere
 
 Declare image variants for different breakpoints; document expected weights in `context` strings for engineering.
 
-For generated imagery, use `G(nodeId, "ai", "<prompt>")` to specify a generated image that matches the surface direction. Engineering substitutes the production image at the right weight.
+For generated imagery, use `Generate(nodeId, "ai", "<prompt>")` to specify a generated image that matches the surface direction. Engineering substitutes the production image at the right weight.
 
 - Hero images: WebP or AVIF; 80% quality; sized to the largest expected viewport (1920w) with downsized variants at 1280, 768, 320.
 - Supporting images: thumbnails 200–400px wide; aggressive compression (60–75% quality); lazy-loaded if below the fold.
@@ -79,7 +79,7 @@ See [motion-design.md](motion-design.md) for the easing and duration depth.
 For any content that takes >300ms to load, build a skeleton state. The skeleton matches the line height and shape of the loaded content; the user sees structure, not a spinner.
 
 - Build the skeleton as a sibling frame of the loaded frame inside the same `reusable` component.
-- Use `set_variables` to declare `$skeletonBase` and `$skeletonHighlight` tokens for the animated shimmer surface.
+- Call `SetVariables` inside `batch_design` to declare `$skeletonBase` and `$skeletonHighlight` tokens for the animated shimmer surface.
 - Skeletons that match the loaded shape feel like *"the content is coming"*; skeletons that don't (every loading state shows the same rectangle grid) feel like *"this is a loading screen"*. The first one preserves perceived performance; the second one breaks it.
 
 See [states.md](states.md) for the skeleton-state pattern and [interaction-design.md](interaction-design.md) for the loading-state design.

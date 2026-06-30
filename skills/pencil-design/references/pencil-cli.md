@@ -27,7 +27,7 @@ The decision table — load-bearing content; the rest of this file is appendix-s
 | User says *"render N variations of this hero"* | **CLI** | The agent-mode `--prompt` is purpose-built for one-shot generation. |
 | Quick sketch, exploration, iteration | **MCP** | The CLI's one-shot model is wrong for a back-and-forth task. |
 | Scripted recurring task (a cron, a CI hook) | **CLI** | No human in the loop; CLI is the only sane choice. |
-| Auditing a file (`search_all_unique_properties`, `batch_get`) | **MCP** | Audit is interactive; the CLI doesn't expose these tools meaningfully. |
+| Auditing a file (`batch_get`, then tallying values yourself) | **MCP** | Audit is interactive; the CLI doesn't expose these tools meaningfully. |
 
 **The rule of thumb:** if a human is in the loop, MCP. If no human is in the loop, CLI. If a human is in the loop but explicitly wants headless behavior, ask before launching the CLI.
 
@@ -55,7 +55,7 @@ pencil status        # confirms auth state
 **Environment variables:**
 
 - `PENCIL_CLI_KEY` — Pencil API key. Used in CI where browser-based auth isn't available.
-- `ANTHROPIC_API_KEY` — required for AI-generation modes (`G("ai", ...)` ops, `--prompt`).
+- `ANTHROPIC_API_KEY` — required for AI-generation modes (`Generate("ai", ...)` ops, `--prompt`).
 - `PENCIL_LOG_LEVEL` — set to `debug` for troubleshooting.
 
 ## Modes
@@ -82,7 +82,7 @@ Opens a shell that exposes the same MCP tools as the desktop app. Useful when an
 pencil interactive
 ```
 
-Inside the shell, the same MCP server runs that the desktop app launches. An agent can connect via the standard MCP protocol and call all 13 tools (`get_editor_state`, `batch_design`, `snapshot_layout`, etc.).
+Inside the shell, the same MCP server runs that the desktop app launches. An agent can connect via the standard MCP protocol and call all 9 tools (`get_editor_state`, `batch_design`, `snapshot_layout`, etc.).
 
 **Use case:** a CI job that needs to generate, audit, or modify designs without a desktop app available. The agent connects to interactive mode and operates as if the editor were open — except the document is a file, not a live canvas.
 
@@ -214,7 +214,7 @@ For batch generation, point at a tasks file:
 - **Live editor sync.** A CLI run does not update the desktop app's open document.
 - **Screenshots that match what the user sees.** `--export` renders against the file's declared themes / dimensions; the desktop app might be in a different mode or zoom. Use the desktop app for "what does this look like to me right now."
 - **Real-time multi-agent edits.** Two CLI runs hitting the same `.pen` race; the second silently overwrites the first.
-- **`get_editor_state`, `find_empty_space_on_canvas`, `get_screenshot` against a live canvas.** The CLI's interactive mode exposes these against the file, but the file is a static snapshot — there's no canvas to find space on, no live screenshot.
+- **`get_editor_state`, `FindEmptySpace`, `get_screenshot` against a live canvas.** The CLI's interactive mode exposes these against the file, but the file is a static snapshot — there's no canvas to find space on, no live screenshot.
 - **Interactive design exploration.** The CLI's agent mode is one-shot. Iteration requires re-running.
 
 ## What MCP can't do

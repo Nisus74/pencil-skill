@@ -61,7 +61,7 @@ Is there one moment on the page that wouldn't survive being deleted? A custom da
 Does the design have any of the anti-patterns from the Aesthetic foundation section — pure white/black, Inter with no direction, pill badges defaulted to `cornerRadius: 999`, full-opacity accent everywhere, soft shadows where the direction called for hairline borders?
 
 **Fail mode:** the design reads as AI-generated at a glance — not because of any single flaw, but because nothing signals deliberate intent.
-**Fix:** name the specific tell and override it. "Cards have soft shadows but the direction called for flat surfaces. `U(cardId, { effect: [] })`."
+**Fix:** name the specific tell and override it. "Cards have soft shadows but the direction called for flat surfaces. `Update(cardId, { effect: [] })`."
 
 ### 7. Microcopy feels specific to this product
 

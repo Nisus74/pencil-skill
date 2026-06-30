@@ -18,7 +18,7 @@ For the per-register depth, see [brand.md](brand.md) and [product.md](product.md
 
 ## Assess current state
 
-Run `search_all_unique_properties({ property: "content" })` (or walk the design tree) to list every text node on the surface. For each one, rate it:
+Read the subtree with `batch_get` (or walk the design tree) to list every text node on the surface and tally the `content` values yourself. For each one, rate it:
 
 - **Specific.** The string couldn't have been generated for a different product; it names something the user can act on in this context.
 - **Generic.** The string would work on three other products without modification. *"Welcome"*, *"Overview"*, *"Get started"*, *"Submit"*, *"Continue"*, *"Done"*.

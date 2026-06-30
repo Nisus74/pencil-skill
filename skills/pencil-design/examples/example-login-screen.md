@@ -38,49 +38,44 @@ Components: `Input`, `ButtonPrimary`, `LinkText`. Token list includes: `$surface
 
 > *"I'll build `LoginPage` at 1440×900: a 360px form card centred on the page with a title, subtitle, email and password `Input` instances, `ButtonPrimary` for submit, `LinkText` for 'Forgot password?'. Direction: utility scale — hairline border on the card, no shadow, `$text2xl` title, not a hero heading."*
 
-## Step 4.5: Open document, declare mode axis and imports
+## Step 4.5: Create document, declare mode axis and imports
 
-```
-open_document({ path: "new" })
-```
+The user creates a new `.pen` in the editor. The predefined root id is `document`. The mode axis doesn't need a separate declaration: it auto-registers from the themed values you pass to `SetVariables`, so a single `mode` axis appears as soon as the first light/dark token lands. The library is attached through the editor's import UI; confirm it landed via `get_editor_state`.
 
-The server returns the document root id; call it `doc`. Declare the mode axis and library import before any frames land:
-
-```
-U(doc, { themes: { mode: ["light", "dark"] } })
-U(doc, { imports: { "ds": "./design/system.lib.pen" } })
-```
-
-2 ops. No rendered change; no screenshot needed.
+No rendered change yet; no screenshot needed.
 
 ## Step 5a: Place the page and the form card
 
 ```
-page=I(doc, { type: "frame", name: "LoginPage", layout: "vertical", justifyContent: "center", alignItems: "center", padding: "$space-8", width: 1440, height: 900, fill: "$surface" })
-form=I(page, { type: "frame", name: "Form", layout: "vertical", gap: "$space-4", padding: "$space-6", width: 360, cornerRadius: 12, fill: "$surfaceMuted", stroke: { thickness: 1, fill: "$border" } })
+batch_design({ filePath: "", input: `
+page = Insert(document, { type: "frame", name: "LoginPage", layout: "vertical", justifyContent: "center", alignItems: "center", padding: "$space-8", width: 1440, height: 900, fill: "$surface" })
+form = Insert(page, { type: "frame", name: "Form", layout: "vertical", gap: "$space-4", padding: "$space-6", width: 360, cornerRadius: 12, fill: "$surfaceMuted", stroke: "$border", strokeWidth: 1 })
+` })
 ```
 
 2 ops. Screenshot:
 
 ```
-get_screenshot({ nodeId: page })
+get_screenshot({ filePath: "", nodeId: page })
 ```
 
 Narrate:
 
-> *"The 1440×900 page is on canvas with the 360px form card centred. Direction match: hairline border visible, no shadow — the card separates from the background without claiming elevation. No AI-default drift to fix: the generic trap here is adding `effect: [{ type: 'drop_shadow', blur: 8, opacity: 0.1 }]` to the card, which I have not done."*
+> *"The 1440×900 page is on canvas with the 360px form card centred. Direction match: hairline border visible, no shadow — the card separates from the background without claiming elevation. No AI-default drift to fix: the generic trap here is adding `effect: [{ type: 'shadow', blur: 8, color: '#0000001a' }]` to the card, which I have not done."*
 
 If the card sits off-centre, the page height constraint is the culprit:
 
 ```
-U(page, { height: "fill_container(900)" })
+batch_design({ filePath: "", input: `Update(page, { height: "fill_container(900)" })` })
 ```
 
 ## Step 5c: Add the title block
 
 ```
-title=I(form, { type: "text", content: "Sign in", fontSize: "$text2xl", fontWeight: 700, fill: "$text" })
-sub=I(form, { type: "text", content: "Welcome back. Enter your details below.", fontSize: "$textBase", fill: "$textMuted" })
+batch_design({ filePath: "", input: `
+title = Insert(form, { type: "text", content: "Sign in", fontSize: "$text2xl", fontWeight: 700, fill: "$text" })
+sub = Insert(form, { type: "text", content: "Welcome back. Enter your details below.", fontSize: "$textBase", fill: "$textMuted" })
+` })
 ```
 
 2 ops. Screenshot the form. Narrate:
@@ -90,8 +85,10 @@ sub=I(form, { type: "text", content: "Welcome back. Enter your details below.", 
 ## Step 5d: Add the inputs
 
 ```
-email=I(form, { type: "ref", ref: "Input", descendants: { label: { content: "Email" }, input: { placeholder: "you@example.com" } } })
-pwd=I(form, { type: "ref", ref: "Input", descendants: { label: { content: "Password" }, input: { type: "password", placeholder: "••••••••" } } })
+batch_design({ filePath: "", input: `
+email = Insert(form, { type: "ref", ref: "Input", descendants: { label: { content: "Email" }, input: { placeholder: "you@example.com" } } })
+pwd = Insert(form, { type: "ref", ref: "Input", descendants: { label: { content: "Password" }, input: { type: "password", placeholder: "••••••••" } } })
+` })
 ```
 
 2 ops. Screenshot the form. Narrate:
@@ -101,8 +98,10 @@ pwd=I(form, { type: "ref", ref: "Input", descendants: { label: { content: "Passw
 ## Step 5e: Add the submit and forgot-password link
 
 ```
-submit=I(form, { type: "ref", ref: "ButtonPrimary", descendants: { label: { content: "Sign in" } } })
-forgot=I(form, { type: "ref", ref: "LinkText", descendants: { label: { content: "Forgot password?" } } })
+batch_design({ filePath: "", input: `
+submit = Insert(form, { type: "ref", ref: "ButtonPrimary", descendants: { label: { content: "Sign in" } } })
+forgot = Insert(form, { type: "ref", ref: "LinkText", descendants: { label: { content: "Forgot password?" } } })
+` })
 ```
 
 2 ops. Screenshot the form. Narrate:
@@ -112,7 +111,7 @@ forgot=I(form, { type: "ref", ref: "LinkText", descendants: { label: { content: 
 ## Step 5f: Adjust the link alignment
 
 ```
-U(forgot, { textAlign: "center" })
+batch_design({ filePath: "", input: `Update(forgot, { textAlign: "center" })` })
 ```
 
 1 op. Screenshot. Narrate:
@@ -126,8 +125,8 @@ Five accessibility checks:
 - **Contrast.** `$text` on `$surfaceMuted` passes 4.5:1 in light mode. Switch to dark mode and screenshot:
 
   ```
-  U(page, { theme: { mode: "dark" } })
-  get_screenshot({ nodeId: page })
+  batch_design({ filePath: "", input: `Update(page, { theme: { mode: "dark" } })` })
+  get_screenshot({ filePath: "", nodeId: page })
   ```
 
   Narrate: *"Dark mode: title and subtitle legible, card surface picks up `$surfaceMuted` dark value, button keeps its hue, focus styles from the library hold. The mode axis declared in step 4.5 means no raw-hex values need updating."*
@@ -137,7 +136,7 @@ Five accessibility checks:
 - **Semantic names.** `LoginPage`, `Form` correct; `email`, `pwd`, `submit`, `forgot` are bindings. Verify no default `Frame` names survived.
 - **Focus states.** Inherited from `Input` and `ButtonPrimary`.
 
-Pass. Switch back to light mode: `U(page, { theme: { mode: "light" } })`.
+Pass. Switch back to light mode: `batch_design({ filePath: "", input: `Update(page, { theme: { mode: "light" } })` })`.
 
 ## Final report to user
 
@@ -155,4 +154,4 @@ Pass. Switch back to light mode: `U(page, { theme: { mode: "light" } })`.
 
 - **Component refs preserve future states.** Using `Input` and `ButtonPrimary` library refs means error states, loading states, and focus rings are already specified at the component level. Raw primitives require rebuilding for every state variant.
 
-- **Mode axis declared first.** Before any frame placement, `themes: { mode: ["light", "dark"] }` and the library import go on the doc root. No raw hex in the design; every colour resolves through a variable.
+- **Mode axis registered first.** Before any frame placement, the mode axis auto-registers from the themed values passed to `SetVariables`, and the library import is attached through the editor. No raw hex in the design; every colour resolves through a variable.
