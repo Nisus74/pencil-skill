@@ -39,19 +39,16 @@ Three-column layout: main app sidebar | settings sidebar | settings content. The
 
 ## Step 3. Find empty space and build the layout shell
 
-```js
-find_empty_space_on_canvas({ width: 1440, height: 900, padding: 80, direction: "right" })
-```
-
-Returns `(x1, y1)`. Build the shell:
+Run `FindEmptySpace` as the first line inside the `batch_design` snippet (it returns `{x, y}`), then build the shell:
 
 ```js
-batch_design({ documentId: doc, operations: `
-page=I(document, { type: "frame", name: "Settings", layout: "horizontal", x: <x1>, y: <y1>, width: 1440, height: 900, fill: [{ type: "solid_color", color: "$bg" }], placeholder: true, context: "Settings surface. Three-column: collapsed main nav, settings sidebar, settings content. Profile section is the default route." })
-mainNav=I(page, { type: "ref", ref: "MainNav", descendants: { state: { value: "collapsed" } }, context: "Collapsed reference to the project's main nav. Renders icon-only in this surface so the settings sidebar gets visual priority." })
-settingsNav=I(page, { type: "frame", name: "SettingsNav", layout: "vertical", gap: "$space-1", padding: "$space-4", width: 240, fill: [{ type: "solid_color", color: "$surface" }], context: "Settings section list. Active section is highlighted with $accent background; others use $textSecondary." })
-settingsContent=I(page, { type: "frame", name: "SettingsContent", layout: "vertical", gap: "$space-6", padding: "$space-8", width: "fill_container", height: "fill_container", context: "Slot for the active section's body. Profile section renders here by default." })
-`})
+batch_design({ filePath: "", input: `
+const slot = FindEmptySpace({ width: 1440, height: 900, padding: 80, direction: "right" })
+page = Insert(document, { type: "frame", name: "Settings", layout: "horizontal", x: slot.x, y: slot.y, width: 1440, height: 900, fill: "$bg", placeholder: true, context: "Settings surface. Three-column: collapsed main nav, settings sidebar, settings content. Profile section is the default route." })
+mainNav = Insert(page, { type: "ref", ref: "MainNav", descendants: { state: { value: "collapsed" } }, context: "Collapsed reference to the project's main nav. Renders icon-only in this surface so the settings sidebar gets visual priority." })
+settingsNav = Insert(page, { type: "frame", name: "SettingsNav", layout: "vertical", gap: "$space-1", padding: "$space-4", width: 240, fill: "$surface", context: "Settings section list. Active section is highlighted with $accent background; others use $textSecondary." })
+settingsContent = Insert(page, { type: "frame", name: "SettingsContent", layout: "vertical", gap: "$space-6", padding: "$space-8", width: "fill_container", height: "fill_container", context: "Slot for the active section's body. Profile section renders here by default." })
+` })
 ```
 
 The settings sidebar's section list is built next as four `LinkText` rows (`Profile`, `Notifications`, `Billing`, `Integrations`), with the active one highlighted.
@@ -72,14 +69,14 @@ Each frame holds the section's body and gets dropped into `settingsContent` at t
 Avatar upload, display name, email (read-only with edit affordance), timezone. Each field is a `Field` ref with `context` documenting the autosave behaviour.
 
 ```js
-batch_design({ documentId: doc, operations: `
-profile=I(document, { type: "frame", name: "Settings_Profile", layout: "vertical", gap: "$space-6", x: <x1 + 1520>, y: <y1>, width: 720, padding: "$space-8", fill: [{ type: "solid_color", color: "$bg" }], context: "Profile settings. Autosave on blur for every field. Saved indicator appears for 2 seconds, then decays." })
-hdr=I(profile, { type: "text", name: "SectionHeading", content: "Profile", fontSize: "$text2xl", fontWeight: 700, fill: [{ type: "solid_color", color: "$textPrimary" }] })
-avatar=I(profile, { type: "ref", ref: "AvatarUpload", descendants: { label: { content: "Profile photo" }, helper: { content: "PNG or JPG, 2MB max." } }, context: "Autosaves on file selection. Uploads via signed URL. Saving spinner replaces avatar during in-flight upload." })
-displayName=I(profile, { type: "ref", ref: "Field", descendants: { label: { content: "Display name" }, input: { value: "Alex Chen" }, helper: { content: "Visible to teammates and in mentions." } }, context: "Autosaves on blur. Saved indicator appears for 2 seconds, then decays. Validates non-empty, ≤ 60 chars." })
-email=I(profile, { type: "ref", ref: "Field", descendants: { label: { content: "Email" }, input: { value: "alex@startup.io", readOnly: true }, action: { content: "Change email" } }, context: "Read-only; the action link opens a secure flow with re-auth and verification, that flow lives in Auth / ChangeEmail." })
-tz=I(profile, { type: "ref", ref: "Select", descendants: { label: { content: "Timezone" }, value: { content: "Australia/Sydney (AEDT)" } }, context: "Autosaves on selection. Used for scheduled digests, due-date calculations, and displayed timestamps." })
-`})
+batch_design({ filePath: "", input: `
+profile = Insert(document, { type: "frame", name: "Settings_Profile", layout: "vertical", gap: "$space-6", x: <x1 + 1520>, y: <y1>, width: 720, padding: "$space-8", fill: "$bg", context: "Profile settings. Autosave on blur for every field. Saved indicator appears for 2 seconds, then decays." })
+hdr = Insert(profile, { type: "text", name: "SectionHeading", content: "Profile", fontSize: "$text2xl", fontWeight: 700, fill: "$textPrimary" })
+avatar = Insert(profile, { type: "ref", ref: "AvatarUpload", descendants: { label: { content: "Profile photo" }, helper: { content: "PNG or JPG, 2MB max." } }, context: "Autosaves on file selection. Uploads via signed URL. Saving spinner replaces avatar during in-flight upload." })
+displayName = Insert(profile, { type: "ref", ref: "Field", descendants: { label: { content: "Display name" }, input: { value: "Alex Chen" }, helper: { content: "Visible to teammates and in mentions." } }, context: "Autosaves on blur. Saved indicator appears for 2 seconds, then decays. Validates non-empty, ≤ 60 chars." })
+email = Insert(profile, { type: "ref", ref: "Field", descendants: { label: { content: "Email" }, input: { value: "alex@startup.io", readOnly: true }, action: { content: "Change email" } }, context: "Read-only; the action link opens a secure flow with re-auth and verification, that flow lives in Auth / ChangeEmail." })
+tz = Insert(profile, { type: "ref", ref: "Select", descendants: { label: { content: "Timezone" }, value: { content: "Australia/Sydney (AEDT)" } }, context: "Autosaves on selection. Used for scheduled digests, due-date calculations, and displayed timestamps." })
+` })
 ```
 
 That's one section done. The other three follow the same shape: a frame, a heading, a stack of refs, every interactive node carrying a `context` that names the behaviour.
@@ -89,20 +86,20 @@ That's one section done. The other three follow the same shape: a frame, a headi
 A toggle list grouped by category. The `context` lives on the section frame because the behaviour is uniform.
 
 ```js
-batch_design({ documentId: doc, operations: `
-notifs=I(document, { type: "frame", name: "Settings_Notifications", layout: "vertical", gap: "$space-6", x: <x1 + 3040>, y: <y1>, width: 720, padding: "$space-8", fill: [{ type: "solid_color", color: "$bg" }], context: "All toggles autosave on change. Saving indicator appears in the section header during in-flight changes; decays once all changes settle." })
-nhdr=I(notifs, { type: "text", name: "SectionHeading", content: "Notifications", fontSize: "$text2xl", fontWeight: 700, fill: [{ type: "solid_color", color: "$textPrimary" }] })
-mentionsGroup=I(notifs, { type: "frame", name: "MentionsGroup", layout: "vertical", gap: "$space-3" })
-mentionsTitle=I(mentionsGroup, { type: "text", content: "Mentions", fontSize: "$textSm", fontWeight: 600, fill: [{ type: "solid_color", color: "$textSecondary" }] })
-mEmail=I(mentionsGroup, { type: "ref", ref: "Toggle", descendants: { label: { content: "Email me when someone @mentions me" }, value: { checked: true } } })
-mPush=I(mentionsGroup, { type: "ref", ref: "Toggle", descendants: { label: { content: "Push notify on @mentions" }, value: { checked: true } } })
-activityGroup=I(notifs, { type: "frame", name: "ActivityGroup", layout: "vertical", gap: "$space-3" })
-activityTitle=I(activityGroup, { type: "text", content: "Activity", fontSize: "$textSm", fontWeight: 600, fill: [{ type: "solid_color", color: "$textSecondary" }] })
-aDigest=I(activityGroup, { type: "ref", ref: "Toggle", descendants: { label: { content: "Daily activity digest" }, value: { checked: false } } })
-sysGroup=I(notifs, { type: "frame", name: "SystemGroup", layout: "vertical", gap: "$space-3" })
-systemTitle=I(sysGroup, { type: "text", content: "System", fontSize: "$textSm", fontWeight: 600, fill: [{ type: "solid_color", color: "$textSecondary" }] })
-sBilling=I(sysGroup, { type: "ref", ref: "Toggle", descendants: { label: { content: "Billing receipts" }, value: { checked: true } }, context: "Cannot be disabled in some jurisdictions; legal compliance." })
-`})
+batch_design({ filePath: "", input: `
+notifs = Insert(document, { type: "frame", name: "Settings_Notifications", layout: "vertical", gap: "$space-6", x: <x1 + 3040>, y: <y1>, width: 720, padding: "$space-8", fill: "$bg", context: "All toggles autosave on change. Saving indicator appears in the section header during in-flight changes; decays once all changes settle." })
+nhdr = Insert(notifs, { type: "text", name: "SectionHeading", content: "Notifications", fontSize: "$text2xl", fontWeight: 700, fill: "$textPrimary" })
+mentionsGroup = Insert(notifs, { type: "frame", name: "MentionsGroup", layout: "vertical", gap: "$space-3" })
+mentionsTitle = Insert(mentionsGroup, { type: "text", content: "Mentions", fontSize: "$textSm", fontWeight: 600, fill: "$textSecondary" })
+mEmail = Insert(mentionsGroup, { type: "ref", ref: "Toggle", descendants: { label: { content: "Email me when someone @mentions me" }, value: { checked: true } } })
+mPush = Insert(mentionsGroup, { type: "ref", ref: "Toggle", descendants: { label: { content: "Push notify on @mentions" }, value: { checked: true } } })
+activityGroup = Insert(notifs, { type: "frame", name: "ActivityGroup", layout: "vertical", gap: "$space-3" })
+activityTitle = Insert(activityGroup, { type: "text", content: "Activity", fontSize: "$textSm", fontWeight: 600, fill: "$textSecondary" })
+aDigest = Insert(activityGroup, { type: "ref", ref: "Toggle", descendants: { label: { content: "Daily activity digest" }, value: { checked: false } } })
+sysGroup = Insert(notifs, { type: "frame", name: "SystemGroup", layout: "vertical", gap: "$space-3" })
+systemTitle = Insert(sysGroup, { type: "text", content: "System", fontSize: "$textSm", fontWeight: 600, fill: "$textSecondary" })
+sBilling = Insert(sysGroup, { type: "ref", ref: "Toggle", descendants: { label: { content: "Billing receipts" }, value: { checked: true } }, context: "Cannot be disabled in some jurisdictions; legal compliance." })
+` })
 ```
 
 ## Step 7. Billing section (explicit Save)
@@ -110,17 +107,17 @@ sBilling=I(sysGroup, { type: "ref", ref: "Toggle", descendants: { label: { conte
 This is the one that's different. A `Form` ref wraps the fields so dirty-state and submit live at the form level, not field-by-field.
 
 ```js
-batch_design({ documentId: doc, operations: `
-billing=I(document, { type: "frame", name: "Settings_Billing", layout: "vertical", gap: "$space-6", x: <x1 + 4560>, y: <y1>, width: 720, padding: "$space-8", fill: [{ type: "solid_color", color: "$bg" }] })
-bhdr=I(billing, { type: "text", name: "SectionHeading", content: "Billing", fontSize: "$text2xl", fontWeight: 700, fill: [{ type: "solid_color", color: "$textPrimary" }] })
-planCard=I(billing, { type: "ref", ref: "Card", descendants: { title: { content: "Pro plan" }, body: { content: "$24 per seat per month, billed monthly." }, action: { content: "Change plan" } } })
-form=I(billing, { type: "ref", ref: "Form", descendants: { label: { content: "Payment and address" }, submitLabel: { content: "Save changes" } }, context: "Explicit save. Dirty state triggers beforeunload warning per forms.md § Unsaved-changes warning. Submit revalidates the card via the payment provider before persisting." })
-payment=I(form, { type: "ref", ref: "Field", descendants: { label: { content: "Payment method" }, value: { content: "Visa ending 4242" }, action: { content: "Update card" } } })
-addrLine1=I(form, { type: "ref", ref: "Field", descendants: { label: { content: "Billing address" }, input: { placeholder: "123 George St" } } })
-addrCity=I(form, { type: "ref", ref: "Field", descendants: { label: { content: "City" }, input: { placeholder: "Sydney" } } })
-addrPost=I(form, { type: "ref", ref: "Field", descendants: { label: { content: "Postcode" }, input: { placeholder: "2000" } } })
-cancelBlock=I(billing, { type: "ref", ref: "DangerZone", descendants: { title: { content: "Cancel subscription" }, body: { content: "You'll keep access until the end of the current billing period." }, action: { content: "Cancel subscription" } }, context: "Confirmation modal before destructive action: type the workspace name to confirm. Per voice.md: irreversible actions name the consequence first." })
-`})
+batch_design({ filePath: "", input: `
+billing = Insert(document, { type: "frame", name: "Settings_Billing", layout: "vertical", gap: "$space-6", x: <x1 + 4560>, y: <y1>, width: 720, padding: "$space-8", fill: "$bg" })
+bhdr = Insert(billing, { type: "text", name: "SectionHeading", content: "Billing", fontSize: "$text2xl", fontWeight: 700, fill: "$textPrimary" })
+planCard = Insert(billing, { type: "ref", ref: "Card", descendants: { title: { content: "Pro plan" }, body: { content: "$24 per seat per month, billed monthly." }, action: { content: "Change plan" } } })
+form = Insert(billing, { type: "ref", ref: "Form", descendants: { label: { content: "Payment and address" }, submitLabel: { content: "Save changes" } }, context: "Explicit save. Dirty state triggers beforeunload warning per forms.md § Unsaved-changes warning. Submit revalidates the card via the payment provider before persisting." })
+payment = Insert(form, { type: "ref", ref: "Field", descendants: { label: { content: "Payment method" }, value: { content: "Visa ending 4242" }, action: { content: "Update card" } } })
+addrLine1 = Insert(form, { type: "ref", ref: "Field", descendants: { label: { content: "Billing address" }, input: { placeholder: "123 George St" } } })
+addrCity = Insert(form, { type: "ref", ref: "Field", descendants: { label: { content: "City" }, input: { placeholder: "Sydney" } } })
+addrPost = Insert(form, { type: "ref", ref: "Field", descendants: { label: { content: "Postcode" }, input: { placeholder: "2000" } } })
+cancelBlock = Insert(billing, { type: "ref", ref: "DangerZone", descendants: { title: { content: "Cancel subscription" }, body: { content: "You'll keep access until the end of the current billing period." }, action: { content: "Cancel subscription" } }, context: "Confirmation modal before destructive action: type the workspace name to confirm. Per voice.md: irreversible actions name the consequence first." })
+` })
 ```
 
 ## Step 8. Integrations section
@@ -128,14 +125,14 @@ cancelBlock=I(billing, { type: "ref", ref: "DangerZone", descendants: { title: {
 A card grid of available integrations. Each card has a Connect or Disconnect button depending on state. The empty case (nothing connected) needs its own treatment.
 
 ```js
-batch_design({ documentId: doc, operations: `
-integ=I(document, { type: "frame", name: "Settings_Integrations", layout: "vertical", gap: "$space-6", x: <x1 + 6080>, y: <y1>, width: 720, padding: "$space-8", fill: [{ type: "solid_color", color: "$bg" }] })
-ihdr=I(integ, { type: "text", name: "SectionHeading", content: "Integrations", fontSize: "$text2xl", fontWeight: 700, fill: [{ type: "solid_color", color: "$textPrimary" }] })
-grid=I(integ, { type: "frame", name: "IntegrationsGrid", layout: "horizontal", wrap: true, gap: "$space-4" })
-slack=I(grid, { type: "ref", ref: "IntegrationCard", descendants: { logo: { source: "slack" }, title: { content: "Slack" }, body: { content: "Post updates to a channel." }, action: { content: "Connect" } } })
-linear=I(grid, { type: "ref", ref: "IntegrationCard", descendants: { logo: { source: "linear" }, title: { content: "Linear" }, body: { content: "Connected to acme-design." }, action: { content: "Disconnect" } } })
-github=I(grid, { type: "ref", ref: "IntegrationCard", descendants: { logo: { source: "github" }, title: { content: "GitHub" }, body: { content: "Mirror PR comments into threads." }, action: { content: "Connect" } } })
-`})
+batch_design({ filePath: "", input: `
+integ = Insert(document, { type: "frame", name: "Settings_Integrations", layout: "vertical", gap: "$space-6", x: <x1 + 6080>, y: <y1>, width: 720, padding: "$space-8", fill: "$bg" })
+ihdr = Insert(integ, { type: "text", name: "SectionHeading", content: "Integrations", fontSize: "$text2xl", fontWeight: 700, fill: "$textPrimary" })
+grid = Insert(integ, { type: "frame", name: "IntegrationsGrid", layout: "horizontal", gap: "$space-4" })
+slack = Insert(grid, { type: "ref", ref: "IntegrationCard", descendants: { logo: { source: "slack" }, title: { content: "Slack" }, body: { content: "Post updates to a channel." }, action: { content: "Connect" } } })
+linear = Insert(grid, { type: "ref", ref: "IntegrationCard", descendants: { logo: { source: "linear" }, title: { content: "Linear" }, body: { content: "Connected to acme-design." }, action: { content: "Disconnect" } } })
+github = Insert(grid, { type: "ref", ref: "IntegrationCard", descendants: { logo: { source: "github" }, title: { content: "GitHub" }, body: { content: "Mirror PR comments into threads." }, action: { content: "Connect" } } })
+` })
 ```
 
 For the empty case (nothing connected at all), the section renders the empty-state pattern from [`design-system/empty-states.md`](../design-system/empty-states.md) § Settings: a small illustration, a one-line headline (*"Connect your tools."*), a single explanation, and the same grid below as a teaser. Don't gate the grid behind the empty state, the user needs to see what's available to act.
@@ -158,13 +155,13 @@ Build at least the dirty-Billing state and one validation error on Profile as ca
 Per `SKILL.md` § Verification ladder, structural verification first:
 
 ```js
-snapshot_layout({ parentId: page, maxDepth: 3 })
+snapshot_layout({ filePath: "", parentId: page, maxDepth: 3 })
 ```
 
 Confirm the three columns landed at the right widths (collapsed nav ~64px, settings sidebar 240px, content fills the rest). If geometry's right, take one screenshot of the settings surface in the primary mode:
 
 ```js
-get_screenshot({ nodeId: page })
+get_screenshot({ filePath: "", nodeId: page })
 ```
 
 Verify on the screenshot:
@@ -180,8 +177,8 @@ If anything reads off, fix structurally and re-snapshot. Don't take a second scr
 Then strip the placeholder flag:
 
 ```js
-batch_design({ documentId: doc, operations: `
-U(page, { placeholder: false })
+batch_design({ filePath: "", input: `
+Update(page, { placeholder: false })
 ` })
 ```
 

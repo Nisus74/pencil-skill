@@ -52,7 +52,7 @@ $chart7: #D55E00 (Vermilion)
 $chart8: #CC79A7 (Reddish Purple)
 ```
 
-And calls `set_variables` to mirror them into the `.pen` file's `variables`.
+And calls `SetVariables` (inside a `batch_design` snippet) to mirror them into the `.pen` file's `variables`.
 
 ## Step 4: Plan the dashboard layout
 
@@ -63,114 +63,81 @@ Three rows:
 - **Row 3 (chart + table)**: heatmap (left, 60% width) + Top customers table (right, 40% width).
 
 ```js
-batch_design({
-  documentId,
-  ops: [
-    {
-      op: "C",
-      parent: "<canvas-root-id>",
-      node: {
-        type: "frame",
-        name: "Dashboard_Analytics",
-        context: "Analytics dashboard. Three rows: KPIs (4 cards), charts (2 tiles), heatmap + table (split). Uses Okabe-Ito for categorical and Viridis for the cohort heatmap. All charts colour-blind-safe; state coding pairs colour with shape.",
-        layout: { direction: "column", padding: 32, gap: 24 },
-        children: [
-          { type: "frame", name: "Row_KPIs", layout: { direction: "row", gap: 16 } },
-          { type: "frame", name: "Row_Charts", layout: { direction: "row", gap: 16 } },
-          { type: "frame", name: "Row_HeatmapAndTable", layout: { direction: "row", gap: 16 } },
-        ],
-      },
-    },
+batch_design({ filePath: "", input: `
+Insert(document, {
+  type: "frame",
+  name: "Dashboard_Analytics",
+  context: "Analytics dashboard. Three rows: KPIs (4 cards), charts (2 tiles), heatmap + table (split). Uses Okabe-Ito for categorical and Viridis for the cohort heatmap. All charts colour-blind-safe; state coding pairs colour with shape.",
+  layout: "vertical",
+  padding: 32,
+  gap: 24,
+  children: [
+    { type: "frame", name: "Row_KPIs", layout: "horizontal", gap: 16 },
+    { type: "frame", name: "Row_Charts", layout: "horizontal", gap: 16 },
+    { type: "frame", name: "Row_HeatmapAndTable", layout: "horizontal", gap: 16 },
   ],
-});
+})
+` });
 ```
 
 ## Step 5: Build the line chart (revenue by month)
 
 ```js
-batch_design({
-  documentId,
-  ops: [
-    {
-      op: "C",
-      parent: "<row-charts-id>",
-      node: {
-        type: "frame",
-        name: "ChartTile_RevenueByMonth",
-        context: "Line chart, monthly revenue, 12-month rolling window. Single series (current period in $chart6 / Blue). Y-axis starts at zero; gridlines on the value axis only. Direct label at the line endpoint. Skeleton with axis hints during load.",
-        children: [
-          { type: "ref", componentId: "ChartTile", descendants: { title: "Revenue by month", chartType: "line", series: "<data>", colour: "$chart6" } },
-        ],
-      },
-    },
+batch_design({ filePath: "", input: `
+Insert("<row-charts-id>", {
+  type: "frame",
+  name: "ChartTile_RevenueByMonth",
+  context: "Line chart, monthly revenue, 12-month rolling window. Single series (current period in $chart6 / Blue). Y-axis starts at zero; gridlines on the value axis only. Direct label at the line endpoint. Skeleton with axis hints during load.",
+  children: [
+    { type: "ref", ref: "ChartTile", descendants: { title: "Revenue by month", chartType: "line", series: "<data>", colour: "$chart6" } },
   ],
-});
+})
+` });
 ```
 
 ## Step 6: Build the horizontal bar chart (conversion by channel)
 
 ```js
-batch_design({
-  documentId,
-  ops: [
-    {
-      op: "C",
-      parent: "<row-charts-id>",
-      node: {
-        type: "frame",
-        name: "ChartTile_ConversionByChannel",
-        context: "Horizontal bar chart, top 8 channels by conversion. Channel names on the Y axis (long labels). Bars in $chart2 / Orange (Okabe-Ito). Sort descending by default. Value labels at the right end of each bar.",
-        children: [
-          { type: "ref", componentId: "ChartTile", descendants: { title: "Conversion by channel", chartType: "barHorizontal", series: "<data>", colour: "$chart2" } },
-        ],
-      },
-    },
+batch_design({ filePath: "", input: `
+Insert("<row-charts-id>", {
+  type: "frame",
+  name: "ChartTile_ConversionByChannel",
+  context: "Horizontal bar chart, top 8 channels by conversion. Channel names on the Y axis (long labels). Bars in $chart2 / Orange (Okabe-Ito). Sort descending by default. Value labels at the right end of each bar.",
+  children: [
+    { type: "ref", ref: "ChartTile", descendants: { title: "Conversion by channel", chartType: "barHorizontal", series: "<data>", colour: "$chart2" } },
   ],
-});
+})
+` });
 ```
 
 ## Step 7: Build the heatmap (churn cohort)
 
 ```js
-batch_design({
-  documentId,
-  ops: [
-    {
-      op: "C",
-      parent: "<row-heatmap-id>",
-      node: {
-        type: "frame",
-        name: "ChartTile_ChurnCohort",
-        context: "Cohort heatmap. Y axis: cohort (signup month). X axis: months since signup. Cell value: % of cohort still active. Viridis sequential colour scale (perceptually uniform, colour-blind-safe). Diverging value not appropriate; sequential right.",
-        children: [
-          { type: "ref", componentId: "ChartTile", descendants: { title: "Churn cohort", chartType: "heatmap", colourScale: "viridis", data: "<matrix>" } },
-        ],
-      },
-    },
+batch_design({ filePath: "", input: `
+Insert("<row-heatmap-id>", {
+  type: "frame",
+  name: "ChartTile_ChurnCohort",
+  context: "Cohort heatmap. Y axis: cohort (signup month). X axis: months since signup. Cell value: % of cohort still active. Viridis sequential colour scale (perceptually uniform, colour-blind-safe). Diverging value not appropriate; sequential right.",
+  children: [
+    { type: "ref", ref: "ChartTile", descendants: { title: "Churn cohort", chartType: "heatmap", colourScale: "viridis", data: "<matrix>" } },
   ],
-});
+})
+` });
 ```
 
 ## Step 8: Build the top customers table
 
 ```js
-batch_design({
-  documentId,
-  ops: [
-    {
-      op: "C",
-      parent: "<row-table-id>",
-      node: {
-        type: "frame",
-        name: "TableTile_TopCustomers",
-        context: "Top 10 customers by MRR. Columns: Customer, MRR, Tenure, Status. Sort by MRR descending by default. Tabular numerics on MRR column. Sparkline column shows MRR trend (last 6 months).",
-        children: [
-          { type: "ref", componentId: "TableTile", descendants: { columns: "<spec>", rows: "<data>", virtualised: true } },
-        ],
-      },
-    },
+batch_design({ filePath: "", input: `
+Insert("<row-table-id>", {
+  type: "frame",
+  name: "TableTile_TopCustomers",
+  context: "Top 10 customers by MRR. Columns: Customer, MRR, Tenure, Status. Sort by MRR descending by default. Tabular numerics on MRR column. Sparkline column shows MRR trend (last 6 months).",
+  children: [
+    { type: "ref", ref: "TableTile", descendants: { columns: "<spec>", rows: "<data>", virtualised: true } },
   ],
-});
+})
+` });
 ```
 
 ## Step 9: Default chart styling
@@ -203,8 +170,10 @@ Per `references/data-viz.md` § Loading states for charts:
 ## Step 12: Verify with one screenshot
 
 ```js
-get_screenshot({ documentId, nodeId: "<dashboard-frame-id>" });
-get_screenshot({ documentId, nodeId: "<dashboard-frame-id>", theme: { mode: "dark" } });
+get_screenshot({ filePath: "", nodeId: "<dashboard-frame-id>" });
+// Dark mode: set the mode first, then capture
+batch_design({ filePath: "", input: `Update("<dashboard-frame-id>", { theme: { mode: "dark" } })` });
+get_screenshot({ filePath: "", nodeId: "<dashboard-frame-id>" });
 ```
 
 Confirm:

@@ -48,42 +48,47 @@ The plan mentions `$illustration`. Confirm before binding:
 get_variables()
 ```
 
-Returns the doc's variables. `$textMuted`, `$danger`, `$primary` are present. `$illustration` is **not** declared. Add it:
+Returns the doc's variables. `$textMuted`, `$danger`, `$primary` are present. `$illustration` is **not** declared. Add it inside a `batch_design` snippet:
 
 ```
-set_variables({
-  variables: {
-    illustration: { type: "color", value: [
-      { value: "#A1A1AA", theme: { mode: "light" } },
-      { value: "#52525B", theme: { mode: "dark"  } }
-    ] }
-  },
-  replace: false
-})
+batch_design({ filePath: "", input: `
+SetVariables({
+  illustration: { type: "color", value: [
+    { value: "#A1A1AA", theme: { mode: "light" } },
+    { value: "#52525B", theme: { mode: "dark"  } }
+  ] }
+}, false)
+` })
 ```
 
 The icon colour is now theme-aware and centrally controllable.
 
 ## Step 4.7: Place the new frames in empty canvas
 
-Existing frames occupy part of the canvas. To avoid overlap:
+Existing frames occupy part of the canvas. To avoid overlap, run `FindEmptySpace` as the first line inside the `batch_design` snippet (it returns `{x, y}`):
 
 ```
-find_empty_space_on_canvas({ width: 1440, height: 900, padding: 80, direction: "right" })
+batch_design({ filePath: "", input: `
+const slot = FindEmptySpace({ width: 1440, height: 900, padding: 80, direction: "right" })
+// slot.x / slot.y anchor Page_404; place Page_Offline immediately to the right or below.
+` })
 ```
 
-Returns coordinates `(x404, y404)`. Place `Page_404` there. Find space for `Page_Offline` immediately to the right or below.
+Place `Page_404` at the returned coordinates. Find space for `Page_Offline` immediately to the right or below.
 
 ## Step 5: First batch_design (404 page + shared lockup)
 
 ```
-page404=I("doc", { type: "frame", name: "Page_404", layout: "vertical", justifyContent: "center", alignItems: "center", x: <x404>, y: <y404>, width: 1440, height: 900, padding: "$space-8", fill: [{ type: "color", color: "$surface" }] })
-block=I(page404, { type: "frame", name: "ErrorBlock", layout: "vertical", justifyContent: "center", alignItems: "center", gap: "$space-5", padding: "$space-8", width: 480 })
-icon=I(block, { type: "icon_font", name: "ErrorIcon", iconFontName: "circle-alert", iconFontFamily: "lucide", width: 64, height: 64, fill: [{ type: "color", color: "$illustration" }] })
-title=I(block, { type: "text", name: "Title", content: "This page doesn't exist.", fontSize: "$text2xl", fontWeight: 700, textAlign: "center", fill: [{ type: "color", color: "$textPrimary" }] })
-desc=I(block, { type: "text", name: "Description", content: "The link may be broken, or the page may have moved. Head back to the dashboard.", fontSize: "$textBase", textAlign: "center", fill: [{ type: "color", color: "$textMuted" }] })
-cta=I(block, { type: "ref", ref: "ButtonPrimary", descendants: { label: { content: "Go to dashboard" } } })
-code=I(block, { type: "text", name: "ErrorCode", content: "404", fontSize: "$textXs", textAlign: "center", fill: [{ type: "color", color: "$textMuted" }] })
+batch_design({ filePath: "", input: `
+const slot = FindEmptySpace({ width: 1440, height: 900, padding: 80, direction: "right" })
+page404 = Insert(document, { type: "frame", name: "Page_404", layout: "vertical", justifyContent: "center", alignItems: "center", x: slot.x, y: slot.y, width: 1440, height: 900, padding: "$space-8", fill: "$surface" })
+block = Insert(page404, { type: "frame", name: "ErrorBlock", layout: "vertical", justifyContent: "center", alignItems: "center", gap: "$space-5", padding: "$space-8", width: 480 })
+icon = Insert(block, { type: "icon", name: "ErrorIcon", icon: "circle-alert", library: "lucide", width: 64, height: 64, fill: "$illustration" })
+title = Insert(block, { type: "text", name: "Title", content: "This page doesn't exist.", fontSize: "$text2xl", fontWeight: 700, textAlign: "center", fill: "$textPrimary" })
+desc = Insert(block, { type: "text", name: "Description", content: "The link may be broken, or the page may have moved. Head back to the dashboard.", fontSize: "$textBase", textAlign: "center", fill: "$textMuted" })
+cta = Insert(block, { type: "ref", ref: "ButtonPrimary", descendants: { label: { content: "Go to dashboard" } } })
+code = Insert(block, { type: "text", name: "ErrorCode", content: "404", fontSize: "$textXs", textAlign: "center", fill: "$textMuted" })
+` })
 ```
 
 7 ops.
@@ -91,8 +96,8 @@ code=I(block, { type: "text", name: "ErrorCode", content: "404", fontSize: "$tex
 ## Step 6a: Screenshot and verify structure (404)
 
 ```
-snapshot_layout({ parentId: "page404", maxDepth: 2 })
-get_screenshot({ nodeId: "page404" })
+snapshot_layout({ filePath: "", parentId: page404, maxDepth: 2 })
+get_screenshot({ filePath: "", nodeId: page404 })
 ```
 
 Narrate:
@@ -102,36 +107,39 @@ Narrate:
 If the title or description text grows beyond the block width, fix with an explicit width:
 
 ```
-U("desc", { width: 480 })   // forces wrap within the block
+batch_design({ filePath: "", input: `Update(desc, { width: 480 })` })   // forces wrap within the block
 ```
 
 ## Step 5b: Second batch_design (offline page, copying the ErrorBlock)
 
-The lockup is identical. Use `C` (copy) with descendants overrides:
+The lockup is identical. Use `Copy` with descendants overrides:
 
 ```
-pageOffline=I("doc", { type: "frame", name: "Page_Offline", layout: "vertical", justifyContent: "center", alignItems: "center", x: <xOffline>, y: <yOffline>, width: 1440, height: 900, padding: "$space-8", fill: [{ type: "color", color: "$surface" }] })
-blockCopy=C(block, pageOffline, { descendants: {
-  ErrorIcon:    { iconFontName: "cloud-off" },
+batch_design({ filePath: "", input: `
+const slot = FindEmptySpace({ width: 1440, height: 900, padding: 80, direction: "right" })
+pageOffline = Insert(document, { type: "frame", name: "Page_Offline", layout: "vertical", justifyContent: "center", alignItems: "center", x: slot.x, y: slot.y, width: 1440, height: 900, padding: "$space-8", fill: "$surface" })
+blockCopy = Copy(block, pageOffline, { descendants: {
+  ErrorIcon:    { icon: "cloud-off" },
   Title:        { content: "You're offline." },
   Description:  { content: "We can't reach the server. Check your connection and try again." },
   ErrorCode:    { content: "" }
 } })
+` })
 ```
 
 The CTA label needs changing too. If the copy preserves child ids on copy:
 
 ```
-U(`${blockCopy}/cta`, { descendants: { label: { content: "Try again" } } })
+batch_design({ filePath: "", input: `Update(\`${blockCopy}/cta\`, { descendants: { label: { content: "Try again" } } })` })
 ```
 
-If not, resolve via `batch_get` first, then `U`.
+If not, resolve via `batch_get` first, then `Update`.
 
 ## Step 6b: Verify structure (offline)
 
 ```
-snapshot_layout({ parentId: "pageOffline", maxDepth: 2 })
-get_screenshot({ nodeId: "pageOffline" })
+snapshot_layout({ filePath: "", parentId: pageOffline, maxDepth: 2 })
+get_screenshot({ filePath: "", nodeId: pageOffline })
 ```
 
 Narrate:
@@ -164,6 +172,6 @@ If yes: mark the `block` node `reusable: true`. If no: leave as-is. Two-instance
 
 - **`get_variables` before adding tokens.** Checking what exists before adding `$illustration` prevents duplicate tokens with different values. The variable system is the source of truth; don't add to it without reading it first.
 
-- **`find_empty_space_on_canvas` on a populated canvas.** Placing new frames at arbitrary coordinates risks invisible overlaps with existing work. The canvas tool returns safe coordinates; use it every time the canvas already has content.
+- **`FindEmptySpace` on a populated canvas.** Placing new frames at arbitrary coordinates risks invisible overlaps with existing work. Calling `FindEmptySpace` as the first line of the `batch_design` snippet returns safe coordinates; use it every time the canvas already has content.
 
 For the screen-state taxonomy and the full fault-state matrix, see [`references/states.md`](../references/states.md).

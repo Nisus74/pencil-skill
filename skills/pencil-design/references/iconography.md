@@ -99,7 +99,7 @@ Sometimes the chosen library doesn't have what you need: a brand-specific catego
 
 Pencil represents icons via two node types:
 
-- **`icon_font`**: an icon from a font-based icon set (Lucide, Material Symbols, Phosphor, Feather). Prefer this for any standard-library icon. Properties: `name` (the icon's identifier in its family, e.g. `chevron-right`), `weight` (when the family supports multiple weights, e.g. Phosphor's `thin` / `light` / `regular` / `bold` / `fill` / `duotone`), `size` (in px). The chosen family is documented at the project level so the renderer resolves the name correctly.
+- **`icon`**: an icon from a font-based icon set (Lucide, Material Symbols, Phosphor, Feather). Prefer this for any standard-library icon. Properties: `icon` (the icon's identifier in its family, e.g. `chevron-right`), `library` (the icon set the name resolves against), `weight` (when the family supports multiple weights, e.g. Phosphor's `thin` / `light` / `regular` / `bold` / `fill` / `duotone`). Icons are sized by `width` / `height` (in px) and need a `fill`. The chosen family can be documented at the project level so the renderer resolves the name correctly.
 - **`icon_image`**: an icon from a custom SVG or raster source. Reserve for brand marks, custom illustrations, and anything outside the chosen library.
 
 Document the chosen library in the project's [`design-system/iconography.md`](../design-system/iconography.md) so every agent that touches the file picks from the same set. Include the family name, the default size, the default weight, and any size-to-weight rules ("16px renders thin; 20px and up renders regular").
@@ -112,7 +112,7 @@ In `.pen`, an inline status icon beside text typically reads:
   "name": "Status_Saved",
   "context": "Inline status icon plus label. Icon is decorative; label is the announcement.",
   "children": [
-    { "type": "icon_font", "name": "CheckIcon", "context": "Decorative. aria-hidden=true." },
+    { "type": "icon", "name": "CheckIcon", "icon": "check", "library": "lucide", "width": 16, "height": 16, "fill": "$success", "context": "Decorative. aria-hidden=true." },
     { "type": "text", "name": "StatusLabel", "text": "Saved" }
   ]
 }
@@ -152,4 +152,4 @@ These read as icon-blind designs and should be fixed in passing:
 - [`design-system/iconography.md`](../design-system/iconography.md): the project's chosen icon family, default size, default weight.
 - [`design-system/components.md`](../design-system/components.md): component-internal icon placement (button-internal, input chrome, list-row trailing).
 - [`forms.md`](forms.md): form-field leading/trailing icons, validation icons, error icon pairing.
-- [`pen-schema.md`](pen-schema.md): the `icon_font` and `icon_image` node types in the `.pen` schema.
+- [`pen-schema.md`](pen-schema.md): the `icon` and `icon_image` node types in the `.pen` schema.

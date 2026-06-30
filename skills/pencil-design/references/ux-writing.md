@@ -178,7 +178,7 @@ A brand microcopy that reads *"Let's make something beautiful"* on a CTA is fine
 Text nodes in `.pen` carry their content in the `content` property:
 
 ```
-T1=I("parent", {
+T1 = Insert("parent", {
   type: "text",
   content: "Delete 5 items",
   fontFamily: "$fontBody",
@@ -192,7 +192,7 @@ This means the design carries the copy. There's no *"lorem ipsum and the writer 
 
 ### Placeholder names
 
-Per SKILL.md's anti-patterns: don't ship placeholder names like *"John Doe"*, *"Acme Corp"*, *"Lorem Ipsum"*. Use plausible, context-appropriate content or `G(node, "ai", ...)` for imagery. For copy, name people with real-sounding names drawn from the design's plausible user base (*"Aiko Watanabe"*, *"Daichi Ito"*, *"Sophia Lee"*). Recognise that placeholder names age the design instantly the moment they reach a real user.
+Per SKILL.md's anti-patterns: don't ship placeholder names like *"John Doe"*, *"Acme Corp"*, *"Lorem Ipsum"*. Use plausible, context-appropriate content or `Generate(node, "ai", ...)` for imagery. For copy, name people with real-sounding names drawn from the design's plausible user base (*"Aiko Watanabe"*, *"Daichi Ito"*, *"Sophia Lee"*). Recognise that placeholder names age the design instantly the moment they reach a real user.
 
 ### Empty-state copy as variants
 

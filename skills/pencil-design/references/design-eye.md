@@ -28,7 +28,7 @@ Examples of elements that are deliberate vs. defaulted:
 
 | Deliberate | Defaulted |
 |---|---|
-| `stroke: { thickness: 1, color: "$border" }` — separates card without claiming elevation | `effect: [{ type: "drop_shadow" }]` — default shadow from any component kit |
+| `stroke: "$border", strokeWidth: 1` — separates card without claiming elevation | `effect: [{ type: "shadow", shadowType: "outer" }]` — default shadow from any component kit |
 | Status badge with 12% opacity tinted fill | Pill badge with `cornerRadius: 999` and full-saturation fill |
 | Page background in a grey variable, not `#FFFFFF` | `fill: "#FFFFFF"` — pure white |
 | Monospace font on numeric figures | Proportional font on all text including financial values |
@@ -55,7 +55,7 @@ Everything else — cards, panels, containers, form fields, data tables — shou
 **Fix:**
 
 ```
-U(nodeId, { effect: [] })
+Update(nodeId, { effect: [] })
 ```
 
 One op. Do it before any other work.

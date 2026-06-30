@@ -50,7 +50,7 @@ Every `.pen` file opens with a top-level frame named `Cover`, positioned at canv
 
 ## Section frames as canvas regions
 
-Top-level frames (siblings of the Cover) belong in named *section regions* on the canvas. Each region is a logical group; not a literal `frame` containing children, but a spatial region you keep your section frames within. Use `find_empty_space_on_canvas` between regions so they don't overlap.
+Top-level frames (siblings of the Cover) belong in named *section regions* on the canvas. Each region is a logical group; not a literal `frame` containing children, but a spatial region you keep your section frames within. Use `FindEmptySpace` (a JS function inside `batch_design`, returns `{x, y, parentId?}`) between regions so they don't overlap.
 
 **The standard regions** (in canvas-position order from top-left):
 
@@ -359,6 +359,6 @@ Fix what fails. The point of the discipline is to make the file readable in 30 s
 - SKILL.md § Design-system convention: when to scaffold `design-system/` markdown files alongside `.pen` files.
 - [`composition-patterns.md`](composition-patterns.md): component status workflow.
 - [`pen-schema.md`](pen-schema.md): `.pen` data model, `.lib.pen` libraries, imports.
-- [`mcp-tools.md`](mcp-tools.md): `find_empty_space_on_canvas` for placing section regions.
+- [`mcp-tools.md`](mcp-tools.md): `FindEmptySpace` for placing section regions.
 - [`states.md`](states.md): state vocabulary for the `[State]` slot in hierarchical names.
 - [`flows.md`](flows.md): multi-screen flow orchestration; flow patterns map to the `[Flow]` slot.

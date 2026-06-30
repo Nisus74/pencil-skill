@@ -46,7 +46,7 @@ Decide which gaps ship now and which get deferred with a written justification. 
 For every interactive node, build the states it ships. The two structural options in Pencil:
 
 - **Sibling frames inside a `reusable` component.** One frame per state, named clearly (*"default"*, *"hover"*, *"pressed"*, *"disabled"*, *"loading"*, *"error"*).
-- **State theme axis.** Declare `state` as a theme axis via `set_variables` and render the same component frame under different `state` values. Useful when many components share the same state tokens.
+- **State theme axis.** Declare `state` as a theme axis via `SetVariables` (inside `batch_design`) and render the same component frame under different `state` values. Useful when many components share the same state tokens.
 
 Both approaches are documented in [states.md](states.md); pick one per component family and stay in it.
 

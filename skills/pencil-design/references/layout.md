@@ -168,8 +168,8 @@ Mouse pointers have pixel precision; fingers don't. A 24px button works on deskt
 The Pencil pattern: keep the visual icon at its natural size and expand the tap target via a sibling frame with `fill: "transparent"`:
 
 ```
-U("<iconButton>", { width: 24, height: 24 })
-T1=I("iconButton", { type: "frame", x: -10, y: -10, width: 44, height: 44, fill: "transparent", role: "button" })
+Update("<iconButton>", { width: 24, height: 24 })
+T1 = Insert("iconButton", { type: "frame", x: -10, y: -10, width: 44, height: 44, fill: "transparent", role: "button" })
 ```
 
 Apply at minimum to:
@@ -227,8 +227,8 @@ For per-breakpoint frames, each frame has its own layout; constraints are mostly
 ### Test under realistic content volume
 A grid that looks rhythmic with three cards in design will look different with thirty. A table that looks airy with five rows will look different with five hundred. Build at least one frame with realistic content volume before declaring the layout done. See [cognitive-load.md](cognitive-load.md) on the populated-state verification rule.
 
-### Use `find_empty_space_on_canvas` for crowded boards
-When the canvas already has multiple top-level frames, call `find_empty_space_on_canvas` before placing a new one. Skipping this on a crowded canvas produces invisible overlaps that look like rendering failures.
+### Use `FindEmptySpace` for crowded boards
+When the canvas already has multiple top-level frames, call `FindEmptySpace` (a JS function inside `batch_design`, returns `{x, y, parentId?}`) before placing a new one. Skipping this on a crowded canvas produces invisible overlaps that look like rendering failures.
 
 ### Snapshot the layout for debugging
 When a screenshot reveals that *"something looks off"* but the issue isn't obvious, call `snapshot_layout({ parentId, maxDepth: 2 })` to read positions, sizes, and gaps as numbers. Often the issue is one rogue padding value that fights the rhythm.

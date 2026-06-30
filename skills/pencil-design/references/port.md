@@ -39,10 +39,10 @@ The discipline: a *responsive* design that's just a single column with `display:
 
 ### Breakpoint behaviour
 
-Pencil's responsive model: declare breakpoint tokens via `set_variables`, then bind frames to those tokens via `width: "fill_container(max-WIDTHpx)"` patterns. The standard four work for most products:
+Pencil's responsive model: declare breakpoint tokens via `SetVariables` (inside `batch_design`), then bind frames to those tokens via `width: "fill_container(max-WIDTHpx)"` patterns. The standard four work for most products:
 
 ```
-set_variables({
+SetVariables({
   "bpSm": { mode: { light: "320px", dark: "320px" } },
   "bpMd": { mode: { light: "768px", dark: "768px" } },
   "bpLg": { mode: { light: "1280px", dark: "1280px" } },
@@ -63,8 +63,8 @@ Touch interactions need a 44x44px minimum target. Mouse interactions can use sma
 Pencil supports the *"visual icon, larger tap target"* pattern via a sibling frame:
 
 ```
-U("<iconButton>", { width: 24, height: 24 })
-T1=I("iconButton", { type: "frame", x: -10, y: -10, width: 44, height: 44, fill: "transparent", role: "button" })
+Update("<iconButton>", { width: 24, height: 24 })
+T1 = Insert("iconButton", { type: "frame", x: -10, y: -10, width: 44, height: 44, fill: "transparent", role: "button" })
 ```
 
 Apply at minimum to:
@@ -91,8 +91,8 @@ Every colour variable carries both light and dark values from declaration (SKILL
 
 Port the design under both modes from the same `.pen` file:
 
-- Declare the `mode` theme axis on the document root via `set_variables` with themed values.
-- For per-frame mode-specific rendering: `U("<frameId>", { theme: { mode: "dark" } })`. Use this for screenshots and for surfaces that should always render in a specific mode (a dark hero on a brand site that lives inside a light product).
+- Declare the `mode` theme axis on the document root via `SetVariables` (inside `batch_design`) with themed values.
+- For per-frame mode-specific rendering: `Update("<frameId>", { theme: { mode: "dark" } })`. Use this for screenshots and for surfaces that should always render in a specific mode (a dark hero on a brand site that lives inside a light product).
 - Inspect both modes for the common dark-mode failures listed in [color-and-contrast.md](color-and-contrast.md): borders that disappear, accents that glow, body text that's too white, missing line-height bump on light-on-dark.
 
 ### Density adaptation
@@ -100,7 +100,7 @@ Port the design under both modes from the same `.pen` file:
 If the product has compact / comfortable / spacious modes (Linear's density toggle, Notion's spacing options), declare it as a theme axis:
 
 ```
-set_variables({
+SetVariables({
   "density": { value: "comfortable", themes: { density: ["compact", "comfortable", "spacious"] } },
   "rowPadding": { mode: { density: { compact: 4, comfortable: 8, spacious: 16 } } },
   "rowGap": { mode: { density: { compact: 2, comfortable: 4, spacious: 8 } } }

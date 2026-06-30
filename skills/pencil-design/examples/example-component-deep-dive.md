@@ -9,7 +9,7 @@ This example walks through the full cycle: discover → inspect → understand �
 ## Step 1: Inventory — find what's available
 
 ```
-batch_get({ patterns: [{ reusable: true }], readDepth: 2 })
+batch_get({ filePath: "", patterns: [{ reusable: true }], readDepth: 2 })
 ```
 
 **Response (excerpt):**
@@ -31,7 +31,7 @@ batch_get({ patterns: [{ reusable: true }], readDepth: 2 })
 `readDepth: 2` from inventory only shows top-level fields. Before instantiating, read deeply enough to see all the children that become valid `descendants` keys:
 
 ```
-batch_get({ nodeIds: ["CardPrimary"], readDepth: 4 })
+batch_get({ filePath: "", nodeIds: ["CardPrimary"], readDepth: 4 })
 ```
 
 **Response:**
@@ -104,12 +104,13 @@ From the response above:
 The most common case: you only need to change text values.
 
 ```
-listings=I(page, {
+batch_design({ filePath: "", input: `
+listings = Insert(page, {
   type: "frame", layout: "horizontal", gap: 16,
   children: []
 })
 
-card1=I(listings, {
+card1 = Insert(listings, {
   type: "ref", ref: "CardPrimary",
   descendants: {
     "body/title":    { content: "Espresso Maker" },
@@ -117,6 +118,7 @@ card1=I(listings, {
     "footer/cta":    { content: "Shop now" }
   }
 })
+` })
 ```
 
 No image in this instance — the slot stays empty.
@@ -128,7 +130,8 @@ No image in this instance — the slot stays empty.
 Put `ImageBlock` into the `thumbnail` slot. Set `children` on the slot's id in `descendants`:
 
 ```
-card2=I(listings, {
+batch_design({ filePath: "", input: `
+card2 = Insert(listings, {
   type: "ref", ref: "CardPrimary",
   descendants: {
     thumbnail: {
@@ -143,6 +146,7 @@ card2=I(listings, {
     "body/subtitle": { content: "$34.99" }
   }
 })
+` })
 ```
 
 `children: [...]` on the slot's descendant entry injects content into the hole. The `ImageBlock` ref inside also uses `descendants` to set its own `img.src`.
@@ -154,7 +158,8 @@ card2=I(listings, {
 Use the `/` path syntax to reach `footer/cta` — a node two levels deep:
 
 ```
-card3=I(listings, {
+batch_design({ filePath: "", input: `
+card3 = Insert(listings, {
   type: "ref", ref: "CardPrimary",
   descendants: {
     thumbnail: {
@@ -168,6 +173,7 @@ card3=I(listings, {
     "footer/cta":    { content: "Add to cart" }
   }
 })
+` })
 ```
 
 `"footer/cta"` works because `cta` is a child of `footer`. Using `"cta"` alone would fail — it's not a direct child of `CardPrimary`.
@@ -179,10 +185,12 @@ card3=I(listings, {
 When the product data is loading, show the card in `loading` state. The component has `theme: { state: "default" }` in its definition, which means it has a `state` axis. Pass `theme` on the ref node:
 
 ```
-cardLoading=I(listings, {
+batch_design({ filePath: "", input: `
+cardLoading = Insert(listings, {
   type: "ref", ref: "CardPrimary",
   theme: { state: "loading" }
 })
+` })
 ```
 
 No `descendants` needed — the component's `loading` state is a designed variant that handles its own visual treatment. Don't mix state with content overrides unless you've verified the component handles it (check the design-system docs or the component structure for a `skeleton` child).

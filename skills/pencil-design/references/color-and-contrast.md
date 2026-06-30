@@ -186,10 +186,10 @@ If a check fails, fix it before reporting done. Don't note it as a TODO.
 ## Pencil-specific
 
 ### Declaring colour variables
-Use `set_variables` to declare the colour palette upfront, before placing any frames. Every colour resolves to a token from then on:
+Call `SetVariables` inside `batch_design` to declare the colour palette upfront, before placing any frames. Every colour resolves to a token from then on:
 
 ```
-set_variables({
+SetVariables({
   "bg": { mode: { light: "#FAFAF8", dark: "#1A1B19" } },
   "bgSurface": { mode: { light: "#F4F5F2", dark: "#252622" } },
   "border": { mode: { light: "#E5E7E1", dark: "#3A3B36" } },
@@ -205,25 +205,23 @@ Note the accent shifts slightly in dark mode (lighter, slightly less saturated) 
 For documents with light + dark variants, declare the `mode` theme axis on the document root before placing frames:
 
 ```
-U(docRootId, { themes: { mode: ["light", "dark"] } })
+Update(docRootId, { themes: { mode: ["light", "dark"] } })
 ```
 
 Then individual frames can render in a specific mode via:
 
 ```
-U("<pageFrameId>", { theme: { mode: "dark" } })
+Update("<pageFrameId>", { theme: { mode: "dark" } })
 ```
 
 This lets you screenshot the same design under both modes from the same `.pen` file.
 
 ### Audit existing files
-For files that pre-date the discipline rules, use `search_all_unique_properties` to find raw hex values still in use:
+For files that pre-date the discipline rules, read the subtree with `batch_get` and tally the `fill` values yourself to find raw hex still in use. Any hex string (not starting with `$`) is a bug. To bulk-fix where the same hex maps to a known variable, read the target nodes with `batch_get`, then loop `Update` inside a `batch_design` snippet:
 
 ```
-search_all_unique_properties({ property: "fill" })
+for (id of ["a", "b"]) Update(id, { fill: "$accent" })
 ```
-
-Any returned hex string (not starting with `$`) is a bug. Use `replace_all_matching_properties` to bulk-fix where the same hex maps to a known variable.
 
 ### Verifying contrast under both modes
 After laying out a surface, screenshot it twice: once with `theme.mode: "light"`, once with `theme.mode: "dark"`. Run the WCAG AA contrast check on both. Tokens often pass one and fail the other; both must pass before the design is done.

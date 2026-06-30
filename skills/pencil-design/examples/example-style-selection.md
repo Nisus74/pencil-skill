@@ -4,7 +4,7 @@ User says:
 
 > *"Start a new pencil project for a developer-tools dashboard. Make it feel like Linear."*
 
-This example shows the full workflow the catalogues enable: read brief → pick style → pick palette recipe → pick font pairing → populate `tokens.md` → call `set_variables` MCP → record commitments in `visual-style.md` → scaffold starter components that match the picks. After this sequence, every subsequent design references `$tokens`, never literal hex.
+This example shows the full workflow the catalogues enable: read brief → pick style → pick palette recipe → pick font pairing → populate `tokens.md` → call `SetVariables` inside `batch_design` → record commitments in `visual-style.md` → scaffold starter components that match the picks. After this sequence, every subsequent design references `$tokens`, never literal hex.
 
 ---
 
@@ -61,16 +61,16 @@ From `references/font-pairings.md`:
 
 Weights to ship: Inter 400, 500, 600, 700; JetBrains Mono 400, 500.
 
-## Step 5: Open the document and inspect existing variables
+## Step 5: Create the document and inspect existing variables
 
-Before populating new tokens, the agent reads what already exists in the `.pen` file:
+Before populating new tokens, the user creates a new `.pen` in the editor, then the agent reads what already exists in the file:
 
 ```js
 get_editor_state()
-get_variables({ documentId: <doc-id> })
+get_variables({ filePath: "" })
 ```
 
-This returns the current variables (probably empty for a greenfield project) and the document's themes. The agent confirms the document declares `themes.mode: ["light", "dark"]` (or adds it if missing).
+This returns the current variables (probably empty for a greenfield project) and the document's themes. The mode axis auto-registers from the themed values passed to `SetVariables` in the next step, so light/dark coverage appears as soon as the first themed token lands.
 
 ## Step 6: Populate `design-system/tokens.md`
 
@@ -113,49 +113,37 @@ Updated `tokens.md` sections (showing only the rows the agent populates; the res
 
 Verify contrast: the agent checks each pair against APCA Lc 75 for body text (https://www.myndex.com/APCA/). Slate 900 on Slate 50 in light: passes. Slate 100 on Slate 950 in dark: passes. Indigo 400 on Slate 950: passes. Indigo 600 on Slate 50: passes. Document the result in `visual-style.md`.
 
-## Step 7: Mirror the tokens into the `.pen` file via `set_variables`
+## Step 7: Mirror the tokens into the `.pen` file via `SetVariables`
 
 ```js
-set_variables({
-  documentId: <doc-id>,
-  variables: [
-    {
-      name: "bg",
-      type: "color",
-      value: [
-        { value: "#f8fafc", theme: { mode: "light" } },
-        { value: "#020617", theme: { mode: "dark" } },
-      ],
-    },
-    {
-      name: "surface",
-      type: "color",
-      value: [
-        { value: "#ffffff", theme: { mode: "light" } },
-        { value: "#0f172a", theme: { mode: "dark" } },
-      ],
-    },
-    {
-      name: "accent",
-      type: "color",
-      value: [
-        { value: "#4f46e5", theme: { mode: "light" } },
-        { value: "#818cf8", theme: { mode: "dark" } },
-      ],
-    },
-    // ... continue for textPrimary, textSecondary, border, success, warning, danger, focusRing
-    {
-      name: "fontBody",
-      type: "string",
-      value: "Inter, sans-serif",
-    },
-    {
-      name: "fontMono",
-      type: "string",
-      value: "JetBrains Mono, monospace",
-    },
-  ],
-});
+batch_design({ filePath: "", input: `
+SetVariables({
+  bg: {
+    type: "color",
+    value: [
+      { value: "#f8fafc", theme: { mode: "light" } },
+      { value: "#020617", theme: { mode: "dark" } },
+    ],
+  },
+  surface: {
+    type: "color",
+    value: [
+      { value: "#ffffff", theme: { mode: "light" } },
+      { value: "#0f172a", theme: { mode: "dark" } },
+    ],
+  },
+  accent: {
+    type: "color",
+    value: [
+      { value: "#4f46e5", theme: { mode: "light" } },
+      { value: "#818cf8", theme: { mode: "dark" } },
+    ],
+  },
+  // ... continue for textPrimary, textSecondary, border, success, warning, danger, focusRing
+  fontBody: { type: "string", value: "Inter, sans-serif" },
+  fontMono: { type: "string", value: "JetBrains Mono, monospace" },
+})
+` })
 ```
 
 After this call, the `.pen` file's `variables` section holds the same values as `tokens.md`. The agent has *one source of truth* (tokens.md) and the `.pen` mirrors it.
@@ -213,35 +201,32 @@ With tokens populated, the agent scaffolds the foundational components in a `.li
 Example `batch_design` for the `Button.Primary`:
 
 ```js
-batch_design({
-  documentId: <doc-id>,
-  ops: [
+batch_design({ filePath: "", input: `
+Insert("<library-root-frame-id>", {
+  type: "frame",
+  name: "Button_Primary",
+  reusable: true,
+  context: "Primary CTA button. Uses $accent, $accentHover. 40px height, 16px horizontal padding. Hover increases contrast (lighter accent in dark; darker accent in light). Focus ring uses $focusRing at 2px offset.",
+  layout: "horizontal",
+  align: "center",
+  justify: "center",
+  gap: 8,
+  height: 40,
+  padding: { x: 16, y: 0 },
+  fill: "$accent",
+  cornerRadius: 8,
+  children: [
     {
-      op: "C",  // Create
-      parent: "<library-root-frame-id>",
-      node: {
-        type: "frame",
-        name: "Button_Primary",
-        reusable: true,
-        context: "Primary CTA button. Uses $accent, $accentHover. 40px height, 16px horizontal padding. Hover increases contrast (lighter accent in dark; darker accent in light). Focus ring uses $focusRing at 2px offset.",
-        layout: { direction: "row", align: "center", justify: "center", gap: 8 },
-        size: { height: 40, padding: { x: 16, y: 0 } },
-        fill: "$accent",
-        cornerRadius: 8,
-        children: [
-          {
-            type: "text",
-            text: "Button",
-            fontFamily: "$fontBody",
-            fontWeight: "$fontWeightMedium",
-            color: "$bg",  // contrast against $accent
-          }
-        ],
-      },
-    },
-    // ... Button_Secondary, Button_Ghost, Button_Destructive variants
+      type: "text",
+      content: "Button",
+      fontFamily: "$fontBody",
+      fontWeight: "$fontWeightMedium",
+      fill: "$bg",  // contrast against $accent
+    }
   ],
-});
+})
+// ... Button_Secondary, Button_Ghost, Button_Destructive variants
+` })
 ```
 
 Note: every fill, colour, and font reference is a `$token`, not a literal hex or string.
@@ -256,9 +241,10 @@ Per `SKILL.md` § Verification ladder, take one screenshot of the starter compon
 - Components don't use any literal hex (the agent did its job).
 
 ```js
-get_screenshot({ documentId: <doc-id>, nodeId: "<library-root-frame-id>" });
-// In dark mode
-get_screenshot({ documentId: <doc-id>, nodeId: "<library-root-frame-id>", theme: { mode: "dark" } });
+get_screenshot({ filePath: "", nodeId: "<library-root-frame-id>" });
+// In dark mode: set the mode first, then capture
+batch_design({ filePath: "", input: `Update("<library-root-frame-id>", { theme: { mode: "dark" } })` });
+get_screenshot({ filePath: "", nodeId: "<library-root-frame-id>" });
 ```
 
 If the screenshots match the chosen style, hand back to the user with a one-paragraph summary:
@@ -275,7 +261,7 @@ The catalogues (style, palettes, fonts) are consulted *once* per project. After 
 
 - **Lifting hex codes from `references/colour-palettes.md` into `batch_design` directly.** The references file is a recipe menu, not a value source. Hex values belong in `tokens.md` and the `.pen` `variables`.
 - **Hard-coding font names in `batch_design`.** Same reason. Font names belong in `tokens.md` as `$fontBody`, `$fontMono`.
-- **Skipping the `set_variables` call.** Without mirroring tokens into the `.pen` variables, the design references resolve to nothing (or to defaults).
+- **Skipping the `SetVariables` call.** Without mirroring tokens into the `.pen` variables, the design references resolve to nothing (or to defaults).
 - **Skipping `visual-style.md`.** Without it, the next session's agent doesn't know what style was picked. The product loses coherence.
 - **Picking from the catalogues every session.** The catalogues are a one-time pick. After commitment, the agent reads `visual-style.md` and `tokens.md`.
 

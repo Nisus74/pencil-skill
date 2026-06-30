@@ -37,26 +37,22 @@ Three pricing cards in a row, equal width. Pro tier in the middle, highlighted. 
 - Optional secondary CTA below the feature list.
 
 ```js
-batch_design({
-  documentId,
-  ops: [
-    {
-      op: "C",
-      parent: "<canvas-root-id>",
-      node: {
-        type: "frame",
-        name: "Marketing_Pricing",
-        context: "Three-tier pricing (Free / Pro / Team). Pro is the highlighted recommended tier: coloured border using $accent, layered shadow (ambient + direct), 'Most popular' badge. Don't combine all four treatments; coloured border + badge is the chosen pair.",
-        layout: { direction: "column", padding: 64, gap: 48, align: "center" },
-        children: [
-          { type: "text", text: "Pricing", fontFamily: "$fontDisplay", fontWeight: "$fontWeightBold" },
-          { type: "text", text: "Pick the plan that fits your team. All plans include unlimited projects.", color: "$textSecondary" },
-          { type: "frame", name: "PricingRow", layout: { direction: "row", gap: 24, align: "stretch" }, children: [] },
-        ],
-      },
-    },
+batch_design({ filePath: "", input: `
+Insert("<canvas-root-id>", {
+  type: "frame",
+  name: "Marketing_Pricing",
+  context: "Three-tier pricing (Free / Pro / Team). Pro is the highlighted recommended tier: coloured border using $accent, layered shadow (ambient + direct), 'Most popular' badge. Don't combine all four treatments; coloured border + badge is the chosen pair.",
+  layout: "vertical",
+  padding: 64,
+  gap: 48,
+  align: "center",
+  children: [
+    { type: "text", content: "Pricing", fontFamily: "$fontDisplay", fontWeight: "$fontWeightBold" },
+    { type: "text", content: "Pick the plan that fits your team. All plans include unlimited projects.", fill: "$textSecondary" },
+    { type: "frame", name: "PricingRow", layout: "horizontal", gap: 24, align: "stretch", children: [] },
   ],
-});
+})
+` })
 ```
 
 ## Step 4: Build the Free tier
@@ -64,33 +60,26 @@ batch_design({
 Plain card, no highlight. Use `Card_Pricing` with default treatment.
 
 ```js
-batch_design({
-  documentId,
-  ops: [
-    {
-      op: "C",
-      parent: "<pricing-row-id>",
-      node: {
-        type: "ref",
-        componentId: "Card_Pricing",
-        descendants: {
-          tier: "Free",
-          price: "$0",
-          period: "forever",
-          description: "For trying things out.",
-          ctaLabel: "Start free",
-          ctaVariant: "Secondary",
-          features: [
-            "Up to 3 projects",
-            "Unlimited members",
-            "Community support",
-            "1 GB storage",
-          ],
-        },
-      },
-    },
-  ],
-});
+batch_design({ filePath: "", input: `
+Insert("<pricing-row-id>", {
+  type: "ref",
+  ref: "Card_Pricing",
+  descendants: {
+    tier: "Free",
+    price: "$0",
+    period: "forever",
+    description: "For trying things out.",
+    ctaLabel: "Start free",
+    ctaVariant: "Secondary",
+    features: [
+      "Up to 3 projects",
+      "Unlimited members",
+      "Community support",
+      "1 GB storage",
+    ],
+  },
+})
+` })
 ```
 
 ## Step 5: Build the Pro tier (highlighted)
@@ -98,36 +87,29 @@ batch_design({
 Per `references/layout-patterns.md` § Pricing tables: the highlighted tier carries a coloured border (one accent), a layered shadow, a slight scale-up, and either a badge. Don't combine all four. Coloured border + badge is the canonical pair (per the user's brief).
 
 ```js
-batch_design({
-  documentId,
-  ops: [
-    {
-      op: "C",
-      parent: "<pricing-row-id>",
-      node: {
-        type: "ref",
-        componentId: "Card_Pricing_Highlighted",
-        descendants: {
-          tier: "Pro",
-          price: "$12",
-          period: "per user / month",
-          description: "For growing teams.",
-          badge: "Most popular",
-          ctaLabel: "Start Pro trial",
-          ctaVariant: "Primary",
-          features: [
-            "Everything in Free",
-            "Unlimited projects",
-            "Priority support",
-            "100 GB storage",
-            "Custom roles & permissions",
-            "Audit log",
-          ],
-        },
-      },
-    },
-  ],
-});
+batch_design({ filePath: "", input: `
+Insert("<pricing-row-id>", {
+  type: "ref",
+  ref: "Card_Pricing_Highlighted",
+  descendants: {
+    tier: "Pro",
+    price: "$12",
+    period: "per user / month",
+    description: "For growing teams.",
+    badge: "Most popular",
+    ctaLabel: "Start Pro trial",
+    ctaVariant: "Primary",
+    features: [
+      "Everything in Free",
+      "Unlimited projects",
+      "Priority support",
+      "100 GB storage",
+      "Custom roles & permissions",
+      "Audit log",
+    ],
+  },
+})
+` })
 ```
 
 The `Card_Pricing_Highlighted` component (defined in `design-system.lib.pen`):
@@ -155,35 +137,28 @@ Two-role colour per `SKILL.md` § Aesthetic defaults: Colour (and `references/co
 Plain card, similar to Free but with more features.
 
 ```js
-batch_design({
-  documentId,
-  ops: [
-    {
-      op: "C",
-      parent: "<pricing-row-id>",
-      node: {
-        type: "ref",
-        componentId: "Card_Pricing",
-        descendants: {
-          tier: "Team",
-          price: "$24",
-          period: "per user / month",
-          description: "For teams that need scale.",
-          ctaLabel: "Contact sales",
-          ctaVariant: "Secondary",
-          features: [
-            "Everything in Pro",
-            "SSO + SCIM",
-            "SLA 99.9%",
-            "Dedicated CSM",
-            "Custom contract",
-            "1 TB storage",
-          ],
-        },
-      },
-    },
-  ],
-});
+batch_design({ filePath: "", input: `
+Insert("<pricing-row-id>", {
+  type: "ref",
+  ref: "Card_Pricing",
+  descendants: {
+    tier: "Team",
+    price: "$24",
+    period: "per user / month",
+    description: "For teams that need scale.",
+    ctaLabel: "Contact sales",
+    ctaVariant: "Secondary",
+    features: [
+      "Everything in Pro",
+      "SSO + SCIM",
+      "SLA 99.9%",
+      "Dedicated CSM",
+      "Custom contract",
+      "1 TB storage",
+    ],
+  },
+})
+` })
 ```
 
 ## Step 7: Microcopy pass
@@ -226,8 +201,10 @@ The badge stays in place; the layered shadow renders the same.
 ## Step 11: Verify with one screenshot
 
 ```js
-get_screenshot({ documentId, nodeId: "<marketing-pricing-frame-id>" });
-get_screenshot({ documentId, nodeId: "<marketing-pricing-frame-id>", theme: { mode: "dark" } });
+get_screenshot({ filePath: "", nodeId: "<marketing-pricing-frame-id>" });
+// Dark mode: set the mode first, then capture
+batch_design({ filePath: "", input: `Update("<marketing-pricing-frame-id>", { theme: { mode: "dark" } })` });
+get_screenshot({ filePath: "", nodeId: "<marketing-pricing-frame-id>" });
 ```
 
 Confirm:

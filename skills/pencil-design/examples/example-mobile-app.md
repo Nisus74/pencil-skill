@@ -48,63 +48,59 @@ Library has `IconButton`, `ButtonPrimary`, `Input`, `TabBarItem`, `Toast`. No `S
 
 > *"I'll create three top-level frames at iPhone 15 dimensions (390×844): `Mobile / Home / Default / iPhone15` shows the feed with a 4-tab bottom bar; `Mobile / Compose / 01 / Sheet / Default / iPhone15` shows the Compose full-sheet at the half detent with the keyboard up; `Mobile / Compose / 02 / Confirm / Default / iPhone15` shows the post-submit toast over the home feed. Safe areas respected on every frame: `env(safe-area-inset-top)` for the status bar, `env(safe-area-inset-bottom)` for the home indicator under the tab bar. Haptics annotated in each component's `context` (selection on tab switch, success on submit, error on failure). The Compose sheet uses a `half` detent by default with `full` available via drag, per your `mobile.md`."*
 
-## Step 4.5. Open the document
+## Step 4.5. Create the document
 
-Since no `.pen` is open:
-
-```
-open_document({ path: "new" })
-```
-
-Note the document root id, which we'll call `doc`. Add the library import:
-
-```
-U("doc", { imports: { "ds": "./design/system.lib.pen" } })
-```
+Since no `.pen` is open, the user creates a new `.pen` in the editor. The predefined root id is `document`. The library is attached through the editor's import UI; confirm it landed via `get_editor_state`.
 
 ## Step 4.7. Place the three frames
 
-Three iPhone-sized frames need ~3 × 390 + gutters of horizontal canvas. Pick anchors:
+Three iPhone-sized frames need ~3 × 390 + gutters of horizontal canvas. Pick anchors with `FindEmptySpace` as the first line inside the `batch_design` snippet (it returns `{x, y}`):
 
 ```
-find_empty_space_on_canvas({ width: 390, height: 844, padding: 60, direction: "right" })
+batch_design({ filePath: "", input: `
+const slot = FindEmptySpace({ width: 390, height: 844, padding: 60, direction: "right" })
+// slot.x / slot.y anchor the home frame; the others sit at slot.x + 450 and slot.x + 900.
+` })
 ```
 
-Returns `(x1, y1)`. The other frames will sit at `(x1 + 450, y1)` and `(x1 + 900, y1)`. That's 390 wide each plus 60px gutters between, since they represent sequential states an engineer can scrub.
+The other frames will sit at `(slot.x + 450, slot.y)` and `(slot.x + 900, slot.y)`. That's 390 wide each plus 60px gutters between, since they represent sequential states an engineer can scrub.
 
 ## Step 5a. First batch_design (Home screen)
 
 ```
-home=I("doc", { type: "frame", name: "Mobile / Home / Default / iPhone15", layout: "vertical", x: <x1>, y: <y1>, width: 390, height: 844, fill: [{ type: "solid_color", color: "$surface" }], context: "iPhone 15 viewport. Safe areas: top inset 47px (status bar + Dynamic Island), bottom inset 34px (home indicator). Status bar is system-rendered; we leave space for it." })
-statusSpacer=I(home, { type: "frame", name: "StatusSpacer", height: 47, width: "fill_container" })
-header=I(home, { type: "frame", name: "Header", layout: "horizontal", justifyContent: "space-between", alignItems: "center", padding: "$space-4", width: "fill_container" })
-hTitle=I(header, { type: "text", text: "Home", fontSize: "$textXl", fontWeight: 700 })
-hSearch=I(header, { type: "ref", ref: "IconButton", descendants: { icon: { iconName: "search" } }, context: "Selection haptic on tap. Pushes Search tab." })
-feed=I(home, { type: "frame", name: "Feed", layout: "vertical", gap: "$space-3", padding: "$space-4", width: "fill_container", height: "fill_container" })
-post1=I(feed, { type: "frame", name: "Post1", layout: "vertical", gap: "$space-2", padding: "$space-4", cornerRadius: "$radiusLg", fill: [{ type: "solid_color", color: "$surfaceMuted" }], width: "fill_container" })
-p1Title=I(post1, { type: "text", text: "Mira shipped a new field guide", fontSize: "$textBase", fontWeight: 600 })
-p1Body=I(post1, { type: "text", text: "Three weeks of edits, finally out the door.", fontSize: "$textSm", fill: [{ type: "solid_color", color: "$textMuted" }] })
-post2=I(feed, { type: "frame", name: "Post2", layout: "vertical", gap: "$space-2", padding: "$space-4", cornerRadius: "$radiusLg", fill: [{ type: "solid_color", color: "$surfaceMuted" }], width: "fill_container" })
-p2Title=I(post2, { type: "text", text: "Reminder: standup at 10", fontSize: "$textBase", fontWeight: 600 })
-p2Body=I(post2, { type: "text", text: "Bring the prototype on your phone, not your laptop.", fontSize: "$textSm", fill: [{ type: "solid_color", color: "$textMuted" }] })
-tabBar=I(home, { type: "frame", name: "TabBar", layout: "horizontal", justifyContent: "space-around", alignItems: "center", padding: "$space-3", paddingBottom: 34, width: "fill_container", fill: [{ type: "solid_color", color: "$surface" }], stroke: { thickness: 1, fill: "$border", side: "top" }, context: "Bottom inset 34px for home indicator. Selection haptic on tab change." })
-tabHome=I(tabBar, { type: "ref", ref: "TabBarItem", descendants: { icon: { iconName: "home" }, label: { text: "Home" } }, theme: { state: "active" } })
-tabSearch=I(tabBar, { type: "ref", ref: "TabBarItem", descendants: { icon: { iconName: "search" }, label: { text: "Search" } } })
-tabNotif=I(tabBar, { type: "ref", ref: "TabBarItem", descendants: { icon: { iconName: "bell" }, label: { text: "Notifications" } } })
-tabProfile=I(tabBar, { type: "ref", ref: "TabBarItem", descendants: { icon: { iconName: "user" }, label: { text: "Profile" } } })
+batch_design({ filePath: "", input: `
+const slot = FindEmptySpace({ width: 390, height: 844, padding: 60, direction: "right" })
+home = Insert(document, { type: "frame", name: "Mobile / Home / Default / iPhone15", layout: "vertical", x: slot.x, y: slot.y, width: 390, height: 844, fill: "$surface", context: "iPhone 15 viewport. Safe areas: top inset 47px (status bar + Dynamic Island), bottom inset 34px (home indicator). Status bar is system-rendered; we leave space for it." })
+statusSpacer = Insert(home, { type: "frame", name: "StatusSpacer", height: 47, width: "fill_container" })
+header = Insert(home, { type: "frame", name: "Header", layout: "horizontal", justifyContent: "space_between", alignItems: "center", padding: "$space-4", width: "fill_container" })
+hTitle = Insert(header, { type: "text", content: "Home", fontSize: "$textXl", fontWeight: 700 })
+hSearch = Insert(header, { type: "ref", ref: "IconButton", descendants: { icon: { icon: "search" } }, context: "Selection haptic on tap. Pushes Search tab." })
+feed = Insert(home, { type: "frame", name: "Feed", layout: "vertical", gap: "$space-3", padding: "$space-4", width: "fill_container", height: "fill_container" })
+post1 = Insert(feed, { type: "frame", name: "Post1", layout: "vertical", gap: "$space-2", padding: "$space-4", cornerRadius: "$radiusLg", fill: "$surfaceMuted", width: "fill_container" })
+p1Title = Insert(post1, { type: "text", content: "Mira shipped a new field guide", fontSize: "$textBase", fontWeight: 600 })
+p1Body = Insert(post1, { type: "text", content: "Three weeks of edits, finally out the door.", fontSize: "$textSm", fill: "$textMuted" })
+post2 = Insert(feed, { type: "frame", name: "Post2", layout: "vertical", gap: "$space-2", padding: "$space-4", cornerRadius: "$radiusLg", fill: "$surfaceMuted", width: "fill_container" })
+p2Title = Insert(post2, { type: "text", content: "Reminder: standup at 10", fontSize: "$textBase", fontWeight: 600 })
+p2Body = Insert(post2, { type: "text", content: "Bring the prototype on your phone, not your laptop.", fontSize: "$textSm", fill: "$textMuted" })
+tabBar = Insert(home, { type: "frame", name: "TabBar", layout: "horizontal", justifyContent: "space_around", alignItems: "center", padding: ["$space-3", "$space-3", 34, "$space-3"], width: "fill_container", fill: "$surface", stroke: "$border", strokeWidth: { top: 1, right: 0, bottom: 0, left: 0 }, context: "Bottom inset 34px for home indicator. Selection haptic on tab change." })
+tabHome = Insert(tabBar, { type: "ref", ref: "TabBarItem", descendants: { icon: { icon: "home" }, label: { content: "Home" } }, theme: { state: "active" } })
+tabSearch = Insert(tabBar, { type: "ref", ref: "TabBarItem", descendants: { icon: { icon: "search" }, label: { content: "Search" } } })
+tabNotif = Insert(tabBar, { type: "ref", ref: "TabBarItem", descendants: { icon: { icon: "bell" }, label: { content: "Notifications" } } })
+tabProfile = Insert(tabBar, { type: "ref", ref: "TabBarItem", descendants: { icon: { icon: "user" }, label: { content: "Profile" } } })
+` })
 ```
 
 17 ops. Note:
 
 - `statusSpacer` reserves the 47px iOS top inset. The status bar itself is system-rendered.
-- `tabBar`'s `paddingBottom: 34` clears the home indicator. Labels stay visible at default text size; icon-only mode would fail Dynamic Type.
+- `tabBar`'s 34px bottom padding (the third entry in the `padding` array) clears the home indicator. Labels stay visible at default text size; icon-only mode would fail Dynamic Type.
 - Active tab uses the `active` theme state on `TabBarItem` (filled icon + `$accent` label). Inactive tabs render the default outlined-icon styling.
 - Selection haptic documented in the tab bar's `context`.
 
 ## Step 6a. Verify structure (Home)
 
 ```
-snapshot_layout({ parentId: "home", maxDepth: 3 })
+snapshot_layout({ filePath: "", parentId: home, maxDepth: 3 })
 ```
 
 Check: status spacer at top (47px), header centered with title left and search right, feed fills the middle, tab bar pinned to the bottom with 34px clearance below the icons. No content rendering under the home indicator. Tab labels visible. Per `references/mobile-patterns.md` § Tab bars, that's the contract.
@@ -114,22 +110,24 @@ Check: status spacer at top (47px), header centered with title left and search r
 The Compose flow uses a full sheet rather than a peek sheet, since the user is writing content and submitting. That fits the modal-shape decision in `references/mobile-patterns.md` § Bottom sheets vs modals. Default detent is `half`; the user can drag to `full` for long-form. Edge-swipe dismisses.
 
 ```
-compose=I("doc", { type: "frame", name: "Mobile / Compose / 01 / Sheet / Default / iPhone15", layout: "vertical", x: <x1 + 450>, y: <y1>, width: 390, height: 844, fill: [{ type: "solid_color", color: "$scrim" }], context: "Compose full-sheet at half detent (~50% viewport height). Keyboard is up (336px). Edge-swipe down dismisses with autosaved draft." })
-backdrop=I(compose, { type: "frame", name: "BackdropTap", width: "fill_container", height: 422, context: "Tap to dismiss. Edge-swipe also dismisses." })
-sheet=I(compose, { type: "frame", name: "Sheet", layout: "vertical", width: "fill_container", height: 422, cornerRadiusTopLeft: "$radiusXl", cornerRadiusTopRight: "$radiusXl", fill: [{ type: "solid_color", color: "$surface" }], context: "Half detent. Drag handle indicates draggability to full detent." })
-grabber=I(sheet, { type: "frame", name: "Grabber", width: 36, height: 5, cornerRadius: 2.5, fill: [{ type: "solid_color", color: "$border" }], context: "Centered drag handle." })
-sheetHeader=I(sheet, { type: "frame", name: "SheetHeader", layout: "horizontal", justifyContent: "space-between", alignItems: "center", padding: "$space-4", width: "fill_container" })
-cancel=I(sheetHeader, { type: "ref", ref: "LinkText", descendants: { label: { text: "Cancel" } }, context: "Dismisses sheet. Confirms discard if draft is non-empty." })
-sheetTitle=I(sheetHeader, { type: "text", text: "New post", fontSize: "$textBase", fontWeight: 600 })
-submit=I(sheetHeader, { type: "ref", ref: "ButtonPrimary", descendants: { label: { text: "Post" } }, context: "Disabled until content is non-empty. Success haptic on submit. Error haptic on failure. Stays accessible above the keyboard." })
-body=I(sheet, { type: "frame", name: "Body", layout: "vertical", gap: "$space-3", padding: "$space-4", width: "fill_container", height: "fill_container" })
-textArea=I(body, { type: "ref", ref: "Input", descendants: { input: { placeholder: "What's on your mind?", multiline: true, value: "Just got back from the river ride. The new bridge path is" } }, theme: { state: "focus" }, context: "Autosaves draft locally on every keystroke. Restored on next sheet open." })
-tagRow=I(body, { type: "frame", name: "TagRow", layout: "horizontal", gap: "$space-2", width: "fill_container" })
-tagBtn=I(tagRow, { type: "ref", ref: "IconButton", descendants: { icon: { iconName: "tag" } }, context: "Opens tag picker." })
-attachBtn=I(tagRow, { type: "ref", ref: "IconButton", descendants: { icon: { iconName: "image" } }, context: "Opens iOS image picker. Triggers permission prompt on first use." })
-keyboard=I(compose, { type: "frame", name: "Keyboard", width: "fill_container", height: 336, fill: [{ type: "solid_color", color: "$surfaceMuted" }], context: "iOS system keyboard placeholder. Accessory bar with 'Done' to dismiss sits at its top edge." })
-accessory=I(keyboard, { type: "frame", name: "AccessoryBar", layout: "horizontal", justifyContent: "flex-end", padding: "$space-3", width: "fill_container" })
-done=I(accessory, { type: "ref", ref: "LinkText", descendants: { label: { text: "Done" } }, context: "Dismisses keyboard, sheet stays at half detent." })
+batch_design({ filePath: "", input: `
+compose = Insert(document, { type: "frame", name: "Mobile / Compose / 01 / Sheet / Default / iPhone15", layout: "vertical", x: slot.x + 450, y: slot.y, width: 390, height: 844, fill: "$scrim", context: "Compose full-sheet at half detent (~50% viewport height). Keyboard is up (336px). Edge-swipe down dismisses with autosaved draft." })
+backdrop = Insert(compose, { type: "frame", name: "BackdropTap", width: "fill_container", height: 422, context: "Tap to dismiss. Edge-swipe also dismisses." })
+sheet = Insert(compose, { type: "frame", name: "Sheet", layout: "vertical", width: "fill_container", height: 422, cornerRadius: ["$radiusXl", "$radiusXl", 0, 0], fill: "$surface", context: "Half detent. Drag handle indicates draggability to full detent." })
+grabber = Insert(sheet, { type: "frame", name: "Grabber", width: 36, height: 5, cornerRadius: 2.5, fill: "$border", context: "Centered drag handle." })
+sheetHeader = Insert(sheet, { type: "frame", name: "SheetHeader", layout: "horizontal", justifyContent: "space_between", alignItems: "center", padding: "$space-4", width: "fill_container" })
+cancel = Insert(sheetHeader, { type: "ref", ref: "LinkText", descendants: { label: { content: "Cancel" } }, context: "Dismisses sheet. Confirms discard if draft is non-empty." })
+sheetTitle = Insert(sheetHeader, { type: "text", content: "New post", fontSize: "$textBase", fontWeight: 600 })
+submit = Insert(sheetHeader, { type: "ref", ref: "ButtonPrimary", descendants: { label: { content: "Post" } }, context: "Disabled until content is non-empty. Success haptic on submit. Error haptic on failure. Stays accessible above the keyboard." })
+body = Insert(sheet, { type: "frame", name: "Body", layout: "vertical", gap: "$space-3", padding: "$space-4", width: "fill_container", height: "fill_container" })
+textArea = Insert(body, { type: "ref", ref: "Input", descendants: { input: { placeholder: "What's on your mind?", multiline: true, value: "Just got back from the river ride. The new bridge path is" } }, theme: { state: "focus" }, context: "Autosaves draft locally on every keystroke. Restored on next sheet open." })
+tagRow = Insert(body, { type: "frame", name: "TagRow", layout: "horizontal", gap: "$space-2", width: "fill_container" })
+tagBtn = Insert(tagRow, { type: "ref", ref: "IconButton", descendants: { icon: { icon: "tag" } }, context: "Opens tag picker." })
+attachBtn = Insert(tagRow, { type: "ref", ref: "IconButton", descendants: { icon: { icon: "image" } }, context: "Opens iOS image picker. Triggers permission prompt on first use." })
+keyboard = Insert(compose, { type: "frame", name: "Keyboard", width: "fill_container", height: 336, fill: "$surfaceMuted", context: "iOS system keyboard placeholder. Accessory bar with 'Done' to dismiss sits at its top edge." })
+accessory = Insert(keyboard, { type: "frame", name: "AccessoryBar", layout: "horizontal", justifyContent: "end", padding: "$space-3", width: "fill_container" })
+done = Insert(accessory, { type: "ref", ref: "LinkText", descendants: { label: { content: "Done" } }, context: "Dismisses keyboard, sheet stays at half detent." })
+` })
 ```
 
 16 ops. Note:
@@ -142,7 +140,7 @@ done=I(accessory, { type: "ref", ref: "LinkText", descendants: { label: { text: 
 ## Step 6b. Verify structure (Compose)
 
 ```
-snapshot_layout({ parentId: "compose", maxDepth: 3 })
+snapshot_layout({ filePath: "", parentId: compose, maxDepth: 3 })
 ```
 
 Check: sheet height 422 (half of 844), keyboard height 336, backdrop fills the gap (844 - 422 - 336 = 86 ≈ status area). The text area sits above the keyboard with no overlap. Submit button is reachable in the header row. Grabber centered horizontally.
@@ -150,7 +148,7 @@ Check: sheet height 422 (half of 844), keyboard height 336, backdrop fills the g
 If the sheet's text area extends under the keyboard (a common bug), it's structural:
 
 ```
-U("body", { height: "fill_container" })
+batch_design({ filePath: "", input: `Update(body, { height: "fill_container" })` })
 ```
 
 The flex layout now distributes the remaining sheet height to the body, keeping the input visible.
@@ -160,14 +158,18 @@ The flex layout now distributes the remaining sheet height to the body, keeping 
 The success state per `references/states.md` is: sheet dismisses, toast appears over the home feed, success haptic fires. Frame 03 captures that moment.
 
 ```
-confirm=I("doc", { type: "frame", name: "Mobile / Compose / 02 / Confirm / Default / iPhone15", layout: "vertical", x: <x1 + 900>, y: <y1>, width: 390, height: 844, fill: [{ type: "solid_color", color: "$surface" }], context: "Post-submit. Sheet has dismissed. Toast confirms. Success haptic fires on appearance." })
+batch_design({ filePath: "", input: `
+confirm = Insert(document, { type: "frame", name: "Mobile / Compose / 02 / Confirm / Default / iPhone15", layout: "vertical", x: slot.x + 900, y: slot.y, width: 390, height: 844, fill: "$surface", context: "Post-submit. Sheet has dismissed. Toast confirms. Success haptic fires on appearance." })
+` })
 ```
 
 Then copy the home frame's content and overlay a toast near the top of the safe area:
 
 ```
-homeCopy=C("home", confirm)
-toast=I(confirm, { type: "ref", ref: "Toast", descendants: { icon: { iconName: "check-circle" }, label: { text: "Posted." } }, x: 16, y: 60, width: 358, theme: { state: "success" }, context: "Success haptic on appearance. Auto-dismiss after 2s. Tappable to dismiss early." })
+batch_design({ filePath: "", input: `
+homeCopy = Copy(home, confirm)
+toast = Insert(confirm, { type: "ref", ref: "Toast", descendants: { icon: { icon: "check-circle" }, label: { content: "Posted." } }, x: 16, y: 60, width: 358, theme: { state: "success" }, context: "Success haptic on appearance. Auto-dismiss after 2s. Tappable to dismiss early." })
+` })
 ```
 
 3 ops. The toast lands just below the status bar, full-bleed minus 16px gutters. Copy is one word: *"Posted."* Specific past-tense confirmation, no exclamation, no clichés.
@@ -175,7 +177,7 @@ toast=I(confirm, { type: "ref", ref: "Toast", descendants: { icon: { iconName: "
 ## Step 6c. Verify structure (Confirm)
 
 ```
-snapshot_layout({ parentId: "confirm", maxDepth: 2 })
+snapshot_layout({ filePath: "", parentId: confirm, maxDepth: 2 })
 ```
 
 Check: home content underneath, toast at `y: 60` (clears the 47px status spacer with 13px breathing room). Toast width 358 (390 - 32 gutters).
@@ -185,9 +187,9 @@ Check: home content underneath, toast at `y: 60` (clears the 47px status spacer 
 Three pages, three screenshots. Each scoped to its own page node so the doc root stays out of the capture:
 
 ```
-get_screenshot({ nodeId: "home" })
-get_screenshot({ nodeId: "compose" })
-get_screenshot({ nodeId: "confirm" })
+get_screenshot({ filePath: "", nodeId: home })
+get_screenshot({ filePath: "", nodeId: compose })
+get_screenshot({ filePath: "", nodeId: confirm })
 ```
 
 Verify per page:

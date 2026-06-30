@@ -32,29 +32,23 @@ Sibling top-level frames per step + state.
 ## Step 3: Find canvas space and create the wizard wrapper
 
 ```js
-find_empty_space_on_canvas({ documentId, width: 1440, height: 900 });
+// inside the batch_design snippet, as its first line
+pos = FindEmptySpace({ width: 1440, height: 900, padding: 80 })
 ```
 
 Build a `WizardLayout` reusable that holds the progress indicator, content slot, and footer (Back / Continue / Skip). Each onboarding step instantiates `WizardLayout` with the step's content in the slot.
 
 ```js
-batch_design({
-  documentId,
-  ops: [
-    {
-      op: "C",
-      parent: "<canvas-root-id>",
-      node: {
-        type: "frame",
-        name: "Onboarding_01_WorkspaceName",
-        context: "Onboarding step 1 of 3. Workspace name input. Skippable. Progress indicator: stepper, 1/3 active. Footer: Back disabled (first step), Continue primary, Skip text-link.",
-        children: [
-          { type: "ref", componentId: "WizardLayout", descendants: { progress: "1/3", content: "<step-1-form>", canSkip: true } },
-        ],
-      },
-    },
+batch_design({ filePath: "", input: `
+Insert(document, {
+  type: "frame",
+  name: "Onboarding_01_WorkspaceName",
+  context: "Onboarding step 1 of 3. Workspace name input. Skippable. Progress indicator: stepper, 1/3 active. Footer: Back disabled (first step), Continue primary, Skip text-link.",
+  children: [
+    { type: "ref", ref: "WizardLayout", descendants: { progress: "1/3", content: "<step-1-form>", canSkip: true } },
   ],
-});
+})
+` });
 ```
 
 ## Step 4: Pick the progress indicator
@@ -72,24 +66,17 @@ For three steps, use a stepper. Active step: filled circle; completed step: fill
 Single text input. Auto-focused on screen entry. Helper text below input: 'You can change this later in settings.'
 
 ```js
-batch_design({
-  documentId,
-  ops: [
-    {
-      op: "C",
-      parent: "<step-1-content-slot>",
-      node: {
-        type: "frame",
-        name: "Step1_Form",
-        children: [
-          { type: "text", text: "What's your workspace called?", fontFamily: "$fontDisplay", fontWeight: "$fontWeightBold" },
-          { type: "text", text: "This is the name your team will see.", fontFamily: "$fontBody", color: "$textSecondary" },
-          { type: "ref", componentId: "Field", descendants: { label: "Workspace name", input: "<text-input>", helper: "You can change this later in settings." } },
-        ],
-      },
-    },
+batch_design({ filePath: "", input: `
+Insert("<step-1-content-slot>", {
+  type: "frame",
+  name: "Step1_Form",
+  children: [
+    { type: "text", content: "What's your workspace called?", fontFamily: "$fontDisplay", fontWeight: "$fontWeightBold" },
+    { type: "text", content: "This is the name your team will see.", fontFamily: "$fontBody", fill: "$textSecondary" },
+    { type: "ref", ref: "Field", descendants: { label: "Workspace name", input: "<text-input>", helper: "You can change this later in settings." } },
   ],
-});
+})
+` });
 ```
 
 Validation per `design-system/forms.md` § Validation timing: on-blur for sync constraints (length ≥ 1, max 50 chars). On Continue: validate, focus first error if any, advance if clean.
@@ -101,25 +88,19 @@ Choose from a list of roles (Admin, Editor, Viewer, etc.). Use radio buttons or 
 For ≤ 4 roles, use tile grid (each role as a card with icon + label + description). For 5+, use a list.
 
 ```js
-batch_design({
-  documentId,
-  ops: [
-    {
-      op: "C",
-      parent: "<step-2-content-slot>",
-      node: {
-        type: "frame",
-        name: "Step2_RoleGrid",
-        layout: { direction: "row", gap: 16 },
-        children: [
-          { type: "ref", componentId: "RoleTile", descendants: { icon: "shield-star", label: "Admin", description: "Full access to settings, members, billing." } },
-          { type: "ref", componentId: "RoleTile", descendants: { icon: "edit", label: "Editor", description: "Create and edit content." } },
-          { type: "ref", componentId: "RoleTile", descendants: { icon: "eye", label: "Viewer", description: "Read-only access." } },
-        ],
-      },
-    },
+batch_design({ filePath: "", input: `
+Insert("<step-2-content-slot>", {
+  type: "frame",
+  name: "Step2_RoleGrid",
+  layout: "horizontal",
+  gap: 16,
+  children: [
+    { type: "ref", ref: "RoleTile", descendants: { icon: "shield-star", label: "Admin", description: "Full access to settings, members, billing." } },
+    { type: "ref", ref: "RoleTile", descendants: { icon: "edit", label: "Editor", description: "Create and edit content." } },
+    { type: "ref", ref: "RoleTile", descendants: { icon: "eye", label: "Viewer", description: "Read-only access." } },
   ],
-});
+})
+` });
 ```
 
 Selection state on `RoleTile`: `$accent` border + `$accentMuted` background.
@@ -129,33 +110,27 @@ Selection state on `RoleTile`: `$accent` border + `$accentMuted` background.
 Two-option choice: 'Start with sample data' or 'Start blank'.
 
 ```js
-batch_design({
-  documentId,
-  ops: [
-    {
-      op: "C",
-      parent: "<step-3-content-slot>",
-      node: {
-        type: "frame",
-        name: "Step3_SampleDataChoice",
-        layout: { direction: "row", gap: 16 },
-        children: [
-          { type: "ref", componentId: "OptionCard", descendants: {
-            icon: "sparkles",
-            label: "Start with sample data",
-            description: "Pre-populated workspace with realistic example projects. Replace anytime.",
-            badge: "Recommended for first-time users",
-          }},
-          { type: "ref", componentId: "OptionCard", descendants: {
-            icon: "layout-grid",
-            label: "Start blank",
-            description: "Empty workspace. Create your first project right away.",
-          }},
-        ],
-      },
-    },
+batch_design({ filePath: "", input: `
+Insert("<step-3-content-slot>", {
+  type: "frame",
+  name: "Step3_SampleDataChoice",
+  layout: "horizontal",
+  gap: 16,
+  children: [
+    { type: "ref", ref: "OptionCard", descendants: {
+      icon: "sparkles",
+      label: "Start with sample data",
+      description: "Pre-populated workspace with realistic example projects. Replace anytime.",
+      badge: "Recommended for first-time users",
+    }},
+    { type: "ref", ref: "OptionCard", descendants: {
+      icon: "layout-grid",
+      label: "Start blank",
+      description: "Empty workspace. Create your first project right away.",
+    }},
   ],
-});
+})
+` });
 ```
 
 Per `design-system/onboarding.md` § With sample data vs blank slate: most products benefit from offering both. Sample data leans toward Recommended for first-time users.
@@ -179,26 +154,19 @@ The design's `context` documents the persistence: *'Workspace name auto-saves on
 If the project ships a welcome screen before step 1: full-screen takeover or centred modal, brand voice, single primary action 'Get started'. Optional 'I'll do this later' link.
 
 ```js
-batch_design({
-  documentId,
-  ops: [
-    {
-      op: "C",
-      parent: "<canvas-root-id>",
-      node: {
-        type: "frame",
-        name: "Onboarding_Welcome",
-        context: "Welcome screen. Brand voice. Single primary action 'Get started'. Optional 'I'll do this later' text link routes to empty state of the primary surface.",
-        children: [
-          { type: "text", text: "Welcome to <Product>", fontFamily: "$fontDisplay", fontWeight: "$fontWeightBold" },
-          { type: "text", text: "Three quick steps to set up your workspace.", color: "$textSecondary" },
-          { type: "ref", componentId: "Button.Primary", descendants: { label: "Get started" } },
-          { type: "ref", componentId: "TextLink", descendants: { label: "I'll do this later" } },
-        ],
-      },
-    },
+batch_design({ filePath: "", input: `
+Insert(document, {
+  type: "frame",
+  name: "Onboarding_Welcome",
+  context: "Welcome screen. Brand voice. Single primary action 'Get started'. Optional 'I'll do this later' text link routes to empty state of the primary surface.",
+  children: [
+    { type: "text", content: "Welcome to <Product>", fontFamily: "$fontDisplay", fontWeight: "$fontWeightBold" },
+    { type: "text", content: "Three quick steps to set up your workspace.", fill: "$textSecondary" },
+    { type: "ref", ref: "Button.Primary", descendants: { label: "Get started" } },
+    { type: "ref", ref: "TextLink", descendants: { label: "I'll do this later" } },
   ],
-});
+})
+` });
 ```
 
 ## Step 11: States to design
@@ -216,9 +184,9 @@ Per `references/states.md` § Onboarding states:
 ## Step 12: Verify with screenshots
 
 ```js
-get_screenshot({ documentId, nodeId: "<step-1-frame-id>" });
-get_screenshot({ documentId, nodeId: "<step-2-frame-id>" });
-get_screenshot({ documentId, nodeId: "<step-3-frame-id>" });
+get_screenshot({ filePath: "", nodeId: "<step-1-frame-id>" });
+get_screenshot({ filePath: "", nodeId: "<step-2-frame-id>" });
+get_screenshot({ filePath: "", nodeId: "<step-3-frame-id>" });
 ```
 
 Confirm:

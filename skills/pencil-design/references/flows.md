@@ -262,7 +262,7 @@ What plausible looks like, by surface:
 
 **Anti-pattern reminder:** the SKILL.md aesthetic-defaults section bans fabricated numbers, fake metrics, and placeholder names like John Doe / Acme. This file extends that with positive guidance — plausible content has *texture*: variation in length, in shape, in distribution. AI defaults are smooth; real data is bumpy.
 
-For images, use `G(node, "ai", "<prompt>")` or `G(node, "unsplash", "<query>")` — the `G` op exists for this. Don't leave gray rectangles labeled "Image".
+For images, use `Generate(node, "ai", "<prompt>")` or `Generate(node, "stock", "<query>")` — the `Generate` op exists for this. Don't leave gray rectangles labeled "Image".
 
 ## Deep links & shareable URLs
 
@@ -335,4 +335,4 @@ These read as flow-blind designs and should be fixed in passing whenever you see
 
 - [`states.md`](states.md) — the component states this file's flows transition between (loading, error, success).
 - [`accessibility.md`](accessibility.md) — focus management across flows, modal focus traps, keyboard navigation.
-- [`mcp-tools.md`](mcp-tools.md) — `find_empty_space_on_canvas` for placing the sibling frames a multi-step flow needs.
+- [`mcp-tools.md`](mcp-tools.md) — `FindEmptySpace` for placing the sibling frames a multi-step flow needs.

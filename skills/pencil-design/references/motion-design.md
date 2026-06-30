@@ -139,11 +139,11 @@ Use the `interaction` property on nodes to document expected state transitions (
 
 For prototyping motion in Pencil, build the start and end states as sibling frames with a `transition` annotation in the parent's `context`. Don't try to fake the motion itself in the design file.
 
-### Motion tokens via `set_variables`
-Declare motion tokens once so duration and easing apply globally:
+### Motion tokens via `SetVariables`
+Declare motion tokens once (call `SetVariables` inside `batch_design`) so duration and easing apply globally:
 
 ```
-set_variables({
+SetVariables({
   "durationFast": { mode: { light: "150ms", dark: "120ms" } },
   "durationMedium": { mode: { light: "250ms", dark: "200ms" } },
   "easeOut": { mode: { light: "cubic-bezier(0.16, 1, 0.3, 1)" } }

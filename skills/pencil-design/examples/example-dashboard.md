@@ -37,32 +37,27 @@ Layout shortcut for dashboards (per `references/data-viz.md` § Dashboard tile s
 ## Step 3: Find canvas space and create the outer frame
 
 ```js
-find_empty_space_on_canvas({ documentId, width: 1440, height: 900 });
+// inside the batch_design snippet, as its first line
+pos = FindEmptySpace({ width: 1440, height: 900, padding: 80 })
 ```
 
-The MCP returns a position. Use it for the new top-level frame.
+`FindEmptySpace` returns a `{ x, y }` position. Use it for the new top-level frame in the same snippet.
 
 ```js
-batch_design({
-  documentId,
-  ops: [
-    {
-      op: "C",
-      parent: "<canvas-root-id>",
-      node: {
-        type: "frame",
-        name: "Dashboard",
-        context: "Main dashboard route. Sidebar nav (left, 240px) + main content (right, scrollable). KPI row at top, chart tile mid-page, recent-activity table at the bottom.",
-        size: { width: 1440, height: 900 },
-        layout: { direction: "row" },
-        children: [
-          { type: "ref", componentId: "Sidebar", descendants: { "active": "Dashboard" } },
-          { type: "frame", name: "Main", layout: { direction: "column", padding: 32, gap: 24 }, children: [] }
-        ],
-      },
-    },
+batch_design({ filePath: "", input: `
+Insert(document, {
+  type: "frame",
+  name: "Dashboard",
+  context: "Main dashboard route. Sidebar nav (left, 240px) + main content (right, scrollable). KPI row at top, chart tile mid-page, recent-activity table at the bottom.",
+  width: 1440,
+  height: 900,
+  layout: "horizontal",
+  children: [
+    { type: "ref", ref: "Sidebar", descendants: { "active": "Dashboard" } },
+    { type: "frame", name: "Main", layout: "vertical", padding: 32, gap: 24, children: [] }
   ],
-});
+})
+` });
 ```
 
 ## Step 4: KPI cards (top row)
@@ -77,26 +72,20 @@ Each KPI uses the `KPICard` component from `design-system.lib.pen`. Anatomy per 
 - Sparkline (inline trend)
 
 ```js
-batch_design({
-  documentId,
-  ops: [
-    {
-      op: "C",
-      parent: "<main-id>",
-      node: {
-        type: "frame",
-        name: "KPIRow",
-        layout: { direction: "row", gap: 16 },
-        children: [
-          { type: "ref", componentId: "KPICard", descendants: { value: "$1.24M", label: "Revenue (MTD)", delta: "+14%", deltaDirection: "up", sparkline: "<series>" } },
-          { type: "ref", componentId: "KPICard", descendants: { value: "$87K", label: "MRR", delta: "+5%", deltaDirection: "up", sparkline: "<series>" } },
-          { type: "ref", componentId: "KPICard", descendants: { value: "12,847", label: "Active users", delta: "+8%", deltaDirection: "up", sparkline: "<series>" } },
-          { type: "ref", componentId: "KPICard", descendants: { value: "2.1%", label: "Churn (30d)", delta: "-0.4%", deltaDirection: "down", sparkline: "<series>" } },
-        ],
-      },
-    },
+batch_design({ filePath: "", input: `
+Insert("<main-id>", {
+  type: "frame",
+  name: "KPIRow",
+  layout: "horizontal",
+  gap: 16,
+  children: [
+    { type: "ref", ref: "KPICard", descendants: { value: "$1.24M", label: "Revenue (MTD)", delta: "+14%", deltaDirection: "up", sparkline: "<series>" } },
+    { type: "ref", ref: "KPICard", descendants: { value: "$87K", label: "MRR", delta: "+5%", deltaDirection: "up", sparkline: "<series>" } },
+    { type: "ref", ref: "KPICard", descendants: { value: "12,847", label: "Active users", delta: "+8%", deltaDirection: "up", sparkline: "<series>" } },
+    { type: "ref", ref: "KPICard", descendants: { value: "2.1%", label: "Churn (30d)", delta: "-0.4%", deltaDirection: "down", sparkline: "<series>" } },
   ],
-});
+})
+` });
 ```
 
 Use `tabular-nums` on the value (numbers align across cards). The delta colours pair with shape: `↑` for up, `↓` for down, plus `$success` / `$danger` colour. Don't rely on colour alone (per `references/data-viz.md` § Pairing colour with shape).
@@ -110,28 +99,23 @@ Pick the chart per `references/data-viz.md` § The 25-chart selection matrix:
 Use a single line chart for monthly revenue trend. Optional second line for prior-period comparison.
 
 ```js
-batch_design({
-  documentId,
-  ops: [
-    {
-      op: "C",
-      parent: "<main-id>",
-      node: {
-        type: "frame",
-        name: "ChartTile_Revenue",
-        context: "Revenue trend, monthly. Line chart, 12-month rolling window. Two series: current period (solid, $accent) and prior period (dashed, $textMuted). Skeleton with axis hints during load. 320px height; 100% width.",
-        layout: { direction: "column", padding: 24, gap: 16 },
-        children: [
-          { type: "frame", name: "Header", children: [
-            { type: "text", name: "Title", text: "Revenue trend", fontFamily: "$fontDisplay", fontWeight: "$fontWeightSemiBold" },
-            { type: "text", name: "Subtitle", text: "Last 12 months", fontFamily: "$fontBody", color: "$textSecondary" },
-          ]},
-          { type: "ref", componentId: "LineChart", descendants: { series: "<data>", colour: "$accent" } },
-        ],
-      },
-    },
+batch_design({ filePath: "", input: `
+Insert("<main-id>", {
+  type: "frame",
+  name: "ChartTile_Revenue",
+  context: "Revenue trend, monthly. Line chart, 12-month rolling window. Two series: current period (solid, $accent) and prior period (dashed, $textMuted). Skeleton with axis hints during load. 320px height; 100% width.",
+  layout: "vertical",
+  padding: 24,
+  gap: 16,
+  children: [
+    { type: "frame", name: "Header", children: [
+      { type: "text", name: "Title", content: "Revenue trend", fontFamily: "$fontDisplay", fontWeight: "$fontWeightSemiBold" },
+      { type: "text", name: "Subtitle", content: "Last 12 months", fontFamily: "$fontBody", fill: "$textSecondary" },
+    ]},
+    { type: "ref", ref: "LineChart", descendants: { series: "<data>", colour: "$accent" } },
   ],
-});
+})
+` });
 ```
 
 Default chart styling (per `references/data-viz.md` § Default chart styling): minimal axes, light gridlines on the value axis only, direct labels at the line ends, tabular numerics on values.
@@ -141,23 +125,16 @@ Default chart styling (per `references/data-viz.md` § Default chart styling): m
 Use a `TableTile` component. Sortable headers, virtualised rows for long lists per `references/performance-design.md` § Virtualisation for long lists.
 
 ```js
-batch_design({
-  documentId,
-  ops: [
-    {
-      op: "C",
-      parent: "<main-id>",
-      node: {
-        type: "frame",
-        name: "ActivityTable",
-        context: "Recent activity, last 50 events. Columns: User, Action, Resource, Time. Sort by Time descending by default. Virtualised after 50 rows. Empty state when no activity.",
-        children: [
-          { type: "ref", componentId: "TableTile", descendants: { columns: "<spec>", rows: "<data>" } },
-        ],
-      },
-    },
+batch_design({ filePath: "", input: `
+Insert("<main-id>", {
+  type: "frame",
+  name: "ActivityTable",
+  context: "Recent activity, last 50 events. Columns: User, Action, Resource, Time. Sort by Time descending by default. Virtualised after 50 rows. Empty state when no activity.",
+  children: [
+    { type: "ref", ref: "TableTile", descendants: { columns: "<spec>", rows: "<data>" } },
   ],
-});
+})
+` });
 ```
 
 Time column uses absolute time on hover (relative time by default: '2 minutes ago'). Per `references/microcopy.md` § System status: 'Saved 2 minutes ago' beats 'Up to date'.
@@ -174,8 +151,10 @@ Per `references/states.md` § Component states matrix and § Loading taxonomy:
 ## Step 8: Verify with one screenshot
 
 ```js
-get_screenshot({ documentId, nodeId: "<dashboard-frame-id>" });
-get_screenshot({ documentId, nodeId: "<dashboard-frame-id>", theme: { mode: "dark" } });
+get_screenshot({ filePath: "", nodeId: "<dashboard-frame-id>" });
+// Dark mode: set the mode first, then capture
+batch_design({ filePath: "", input: `Update("<dashboard-frame-id>", { theme: { mode: "dark" } })` });
+get_screenshot({ filePath: "", nodeId: "<dashboard-frame-id>" });
 ```
 
 Confirm:

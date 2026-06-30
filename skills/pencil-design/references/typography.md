@@ -214,7 +214,7 @@ Pair mono with a grotesque body or a serif body, not with another mono. Two mono
 Type nodes use `fontFamily`, `fontWeight`, `fontSize`, `lineHeight`, `letterSpacing`, and `textAlign` properties. Example:
 
 ```
-T1=I("parent", {
+T1 = Insert("parent", {
   type: "text",
   content: "Pricing",
   fontFamily: "Söhne",
@@ -228,11 +228,11 @@ T1=I("parent", {
 
 Text without a `fill` renders invisible. Always set the fill, ideally to a `$variable` so dark mode flips automatically.
 
-### Type tokens via `set_variables`
-Declare type tokens once and reference them everywhere so font changes apply globally:
+### Type tokens via `SetVariables`
+Declare type tokens once (call `SetVariables` inside `batch_design`) and reference them everywhere so font changes apply globally:
 
 ```
-set_variables({
+SetVariables({
   "fontDisplay": { mode: { light: "Söhne", dark: "Söhne" } },
   "fontBody": { mode: { light: "Söhne", dark: "Söhne" } },
   "fontMono": { mode: { light: "Berkeley Mono", dark: "Berkeley Mono" } }
@@ -245,13 +245,13 @@ Then text nodes bind to `fontFamily: "$fontDisplay"` instead of literal font nam
 Pencil exposes OpenType features via `fontFeatureSettings` or analogous properties. For tabular figures on a column of numbers:
 
 ```
-U("<numberColumn>", { fontFeatureSettings: "tnum" })
+Update("<numberColumn>", { fontFeatureSettings: "tnum" })
 ```
 
 For stylistic sets:
 
 ```
-U("<displayHeading>", { fontFeatureSettings: "ss01" })
+Update("<displayHeading>", { fontFeatureSettings: "ss01" })
 ```
 
 Check the schema reference (`references/pen-schema.md`) for the current property name if `fontFeatureSettings` doesn't resolve.
