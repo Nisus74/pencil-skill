@@ -151,10 +151,10 @@ docs/
 
 | Platform | Plugin install | Folder-copy target |
 |----------|---------------|-------------------|
-| Claude Code | `/plugin install github:Nisus74/pencil-skill` (manifest at `.claude-plugin/plugin.json`) | `~/.claude/skills/` or `.claude/skills/` |
+| Claude Code | `/plugin marketplace add Nisus74/pencil-skill`, then `/plugin install pencil-dev-skill@pencil-dev-skill` (manifest at `.claude-plugin/plugin.json`) | `~/.claude/skills/` or `.claude/skills/` |
 | Google Gemini CLI | `gemini-extension.json` at repo root | `~/.gemini/skills/` or `.gemini/skills/` (alias `.agents/skills/`) |
 | Cursor (2.5+) | `/add-plugin` pointing at `github.com/Nisus74/pencil-skill` (manifest at `.cursor-plugin/plugin.json`) | `.cursor/skills/` (Cursor also reads `AGENTS.md` from project root) |
-| OpenAI Codex | `codex plugin install github:Nisus74/pencil-skill` (manifest at `.codex-plugin/plugin.json`) | `~/.codex/skills/` |
+| OpenAI Codex | `codex plugin marketplace add Nisus74/pencil-skill`, then `codex plugin add pencil-dev-skill@pencil-dev-skill` (Codex reads the repo's legacy-compatible `.claude-plugin/marketplace.json`; plugin manifest at `.codex-plugin/plugin.json`) | `~/.codex/skills/` |
 | Copilot CLI | (no plugin manifest) | `~/.copilot/skills/` (alias `~/.agents/skills/`) or project `.github/skills/` |
 
 All platforms also accept a `SKILL.md` in their respective skills directory; folder copy works universally.
@@ -176,7 +176,7 @@ Don't edit files inside a plugin install directory (e.g. `~/.claude/plugins/.../
 ## Plugin System Rules
 
 - The Claude Code plugin manifest MUST live at `.claude-plugin/plugin.json`
-- The Claude Code marketplace listing MUST live at `.claude-plugin/marketplace.json`. This makes the repo installable via `/plugin marketplace add github:Nisus74/pencil-skill` followed by `/plugin install pencil-dev-skill`
+- The Claude Code marketplace listing MUST live at `.claude-plugin/marketplace.json`. This makes the repo installable via `/plugin marketplace add Nisus74/pencil-skill` followed by `/plugin install pencil-dev-skill@pencil-dev-skill`
 - The Cursor plugin manifest MUST live at `.cursor-plugin/plugin.json` (Cursor 2.5+)
 - The Codex plugin manifest MUST live at `.codex-plugin/plugin.json`
 - `gemini-extension.json` MUST live at the repo root (Gemini CLI requirement)
@@ -272,7 +272,8 @@ After bumping, replace the `[Unreleased]` heading in `docs/CHANGELOG.md` with th
 
 **OpenAI Codex:**
 ```bash
-codex plugin install github:Nisus74/pencil-skill
+codex plugin marketplace add Nisus74/pencil-skill
+codex plugin add pencil-dev-skill@pencil-dev-skill
 # Then describe a pencil task; verify pencil-design skill triggers
 ```
 
